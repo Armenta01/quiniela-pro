@@ -1,5 +1,8 @@
 const Database = require('better-sqlite3');
-const db = new Database('/tmp/quiniela.db');
+const db = new Database('quiniela.db');
+
+module.exports = db;
+
 
 // Crear tablas
 db.exec(`
