@@ -4,6 +4,24 @@ const path = require('path');
 const app = express();
 const db = require('./database');
 
+// 🔥 AUTO SEED (solo si no hay datos)
+try {
+  const existe = db.prepare("SELECT COUNT(*) as total FROM partidos").get();
+
+  if (existe.total === 0) {
+    console.log("⚡ Insertando datos iniciales...");
+
+    db.prepare(`
+      INSERT INTO partidos (local, visitante, fecha, jornada)
+      VALUES 
+      ('América', 'Chivas', '2026-05-01', 1),
+      ('Pumas', 'Cruz Azul', '2026-05-01', 1)
+    `).run();
+  }
+} catch (e) {
+  console.log("Error seed:", e);
+}
+
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
