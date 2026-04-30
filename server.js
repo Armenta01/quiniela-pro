@@ -6,13 +6,13 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 🔥 CONEXIÓN POSTGRES (Render)
+// 🔥 DB
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 });
 
-// 🔥 CREAR TABLAS AUTOMÁTICO
+// 🔥 INIT DB
 async function initDB() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
@@ -55,13 +55,28 @@ async function initDB() {
     );
   `);
 
-  console.log("🔥 DB lista en Postgres");
+  console.log("🔥 DB PRO lista");
 }
 
 initDB();
 
 
-// 🔥 OBTENER JORNADAS
+// 🔒 VALIDAR BLOQUEO (1 día antes del primer partido)
+async function jornadaBloqueada(jornada) {
+  const result = await pool.query(`
+    SELECT MIN(fecha) as fecha FROM partidos WHERE jornada = $1
+  `, [jornada]);
+
+  if (!result.rows[0].fecha) return false;
+
+  const limite = new Date(result.rows[0].fecha);
+  limite.setDate(limite.getDate() - 1);
+
+  return new Date() >= limite;
+}
+
+
+// 🔥 JORNADAS
 app.get('/jornadas', async (req, res) => {
   const result = await pool.query(`
     SELECT DISTINCT jornada FROM partidos ORDER BY jornada
@@ -70,14 +85,13 @@ app.get('/jornadas', async (req, res) => {
 });
 
 
-// 🔥 PARTIDOS POR JORNADA
+// 🔥 PARTIDOS
 app.get('/partidos', async (req, res) => {
   const { jornada } = req.query;
 
-  const result = await pool.query(
-    `SELECT * FROM partidos WHERE jornada = $1 ORDER BY fecha`,
-    [jornada]
-  );
+  const result = await pool.query(`
+    SELECT * FROM partidos WHERE jornada = $1 ORDER BY fecha
+  `, [jornada]);
 
   res.json(result.rows);
 });
@@ -88,7 +102,11 @@ app.post('/guardar', async (req, res) => {
   const { nombre, jornada, pronosticos } = req.body;
 
   try {
-    // Usuario
+    if (await jornadaBloqueada(jornada)) {
+      return res.status(400).json({ error: "Jornada bloqueada" });
+    }
+
+    // usuario único
     let user = await pool.query(
       `SELECT * FROM users WHERE nombre = $1`,
       [nombre]
@@ -103,13 +121,12 @@ app.post('/guardar', async (req, res) => {
 
     const userId = user.rows[0].id;
 
-    // Limpiar anteriores
-    await pool.query(
-      `DELETE FROM predicciones WHERE user_id = $1 AND jornada = $2`,
-      [userId, jornada]
-    );
+    // borrar previos
+    await pool.query(`
+      DELETE FROM predicciones WHERE user_id = $1 AND jornada = $2
+    `, [userId, jornada]);
 
-    // Insertar nuevos
+    // insertar
     for (let p of pronosticos) {
       await pool.query(`
         INSERT INTO predicciones(user_id, partido_id, goles_local, goles_visitante, jornada)
@@ -121,53 +138,110 @@ app.post('/guardar', async (req, res) => {
 
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Error guardando' });
+    res.status(500).json({ error: "Error guardando" });
   }
 });
 
 
-// 🔥 TABLA DE POSICIONES
+// 🔥 TABLA GENERAL
+function calcularPuntos(p, pr) {
+  if (p.goles_local === pr.goles_local && p.goles_visitante === pr.goles_visitante) return 3;
+
+  if (
+    (p.goles_local > p.goles_visitante && pr.goles_local > pr.goles_visitante) ||
+    (p.goles_local < p.goles_visitante && pr.goles_local < pr.goles_visitante) ||
+    (p.goles_local === p.goles_visitante && pr.goles_local === pr.goles_visitante)
+  ) return 1;
+
+  return 0;
+}
+
 app.get('/tabla', async (req, res) => {
   const { jornada } = req.query;
 
   const result = await pool.query(`
-    SELECT u.nombre,
-    SUM(
-      CASE 
-        WHEN p.goles_local = pr.goles_local 
-         AND p.goles_visitante = pr.goles_visitante THEN 3
-        WHEN (p.goles_local > p.goles_visitante AND pr.goles_local > pr.goles_visitante)
-          OR (p.goles_local < p.goles_visitante AND pr.goles_local < pr.goles_visitante)
-          OR (p.goles_local = p.goles_visitante AND pr.goles_local = pr.goles_visitante)
-        THEN 1
-        ELSE 0
-      END
-    ) AS puntos
+    SELECT u.nombre, p.*, pr.goles_local as pr_local, pr.goles_visitante as pr_visitante
     FROM predicciones pr
     JOIN partidos p ON pr.partido_id = p.id
     JOIN users u ON pr.user_id = u.id
     WHERE pr.jornada = $1
-    GROUP BY u.nombre
-    ORDER BY puntos DESC
   `, [jornada]);
 
-  res.json(result.rows);
+  const tabla = {};
+
+  result.rows.forEach(row => {
+    if (!tabla[row.nombre]) tabla[row.nombre] = 0;
+
+    tabla[row.nombre] += calcularPuntos(row, {
+      goles_local: row.pr_local,
+      goles_visitante: row.pr_visitante
+    });
+  });
+
+  const ordenado = Object.entries(tabla)
+    .map(([nombre, puntos]) => ({ nombre, puntos }))
+    .sort((a, b) => b.puntos - a.puntos);
+
+  res.json(ordenado);
 });
 
 
-// 🔥 CAMPEÓN
-app.get('/campeon', async (req, res) => {
+// 🏆 TOP 4
+app.get('/top4', async (req, res) => {
   const { jornada } = req.query;
 
-  const result = await pool.query(`
-    SELECT * FROM campeones WHERE jornada = $1
-  `, [jornada]);
-
-  res.json(result.rows[0] || {});
+  const tabla = await fetchTabla(jornada);
+  res.json(tabla.slice(0, 4));
 });
 
 
-// 🔥 GUARDAR RESULTADOS (ADMIN)
+// 🧠 helper
+async function fetchTabla(jornada) {
+  const result = await pool.query(`
+    SELECT u.nombre, p.*, pr.goles_local as pr_local, pr.goles_visitante as pr_visitante
+    FROM predicciones pr
+    JOIN partidos p ON pr.partido_id = p.id
+    JOIN users u ON pr.user_id = u.id
+    WHERE pr.jornada = $1
+  `, [jornada]);
+
+  const tabla = {};
+
+  result.rows.forEach(row => {
+    if (!tabla[row.nombre]) tabla[row.nombre] = 0;
+
+    tabla[row.nombre] += calcularPuntos(row, {
+      goles_local: row.pr_local,
+      goles_visitante: row.pr_visitante
+    });
+  });
+
+  return Object.entries(tabla)
+    .map(([nombre, puntos]) => ({ nombre, puntos }))
+    .sort((a, b) => b.puntos - a.puntos);
+}
+
+
+// 🏆 GENERAR CAMPEÓN AUTOMÁTICO
+app.post('/admin/cerrar-jornada', async (req, res) => {
+  const { jornada } = req.body;
+
+  const tabla = await fetchTabla(jornada);
+
+  if (tabla.length === 0) return res.json({});
+
+  const ganador = tabla[0];
+
+  await pool.query(`
+    INSERT INTO campeones(jornada, nombre, puntos)
+    VALUES($1,$2,$3)
+  `, [jornada, ganador.nombre, ganador.puntos]);
+
+  res.json(ganador);
+});
+
+
+// 🔥 RESULTADOS ADMIN
 app.post('/admin/resultados', async (req, res) => {
   const { resultados } = req.body;
 
@@ -183,9 +257,18 @@ app.post('/admin/resultados', async (req, res) => {
 });
 
 
-// 🔥 PUERTO (IMPORTANTE EN RENDER)
+// 🔥 LÍMITE (para frontend)
+app.get('/limite', async (req, res) => {
+  const { jornada } = req.query;
+
+  const bloqueada = await jornadaBloqueada(jornada);
+  res.json({ bloqueada });
+});
+
+
+// 🚀 PORT
 const PORT = process.env.PORT || 10000;
 
 app.listen(PORT, () => {
-  console.log(`🔥 Servidor listo en puerto ${PORT}`);
+  console.log(`🔥 SERVIDOR PRO corriendo en ${PORT}`);
 });
