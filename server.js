@@ -215,7 +215,9 @@ app.get('/historial', (req, res) => {
     res.status(500).json(err);
   }
 });
-
+app.get('/tabla-excel', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'tabla.html'));
+});
 
 // 🔥 STATIC
 app.use(express.static('public'));
