@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Quiniela</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<body>
+
+<h1>Quiniela</h1>
+
+<button onclick="verTablaExcel()">📊 Ver Tabla</button>
+<input id="usuario" maxlength="15" placeholder="Tu nombre">
+<!-- 🔥 AQUÍ VA EL SELECT -->
+<br><br>
+<select id="jornadaSelect" onchange="cambiarJornada()">
+  <option value="1">Semana 1</option>
+  <option value="2">Semana 2</option>
+  <option value="3">Semana 3</option>
+</select>
+<br><br>
+
+<div id="contador" style="margin:10px; font-weight:bold; color:#facc15;"></div>
+<div id="campeon" style="text-align:center; margin:10px; font-weight:bold;"></div>
+<div id="estadoQuiniela" class="estado hidden"></div>
+
+<!-- 🔥 PARTIDOS -->
+<div id="partidos"></div>
+
+<button id="btnGuardar" onclick="guardarTodo()">Guardar Resultados</button>
+
+<div id="tabla"></div>
+
+<script src="app.js"></script>
+
+</body>
+</html>

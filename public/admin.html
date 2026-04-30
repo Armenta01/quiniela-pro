@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Quiniela</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<h1>Panel Admin Quiniela</h1>
+
+<input id="local" placeholder="Equipo local">
+<input id="visitante" placeholder="Equipo visitante">
+<input id="fecha" type="datetime-local">
+<input id="jornada" placeholder="Jornada">
+<input id="jornada_partido" placeholder="Ej: Liga MX J13">
+<input id="logo_local" placeholder="URL logo local">
+<input id="logo_visitante" placeholder="URL logo visitante">
+<button onclick="crear()">Crear Partido</button>
+
+<hr>
+
+<div id="lista"></div>
+
+<script>
+
+// 🔥 CARGAR PARTIDOS
+async function cargar() {
+  const res = await fetch('/partidos');
+  const data = await res.json();
+
+  const lista = document.getElementById('lista');
+  lista.innerHTML = '';
+
+  data.forEach(p => {
+    lista.innerHTML += `
+      <div class="card">
+        <strong>${p.local} vs ${p.visitante}</strong> - Jornada ${p.jornada}
+        <br><br>
+
+        <input type="number" id="gl${p.id}" placeholder="Local" style="width:60px;">
+        -
+        <input type="number" id="gv${p.id}" placeholder="Visitante" style="width:60px;">
+
+        <br><br>
+
+        <button onclick="guardarResultado(${p.id})">Guardar Resultado</button>
+      </div>
+    `;
+  });
+}
+
+
+// 🔥 CREAR PARTIDO
+async function crear() {
+  const local = document.getElementById('local').value;
+  const visitante = document.getElementById('visitante').value;
+  const fecha = document.getElementById('fecha').value;
+  const jornada = document.getElementById('jornada').value;
+  const logo_local = document.getElementById('logo_local').value;
+  const logo_visitante = document.getElementById('logo_visitante').value;
+  const jornada_partido = document.getElementById('jornada_partido').value;
+  console.log("📅 FECHA:", fecha); // 👈 DEBUG
+  
+  await fetch('/partidos', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      local,
+      visitante,
+      fecha,
+      logo_local,
+      logo_visitante,
+      goles_local: null,
+      goles_visitante: null,
+      jornada,
+      jornada_partido
+
+    })
+  });
+
+  alert("Partido creado");
+  cargar();
+}
+
+
+// 🔥 GUARDAR RESULTADO (FUERA DE CREAR)
+async function guardarResultado(id) {
+  const gl = document.getElementById("gl" + id).value;
+  const gv = document.getElementById("gv" + id).value;
+
+  console.log("👉 valores:", gl, gv);
+
+  if (gl === "" || gv === "") {
+    alert("Ingresa marcador");
+    return;
+  }
+
+  const res = await fetch('/resultado', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      id: Number(id),
+      goles_local: Number(gl),
+      goles_visitante: Number(gv)
+    })
+  });
+
+  const data = await res.json();
+  console.log("👉 respuesta:", data);
+
+  alert("✅ Resultado guardado");
+
+  cargar(); // 🔥 refresca lista
+}
+
+// 🚀 INICIAR
+cargar();
+
+</script>
+
+</body>
+</html>

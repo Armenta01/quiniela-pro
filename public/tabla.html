@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Tabla Quiniela</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<h1>📊 Tabla Quiniela</h1>
+
+<table id="tablaExcel"></table>
+
+<script>
+async function cargarTabla() {
+  // 🔥 obtener jornada seleccionada
+  const jornada = localStorage.getItem("jornadaActual") || 1;
+
+  const res = await fetch(`/tabla-excel-data?jornada=${jornada}`);
+  const data = await res.json();
+
+  const tabla = document.getElementById('tablaExcel');
+
+  let html = "<tr><th>Jugador</th>";
+
+  // 🔥 encabezados partidos CON RESULTADO REAL
+  for (let id in data.partidos) {
+    const p = data.partidos[id];
+
+    html += `
+      <th>
+        <div>${p.nombre}</div>
+        <div class="resultado-real">
+          ${p.resultado ? p.resultado : "-"}
+        </div>
+      </th>
+    `;
+  }
+
+  html += "<th>Puntos</th></tr>";
+
+  // 🔥 filas jugadores
+  data.jugadores.forEach((j, i) => {
+
+    html += `
+      <tr class="${i === 0 ? 'lider' : ''}">
+        <td>
+          ${i === 0 ? '🥇 ' : i === 1 ? '🥈 ' : i === 2 ? '🥉 ' : ''}
+          ${j.nombre}
+        </td>
+    `;
+
+    for (let id in data.partidos) {
+      const pick = j.picks[id];
+
+      if (pick) {
+        html += `<td class="${pick.tipo}">${pick.texto}</td>`;
+      } else {
+        html += `<td>-</td>`;
+      }
+    }
+
+    html += `<td><strong>${j.puntos}</strong></td></tr>`;
+  });
+
+  tabla.innerHTML = html;
+}
+
+
+cargarTabla();
+</script>
+
+<button onclick="window.location.href='/historial-view'">
+  📊 Ver historial completo
+</button>
+<button onclick="volver()">⬅️ Regresar</button>
+
+<script>
+function volver() {
+  window.location.href = "/";
+}
+</script>
+
+</body>
+</html>

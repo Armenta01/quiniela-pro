@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>🏆 Historial</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<h1>🏆 Historial de Campeones</h1>
+
+<div id="historial"></div>
+
+<button onclick="volver()">⬅️ Regresar</button>
+
+<script>
+async function cargarHistorial() {
+  const res = await fetch('/historial');
+  const data = await res.json();
+
+  const cont = document.getElementById('historial');
+
+  if (!data.length) {
+    cont.innerHTML = "No hay historial aún";
+    return;
+  }
+
+  let html = `
+    <table class="tabla-historial">
+      <tr>
+        <th>#</th>
+        <th>Jornada</th>
+        <th>Campeón</th>
+        <th>Puntos</th>
+      </tr>
+  `;
+
+  data.forEach((h, i) => {
+    let medalla = "";
+
+    if (i === 0) medalla = "🥇";
+    else if (i === 1) medalla = "🥈";
+    else if (i === 2) medalla = "🥉";
+
+    html += `
+      <tr class="${i === 0 ? 'top' : ''}">
+        <td>${medalla || i + 1}</td>
+        <td>Semana ${h.jornada}</td>
+        <td>${h.nombre}</td>
+        <td><strong>${h.puntos}</strong></td>
+      </tr>
+    `;
+  });
+
+  html += "</table>";
+
+  cont.innerHTML = html;
+}
+
+function volver() {
+  window.location.href = "/";
+}
+
+cargarHistorial();
+</script>
+
+</body>
+</html>
