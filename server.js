@@ -202,6 +202,7 @@ app.get('/historial', (req, res) => {
 // 🔥 STATIC
 app.use(express.static('public'));
 
+//fix render deploy 
 
 // 🔥 SERVER
 const PORT = process.env.PORT || 3000;
