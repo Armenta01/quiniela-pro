@@ -14,6 +14,7 @@ const pool = new Pool({
 
 // 🔥 INIT DB
 async function initDB() {
+  // 🔥 TABLAS
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
@@ -55,7 +56,20 @@ async function initDB() {
     );
   `);
 
-  console.log("🔥 DB PRO lista");
+  // ⚡ ÍNDICES (rendimiento PRO)
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_partidos_jornada ON partidos(jornada);
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_predicciones_jornada ON predicciones(jornada);
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_users_nombre ON users(nombre);
+  `);
+
+  console.log("🔥 DB + índices listos");
 }
 
 initDB();
