@@ -241,6 +241,7 @@ async function fetchTabla(jornada) {
   result.rows.forEach(row => {
     if (!tabla[row.id]) {
       tabla[row.id] = {
+        nombre: row.nombre,
         puntos: 0,
         detalles: [],
         picks: []
