@@ -37,45 +37,56 @@ function cambiarJornada() {
 
 // 🔥 PARTIDOS
 async function cargarPartidos() {
-  const res = await fetch(`/partidos?jornada=${jornadaActual}`);
-  const data = await res.json();
+  try {
+    const res = await fetch(`/partidos?jornada=${jornadaActual}`);
+    const data = await res.json();
 
-  const cont = document.getElementById("partidos");
-  cont.innerHTML = "";
+    const cont = document.getElementById("partidos");
+    cont.innerHTML = "";
 
-  data.forEach(p => {
-    cont.innerHTML += `
-      <div class="card">
-        <div class="match">
+    if (!data || data.length === 0) {
+      cont.innerHTML = "<p>No hay partidos</p>";
+      return;
+    }
 
-          <div class="team left">
-            <img src="${p.logo_local}">
-            <span>${p.local}</span>
+    data.forEach(p => {
+      cont.innerHTML += `
+        <div class="card">
+          <div class="match">
+
+            <div class="team left">
+              <img src="${p.logo_local || ''}">
+              <span>${p.local}</span>
+            </div>
+
+            <div class="score">
+              <input type="number" id="l${p.id}">
+              <span>-</span>
+              <input type="number" id="v${p.id}">
+            </div>
+
+            <div class="team right">
+              <span>${p.visitante}</span>
+              <img src="${p.logo_visitante || ''}">
+            </div>
+
           </div>
 
-          <div class="score">
-            <input type="number" id="l${p.id}">
-            <span>-</span>
-            <input type="number" id="v${p.id}">
+          <div class="meta">
+            ⏰ ${new Date(p.fecha).toLocaleString()}
           </div>
 
-          <div class="team right">
-            <span>${p.visitante}</span>
-            <img src="${p.logo_visitante}">
+          <div class="liga">
+            🏆 ${p.jornada_partido || ""}
           </div>
-
         </div>
+      `;
+    });
 
-        <div class="meta">
-          ⏰ ${new Date(p.fecha).toLocaleString()}
-        </div>
-
-        <div class="liga">
-          🏆 ${p.jornada_partido || ""}
-        </div>
-      </div>
-    `;
-  });
+  } catch (err) {
+    console.error("Error partidos:", err);
+    document.getElementById("partidos").innerHTML = "❌ Error cargando partidos";
+  }
 }
 
 // 🔥 GUARDAR
@@ -142,6 +153,9 @@ window.verTabla = async function () {
 
   try {
     const res = await fetch(`/tabla?jornada=${jornadaActual}`);
+
+    if (!res.ok) throw new Error("Error backend");
+
     const data = await res.json();
 
     cont.innerHTML = "<h2>🏆 Tabla</h2>";
@@ -151,7 +165,7 @@ window.verTabla = async function () {
       return;
     }
 
-    data.forEach((u, i) => {
+    data.slice(0,4).forEach((u, i) => {
       let medal = ["🥇", "🥈", "🥉"][i] || "";
 
       cont.innerHTML += `
