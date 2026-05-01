@@ -129,63 +129,77 @@ async function guardarTodo() {
   const usuario = document.getElementById("usuario").value;
   if (!usuario) return alert("Pon tu nombre");
 
-  const partidos = await (await fetch(`/partidos?jornada=${jornadaActual}`)).json();
+  const btn = document.getElementById("btnGuardar");
+  if (btn) btn.disabled = true;
 
-  const lista = [];
+  try {
+    const partidos = await (await fetch(`/partidos?jornada=${jornadaActual}`)).json();
 
-  partidos.forEach(p => {
-    const gl = document.getElementById("l"+p.id).value;
-    const gv = document.getElementById("v"+p.id).value;
+    const lista = [];
 
-    if (gl !== "" && gv !== "") {
-      lista.push({
-        partido_id: p.id,
-        local: parseInt(gl),
-        visitante: parseInt(gv)
-      });
+    partidos.forEach(p => {
+      const gl = document.getElementById("l" + p.id).value;
+      const gv = document.getElementById("v" + p.id).value;
+
+      if (gl !== "" && gv !== "") {
+        lista.push({
+          partido_id: p.id,
+          local: parseInt(gl),
+          visitante: parseInt(gv)
+        });
+      }
+    });
+
+    if (lista.length === 0) {
+      alert("No capturaste resultados");
+      return;
     }
-  });
 
-  if (lista.length === 0) {
-    alert("No capturaste resultados");
-    return;
-  }
     // 🔥 GUARDAR EN BACKEND
-  const res = await fetch('/guardar', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({
-      nombre: usuario,
-      jornada: jornadaActual,
-      pronosticos: lista
-    })
-  });
+    const res = await fetch('/guardar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nombre: usuario,
+        jornada: jornadaActual,
+        pronosticos: lista
+      })
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  if (!res.ok) {
-    alert(data.error || "Error al guardar");
-    return;
+    if (!res.ok) {
+      alert(data.error || "Error al guardar");
+      return;
+    }
+
+    // 🎉 CONFIRMACIÓN
+    confetti();
+    alert("🔥 Quiniela enviada");
+
+    // 🔥 MENSAJE WHATSAPP
+    let mensaje = `📊 Quiniela Semana ${jornadaActual}\n`;
+    mensaje += `👤 ${usuario}\n\n`;
+
+    lista.forEach(p => {
+      const partido = partidos.find(x => x.id === p.partido_id);
+      if (!partido) return;
+      mensaje += `⚽ ${partido.local} ${p.local}-${p.visitante} ${partido.visitante}\n`;
+    });
+
+    const phone = "524531021052"; // tu número
+    const texto = encodeURIComponent(mensaje);
+    const url = `https://wa.me/${phone}?text=${texto}`;
+
+    // 🔥 REDIRECCIÓN SEGURA
+    window.location.href = url;
+
+  } catch (err) {
+    console.error(err);
+    alert("❌ Error de conexión");
+  } finally {
+    if (btn) btn.disabled = false;
   }
-
-  // 🎉 CONFIRMACIÓN
-  confetti();
-  alert("🔥 Quiniela enviada");
-
-  // 🔥 MENSAJE WHATSAPP
-  let mensaje = `📊 Quiniela Semana ${jornadaActual}\n`;
-mensaje += `👤 ${usuario}\n\n`;
-
-lista.forEach(p => {
-  const partido = partidos.find(x => x.id === p.partido_id);
-  mensaje += `⚽ ${partido.local} ${p.local}-${p.visitante} ${partido.visitante}\n`;
-});
-
- const texto = encodeURIComponent(mensaje);
-const url = `https://wa.me/524531021052?text=${texto}`;
-
-// 🔥 REDIRECCIÓN DIRECTA (NO window.open)
-window.location.href = url;
 }
 
 
