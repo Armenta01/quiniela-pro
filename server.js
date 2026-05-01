@@ -268,6 +268,18 @@ app.get('/limite', async (req, res) => {
   res.json({ bloqueada });
 });
 
+app.post('/admin/partidos', async (req, res) => {
+  const { local, visitante, fecha, jornada } = req.body;
+
+  await pool.query(
+    `INSERT INTO partidos (local, visitante, fecha, jornada)
+     VALUES ($1,$2,$3,$4)`,
+    [local, visitante, fecha, parseInt(jornada)]
+  );
+
+  res.json({ ok: true });
+});
+
 
 // 🚀 SERVER
 const PORT = process.env.PORT || 10000;

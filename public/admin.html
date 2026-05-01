@@ -1,120 +1,176 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+  <meta charset="UTF-8">
   <title>Admin Quiniela</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #0b1d3a;
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: #132a4f;
+      padding: 20px;
+      border-radius: 15px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    input, select, button {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border: none;
+      font-size: 16px;
+    }
+
+    input, select {
+      background: #eee;
+      color: black;
+    }
+
+    button {
+      background: #00c853;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: #00a844;
+    }
+
+    .msg {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .lista {
+      margin-top: 30px;
+    }
+
+    .partido {
+      background: #1f3c6b;
+      padding: 10px;
+      border-radius: 10px;
+      margin: 5px;
+    }
+  </style>
 </head>
 <body>
 
-<h1>Panel Admin Quiniela</h1>
+<h1>⚙️ Panel Admin Quiniela</h1>
 
-<input id="local" placeholder="Equipo local">
-<input id="visitante" placeholder="Equipo visitante">
-<input id="fecha" type="datetime-local">
-<input id="jornada" placeholder="Jornada">
-<input id="jornada_partido" placeholder="Ej: Liga MX J13">
-<input id="logo_local" placeholder="URL logo local">
-<input id="logo_visitante" placeholder="URL logo visitante">
-<button onclick="crear()">Crear Partido</button>
+<div class="card">
 
-<hr>
+  <input type="text" id="local" placeholder="Equipo local">
+  <input type="text" id="visitante" placeholder="Equipo visitante">
 
-<div id="lista"></div>
+  <input type="datetime-local" id="fecha">
+
+  <select id="jornada">
+    <option value="1">Semana 1</option>
+    <option value="2">Semana 2</option>
+    <option value="3">Semana 3</option>
+    <option value="4">Semana 4</option>
+  </select>
+
+  <button onclick="crearPartido()">Guardar Partido</button>
+
+  <div class="msg" id="msg"></div>
+
+</div>
+
+<div class="lista" id="lista"></div>
 
 <script>
 
-// 🔥 CARGAR PARTIDOS
-async function cargar() {
-  const res = await fetch('/partidos');
-  const data = await res.json();
-
-  const lista = document.getElementById('lista');
-  lista.innerHTML = '';
-
-  data.forEach(p => {
-    lista.innerHTML += `
-      <div class="card">
-        <strong>${p.local} vs ${p.visitante}</strong> - Jornada ${p.jornada}
-        <br><br>
-
-        <input type="number" id="gl${p.id}" placeholder="Local" style="width:60px;">
-        -
-        <input type="number" id="gv${p.id}" placeholder="Visitante" style="width:60px;">
-
-        <br><br>
-
-        <button onclick="guardarResultado(${p.id})">Guardar Resultado</button>
-      </div>
-    `;
-  });
-}
-
-
-// 🔥 CREAR PARTIDO
-async function crear() {
+async function crearPartido() {
   const local = document.getElementById('local').value;
   const visitante = document.getElementById('visitante').value;
   const fecha = document.getElementById('fecha').value;
   const jornada = document.getElementById('jornada').value;
-  const logo_local = document.getElementById('logo_local').value;
-  const logo_visitante = document.getElementById('logo_visitante').value;
-  const jornada_partido = document.getElementById('jornada_partido').value;
-  console.log("📅 FECHA:", fecha); // 👈 DEBUG
-  
-  await fetch('/partidos', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({
-      local,
-      visitante,
-      fecha,
-      logo_local,
-      logo_visitante,
-      goles_local: null,
-      goles_visitante: null,
-      jornada,
-      jornada_partido
 
-    })
-  });
+  const msg = document.getElementById('msg');
 
-  alert("Partido creado");
-  cargar();
-}
-
-
-// 🔥 GUARDAR RESULTADO (FUERA DE CREAR)
-async function guardarResultado(id) {
-  const gl = document.getElementById("gl" + id).value;
-  const gv = document.getElementById("gv" + id).value;
-
-  console.log("👉 valores:", gl, gv);
-
-  if (gl === "" || gv === "") {
-    alert("Ingresa marcador");
+  if (!local || !visitante || !fecha) {
+    msg.innerText = "⚠️ Completa todos los campos";
+    msg.style.color = "orange";
     return;
   }
 
-  const res = await fetch('/resultado', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({
-      id: Number(id),
-      goles_local: Number(gl),
-      goles_visitante: Number(gv)
-    })
-  });
+  try {
+    const res = await fetch('/admin/partidos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        local,
+        visitante,
+        fecha,
+        jornada
+      })
+    });
 
-  const data = await res.json();
-  console.log("👉 respuesta:", data);
+    const data = await res.json();
 
-  alert("✅ Resultado guardado");
+    if (data.ok) {
+      msg.innerText = "✅ Partido guardado";
+      msg.style.color = "lightgreen";
 
-  cargar(); // 🔥 refresca lista
+      document.getElementById('local').value = '';
+      document.getElementById('visitante').value = '';
+      document.getElementById('fecha').value = '';
+
+      cargarPartidos();
+    } else {
+      msg.innerText = "❌ Error";
+      msg.style.color = "red";
+    }
+
+  } catch (err) {
+    console.error(err);
+    msg.innerText = "❌ Error servidor";
+    msg.style.color = "red";
+  }
 }
 
-// 🚀 INICIAR
-cargar();
+async function cargarPartidos() {
+  const lista = document.getElementById('lista');
+
+  try {
+    const res = await fetch('/partidos?jornada=1');
+    const data = await res.json();
+
+    lista.innerHTML = '<h2>📋 Partidos</h2>';
+
+    data.forEach(p => {
+      lista.innerHTML += `
+        <div class="partido">
+          ${p.local} vs ${p.visitante} <br>
+          ${new Date(p.fecha).toLocaleString()}
+        </div>
+      `;
+    });
+
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// cargar al iniciar
+cargarPartidos();
 
 </script>
 
