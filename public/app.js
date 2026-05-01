@@ -119,8 +119,16 @@ async function guardarTodo() {
   confetti();
   alert("🔥 Quiniela enviada");
 
-  const url = `https://wa.me/524531021052?text=Quiniela enviada`;
-  window.location.href = url;
+  let mensaje = `📊 Quiniela Semana ${jornadaActual}%0A`;
+mensaje += `👤 ${usuario}%0A%0A`;
+
+lista.forEach(p => {
+  const partido = partidos.find(x => x.id === p.partido_id);
+  mensaje += `⚽ ${partido.local} ${p.local}-${p.visitante} ${partido.visitante}%0A`;
+});
+
+const url = `https://wa.me/524531021052?text=${mensaje}`;
+window.location.href = url;
 }
 
 // 🔥 TABLA PRO
@@ -157,7 +165,7 @@ async function checkBloqueo() {
     estado.innerText = "🔒 Quiniela cerrada";
     estado.className = "estado closed";
 
-    document.querySelectorAll("input").forEach(i=>i.disabled=true);
+    document.querySelectorAll(".score input").forEach(i=>i.disabled=true);
     document.getElementById("btnGuardar").disabled = true;
   } else {
     quinielaCerrada = false;

@@ -173,9 +173,13 @@ function calcularPuntos(p, pr) {
   return 0;
 }
 
+
 async function fetchTabla(jornada) {
   const result = await pool.query(`
-    SELECT u.nombre, p.*, pr.goles_local as pr_local, pr.goles_visitante as pr_visitante
+    SELECT u.nombre,
+           p.goles_local, p.goles_visitante,
+           pr.goles_local AS pr_local,
+           pr.goles_visitante AS pr_visitante
     FROM predicciones pr
     JOIN partidos p ON pr.partido_id = p.id
     JOIN users u ON pr.user_id = u.id
@@ -187,10 +191,21 @@ async function fetchTabla(jornada) {
   result.rows.forEach(row => {
     if (!tabla[row.nombre]) tabla[row.nombre] = 0;
 
-    tabla[row.nombre] += calcularPuntos(row, {
-      goles_local: row.pr_local,
-      goles_visitante: row.pr_visitante
-    });
+    // 🔥 CLAVE: NO SUMAR SI NO HAY RESULTADO
+    if (row.goles_local == null || row.goles_visitante == null) return;
+
+    // 🎯 EXACTO = 3 pts
+    if (row.goles_local === row.pr_local && row.goles_visitante === row.pr_visitante) {
+      tabla[row.nombre] += 3;
+    }
+    // 🎯 ACIERTO = 1 pt
+    else if (
+      (row.goles_local > row.goles_visitante && row.pr_local > row.pr_visitante) ||
+      (row.goles_local < row.goles_visitante && row.pr_local < row.pr_visitante) ||
+      (row.goles_local === row.goles_visitante && row.pr_local === row.pr_visitante)
+    ) {
+      tabla[row.nombre] += 1;
+    }
   });
 
   return Object.entries(tabla)
