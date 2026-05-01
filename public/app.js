@@ -5,14 +5,13 @@ let quinielaCerrada = false;
 window.onload = async () => {
   await cargarJornadas();
   cambiarJornada();
-};
 
-document.addEventListener("DOMContentLoaded", ()=> {
+  // 🔥 conectar botón correctamente
   const btn = document.getElementById("btnTabla");
-  if (btn){
-    btn.addEventListener("click", verTabla);
+  if (btn) {
+    btn.onclick = verTabla;
   }
-});
+};
 
 // 🔥 JORNADAS
 async function cargarJornadas() {
@@ -29,7 +28,7 @@ async function cargarJornadas() {
 
 // 🔥 CAMBIO
 function cambiarJornada() {
-  jornadaActual = document.getElementById("jornadaSelect").value;
+  jornadaActual = document.getElementById("jornadaSelect").value || 1;
   cargarPartidos();
   verTabla();
   checkBloqueo();
