@@ -1,83 +1,147 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <title>Tabla Quiniela</title>
-  <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tabla Quiniela</title>
+
+<style>
+body {
+  font-family: Arial;
+  background: #0b1d3a;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+th, td {
+  padding: 10px;
+}
+
+th {
+  background: #132a4f;
+}
+
+td {
+  background: #1f3c6b;
+}
+
+.scroll {
+  overflow-x: auto;
+}
+</style>
 </head>
+
 <body>
 
-<h1>📊 Tabla Quiniela</h1>
+<h1>🏆 Tabla General</h1>
 
-<table id="tablaExcel"></table>
+<select id="jornadaSelect"></select>
+
+<div id="tabla"></div>
 
 <script>
-async function cargarTabla() {
-  // 🔥 obtener jornada seleccionada
-  const jornada = localStorage.getItem("jornadaActual") || 1;
 
-  const res = await fetch(`/tabla-excel-data?jornada=${jornada}`);
-  const data = await res.json();
+let jornadaActual = 1;
 
-  const tabla = document.getElementById('tablaExcel');
+window.onload = async () => {
+  await cargarJornadas();
+  cambiarJornada();
+};
 
-  let html = "<tr><th>Jugador</th>";
+async function cargarJornadas() {
+  const r = await fetch('/jornadas');
+  const data = await r.json();
 
-  // 🔥 encabezados partidos CON RESULTADO REAL
-  for (let id in data.partidos) {
-    const p = data.partidos[id];
+  const select = document.getElementById('jornadaSelect');
+  select.innerHTML = '';
+
+  data.forEach(j => {
+    select.innerHTML += `<option value="${j.jornada}">Semana ${j.jornada}</option>`;
+  });
+
+  select.onchange = cambiarJornada;
+}
+
+function cambiarJornada() {
+  jornadaActual = document.getElementById("jornadaSelect").value;
+  verTabla();
+}
+
+async function verTabla() {
+
+  const tablaRes = await fetch(`/tabla?jornada=${jornadaActual}`);
+  const tabla = await tablaRes.json();
+
+  const partidosRes = await fetch(`/partidos?jornada=${jornadaActual}`);
+  const partidos = await partidosRes.json();
+
+  const cont = document.getElementById("tabla");
+
+  if (tabla.length === 0) {
+    cont.innerHTML = "<p>No hay datos aún</p>";
+    return;
+  }
+
+  let html = `
+    <div class="scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Jugador</th>
+  `;
+
+  partidos.forEach(p => {
+
+    let marcador = (p.goles_local != null && p.goles_visitante != null)
+      ? `${p.goles_local} - ${p.goles_visitante}`
+      : "⚪";
 
     html += `
       <th>
-        <div>${p.nombre}</div>
-        <div class="resultado-real">
-          ${p.resultado ? p.resultado : "-"}
-        </div>
+        ${p.local}<br>
+        <b>${marcador}</b><br>
+        ${p.visitante}
       </th>
     `;
-  }
-
-  html += "<th>Puntos</th></tr>";
-
-  // 🔥 filas jugadores
-  data.jugadores.forEach((j, i) => {
-
-    html += `
-      <tr class="${i === 0 ? 'lider' : ''}">
-        <td>
-          ${i === 0 ? '🥇 ' : i === 1 ? '🥈 ' : i === 2 ? '🥉 ' : ''}
-          ${j.nombre}
-        </td>
-    `;
-
-    for (let id in data.partidos) {
-      const pick = j.picks[id];
-
-      if (pick) {
-        html += `<td class="${pick.tipo}">${pick.texto}</td>`;
-      } else {
-        html += `<td>-</td>`;
-      }
-    }
-
-    html += `<td><strong>${j.puntos}</strong></td></tr>`;
   });
 
-  tabla.innerHTML = html;
+  html += `<th>Puntos</th></tr></thead><tbody>`;
+
+  tabla.forEach((u, i) => {
+
+    let medal = ["🥇","🥈","🥉"][i] || "";
+
+    html += `<tr>
+      <td>${medal} ${u.nombre}</td>
+    `;
+
+    u.detalles.forEach(d => {
+
+      let color = {
+        verde: "#22c55e",
+        amarillo: "#eab308",
+        rojo: "#ef4444",
+        gris: "#ffffff"
+      }[d];
+
+      html += `<td style="background:${color};"></td>`;
+    });
+
+    html += `<td>${u.puntos}</td></tr>`;
+  });
+
+  html += `</tbody></table></div>`;
+
+  cont.innerHTML = html;
 }
 
-
-cargarTabla();
-</script>
-
-<button onclick="window.location.href='/historial-view'">
-  📊 Ver historial completo
-</button>
-<button onclick="volver()">⬅️ Regresar</button>
-
-<script>
-function volver() {
-  window.location.href = "/";
-}
 </script>
 
 </body>
