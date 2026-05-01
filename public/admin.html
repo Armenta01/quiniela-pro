@@ -101,13 +101,17 @@
 
 <div class="card">
 
-  <!-- 🔥 AQUÍ VA EL FORM-ROW -->
   <div class="form-row">
 
     <input type="text" id="local" placeholder="Equipo local">
     <input type="text" id="visitante" placeholder="Equipo visitante">
 
     <input type="datetime-local" id="fecha">
+
+    <input type="text" id="liga" placeholder="Ej: Liga MX J13">
+
+    <input type="text" id="logo_local" placeholder="URL logo local">
+    <input type="text" id="logo_visitante" placeholder="URL logo visitante">
 
     <select id="jornada">
       <option value="1">Semana 1</option>
@@ -116,7 +120,7 @@
       <option value="4">Semana 4</option>
     </select>
 
-    <button onclick="crearPartido()">Guardar Partido</button>
+    <button onclick="crearPartido()">Crear Partido</button>
 
   </div>
 
