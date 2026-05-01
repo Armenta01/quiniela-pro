@@ -225,7 +225,7 @@ function calcularPuntos(p, pr) {
 
 async function fetchTabla(jornada) {
   const result = await pool.query(`
-    SELECT u.id, u.nombre,
+    SELECT pr.id AS quiniela_id, u.nombre,
            p.goles_local, p.goles_visitante,
            pr.goles_local AS pr_local,
            pr.goles_visitante AS pr_visitante
@@ -239,8 +239,8 @@ async function fetchTabla(jornada) {
   const tabla = {};
 
   result.rows.forEach(row => {
-    if (!tabla[row.id]) {
-      tabla[row.id] = {
+    if (!tabla[row.quiniela_id]) {
+      tabla[row.quiniela_id] = {
         nombre: row.nombre,
         puntos: 0,
         detalles: [],
@@ -250,16 +250,16 @@ async function fetchTabla(jornada) {
 
     // ⚪ SIN RESULTADO
     if (row.goles_local == null || row.goles_visitante == null) {
-      tabla[row.id].detalles.push("gris");
-      tabla[row.id].picks.push(`${row.pr_local}-${row.pr_visitante}`);
+      tabla[row.quiniela_id].detalles.push("gris");
+      tabla[row.quiniela_id].picks.push(`${row.pr_local}-${row.pr_visitante}`);
       return;
     }
 
     // 🟢 3 pts
     if (row.goles_local === row.pr_local && row.goles_visitante === row.pr_visitante) {
-      tabla[row.id].puntos += 3;
-      tabla[row.id].detalles.push("verde");
-    tabla[row.id].picks.push(`${row.pr_local}-${row.pr_visitante}`);
+      tabla[row.quiniela_id].puntos += 3;
+      tabla[row.quiniela_id].detalles.push("verde");
+    tabla[row.quiniela_id].picks.push(`${row.pr_local}-${row.pr_visitante}`);
     }
 
     // 🟡 1 pt
@@ -268,15 +268,15 @@ async function fetchTabla(jornada) {
       (row.goles_local < row.goles_visitante && row.pr_local < row.pr_visitante) ||
       (row.goles_local === row.goles_visitante && row.pr_local === row.pr_visitante)
     ) {
-      tabla[row.id].puntos += 1;
-      tabla[row.id].detalles.push("amarillo");
-      tabla[row.id].picks.push(`${row.pr_local}-${row.pr_visitante}`);
+      tabla[row.quiniela_id].puntos += 1;
+      tabla[row.quiniela_id].detalles.push("amarillo");
+      tabla[row.quiniela_id].picks.push(`${row.pr_local}-${row.pr_visitante}`);
     }
 
     // 🔴 0 pts
     else {
-      tabla[row.id].detalles.push("rojo");
-      tabla[row.id].picks.push(`${row.pr_local}-${row.pr_visitante}`);
+      tabla[row.quiniela_id].detalles.push("rojo");
+      tabla[row.quiniela_id].picks.push(`${row.pr_local}-${row.pr_visitante}`);
     }
   });
 
