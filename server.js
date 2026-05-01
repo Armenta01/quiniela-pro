@@ -192,7 +192,6 @@ function calcularPuntos(p, pr) {
   return 0;
 }
 
-
 async function fetchTabla(jornada) {
   const result = await pool.query(`
     SELECT u.nombre,
@@ -203,34 +202,56 @@ async function fetchTabla(jornada) {
     JOIN partidos p ON pr.partido_id = p.id
     JOIN users u ON pr.user_id = u.id
     WHERE pr.jornada = $1
+    ORDER BY pr.partido_id
   `, [jornada]);
 
   const tabla = {};
 
   result.rows.forEach(row => {
-    if (!tabla[row.nombre]) tabla[row.nombre] = 0;
-
-    // 🔥 CLAVE: NO SUMAR SI NO HAY RESULTADO
-    if (row.goles_local == null || row.goles_visitante == null) return;
-
-    // 🎯 EXACTO = 3 pts
-    if (row.goles_local === row.pr_local && row.goles_visitante === row.pr_visitante) {
-      tabla[row.nombre] += 3;
+    if (!tabla[row.nombre]) {
+      tabla[row.nombre] = {
+        puntos: 0,
+        detalles: []
+      };
     }
-    // 🎯 ACIERTO = 1 pt
+
+    // ⚪ SIN RESULTADO
+    if (row.goles_local == null || row.goles_visitante == null) {
+      tabla[row.nombre].detalles.push("gris");
+      return;
+    }
+
+    // 🟢 3 pts
+    if (row.goles_local === row.pr_local && row.goles_visitante === row.pr_visitante) {
+      tabla[row.nombre].puntos += 3;
+      tabla[row.nombre].detalles.push("verde");
+    }
+
+    // 🟡 1 pt
     else if (
       (row.goles_local > row.goles_visitante && row.pr_local > row.pr_visitante) ||
       (row.goles_local < row.goles_visitante && row.pr_local < row.pr_visitante) ||
       (row.goles_local === row.goles_visitante && row.pr_local === row.pr_visitante)
     ) {
-      tabla[row.nombre] += 1;
+      tabla[row.nombre].puntos += 1;
+      tabla[row.nombre].detalles.push("amarillo");
+    }
+
+    // 🔴 0 pts
+    else {
+      tabla[row.nombre].detalles.push("rojo");
     }
   });
 
   return Object.entries(tabla)
-    .map(([nombre, puntos]) => ({ nombre, puntos }))
+    .map(([nombre, data]) => ({
+      nombre,
+      puntos: data.puntos,
+      detalles: data.detalles
+    }))
     .sort((a, b) => b.puntos - a.puntos);
 }
+
 
 app.get('/tabla', async (req, res) => {
   const { jornada } = req.query;

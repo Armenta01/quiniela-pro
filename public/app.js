@@ -148,38 +148,34 @@ async function guardarTodo() {
 }
 
 // 🔥 TABLA
-window.verTabla = async function () {
-  const cont = document.getElementById("tabla");
+data.forEach((u, i) => {
+  let medal = ["🥇", "🥈", "🥉"][i] || "";
 
-  try {
-    const res = await fetch(`/tabla?jornada=${jornadaActual}`);
+  let detallesHTML = u.detalles.map(d => {
+    let color = {
+      verde: "#22c55e",
+      amarillo: "#eab308",
+      rojo: "#ef4444",
+      gris: "#9ca3af"
+    }[d];
 
-    if (!res.ok) throw new Error("Error backend");
+    return `<span style="
+      display:inline-block;
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:${color};
+      margin:2px;
+    "></span>`;
+  }).join("");
 
-    const data = await res.json();
-
-    cont.innerHTML = "<h2>🏆 Tabla</h2>";
-
-    if (!data || data.length === 0) {
-      cont.innerHTML += "<p>No hay datos aún</p>";
-      return;
-    }
-
-    data.slice(0,4).forEach((u, i) => {
-      let medal = ["🥇", "🥈", "🥉"][i] || "";
-
-      cont.innerHTML += `
-        <div class="tabla-item ${i === 0 ? 'gold' : ''}">
-          ${medal} ${u.nombre} - ${u.puntos} pts
-        </div>
-      `;
-    });
-
-  } catch (err) {
-    console.error("Error tabla:", err);
-    cont.innerHTML = "<p style='color:red'>Error cargando tabla</p>";
-  }
-};
+  cont.innerHTML += `
+    <div class="tabla-item ${i === 0 ? 'gold' : ''}">
+      ${medal} ${u.nombre} - ${u.puntos} pts
+      <div>${detallesHTML}</div>
+    </div>
+  `;
+});
 
 // 🔒 BLOQUEO
 async function checkBloqueo() {
