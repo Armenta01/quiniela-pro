@@ -357,7 +357,12 @@ async function verTablaCompleta(jornada) {
       ? `${u.nombre} #${contador[u.nombre]}`
       : u.nombre;
 
-    let fila = `<div class="fila">`;
+    let claseTop = index === 0 ? "top1" 
+             : index === 1 ? "top2" 
+             : index === 2 ? "top3" 
+             : "";
+
+let fila = `<div class="fila ${claseTop}">`;
 
     fila += `<div class="celda jugador">
       ${index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : ""}
