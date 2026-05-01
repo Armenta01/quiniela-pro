@@ -122,17 +122,26 @@ async function verTabla() {
       <td>${medal} ${u.nombre}</td>
     `;
 
-    u.detalles.forEach(d => {
+    u.detalles.forEach((d, index) => {
 
-      let color = {
-        verde: "#22c55e",
-        amarillo: "#eab308",
-        rojo: "#ef4444",
-        gris: "#ffffff"
-      }[d];
+  let color = {
+    verde: "#22c55e",
+    amarillo: "#eab308",
+    rojo: "#ef4444",
+    gris: "#ffffff"
+  }[d];
 
-      html += `<td style="background:${color};"></td>`;
-    });
+  let marcador = u.picks[index] || "-";
+
+  html += `
+    <td style="
+      background:${color};
+      font-weight:bold;
+    ">
+      ${marcador}
+    </td>
+  `;
+});
 
     html += `<td>${u.puntos}</td></tr>`;
   });

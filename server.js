@@ -211,13 +211,15 @@ async function fetchTabla(jornada) {
     if (!tabla[row.nombre]) {
       tabla[row.nombre] = {
         puntos: 0,
-        detalles: []
+        detalles: [],
+        picks: []
       };
     }
 
     // ⚪ SIN RESULTADO
     if (row.goles_local == null || row.goles_visitante == null) {
       tabla[row.nombre].detalles.push("gris");
+      tabla[row.nombre].picks.push(`${row.pr_local}-${row.pr_visitante}`);
       return;
     }
 
@@ -225,6 +227,7 @@ async function fetchTabla(jornada) {
     if (row.goles_local === row.pr_local && row.goles_visitante === row.pr_visitante) {
       tabla[row.nombre].puntos += 3;
       tabla[row.nombre].detalles.push("verde");
+    tabla[row.nombre].picks.push(`${row.pr_local}-${row.pr_visitante}`);
     }
 
     // 🟡 1 pt
@@ -235,20 +238,23 @@ async function fetchTabla(jornada) {
     ) {
       tabla[row.nombre].puntos += 1;
       tabla[row.nombre].detalles.push("amarillo");
+      tabla[row.nombre].picks.push(`${row.pr_local}-${row.pr_visitante}`);
     }
 
     // 🔴 0 pts
     else {
       tabla[row.nombre].detalles.push("rojo");
+      tabla[row.nombre].picks.push(`${row.pr_local}-${row.pr_visitante}`);
     }
   });
 
   return Object.entries(tabla)
     .map(([nombre, data]) => ({
-      nombre,
-      puntos: data.puntos,
-      detalles: data.detalles
-    }))
+     nombre,
+    puntos: data.puntos,
+    detalles: data.detalles,
+    picks: data.picks
+}))
     .sort((a, b) => b.puntos - a.puntos);
 }
 
