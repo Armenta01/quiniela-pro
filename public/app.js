@@ -7,6 +7,13 @@ window.onload = async () => {
   cambiarJornada();
 };
 
+document.addEventListener("DOMContentLoaded", ()=> {
+  const btn = document.getElementById("btnTabla");
+  if (btn){
+    btn.addEventListener("click", verTabla);
+  }
+});
+
 // 🔥 JORNADAS
 async function cargarJornadas() {
   const r = await fetch('/jornadas');
@@ -28,7 +35,7 @@ function cambiarJornada() {
   checkBloqueo();
 }
 
-// 🔥 PARTIDOS UI PRO
+// 🔥 PARTIDOS
 async function cargarPartidos() {
   const res = await fetch(`/partidos?jornada=${jornadaActual}`);
   const data = await res.json();
@@ -89,19 +96,17 @@ async function guardarTodo() {
     if (gl !== "" && gv !== "") {
       lista.push({
         partido_id: p.id,
-        lfocal: parseInt(gl),
+        local: parseInt(gl),
         visitante: parseInt(gv)
       });
     }
   });
 
-  // 🔥 VALIDACIÓN CORRECTA
   if (lista.length === 0) {
     alert("No capturaste resultados");
     return;
   }
 
-  // 🔥 FETCH FUERA DEL IF (AQUÍ ESTÁ EL FIX)
   const res = await fetch('/guardar', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
@@ -120,26 +125,24 @@ async function guardarTodo() {
   alert("🔥 Quiniela enviada");
 
   let mensaje = `📊 Quiniela Semana ${jornadaActual}%0A`;
-mensaje += `👤 ${usuario}%0A%0A`;
+  mensaje += `👤 ${usuario}%0A%0A`;
 
-lista.forEach(p => {
-  const partido = partidos.find(x => x.id === p.partido_id);
-  mensaje += `⚽ ${partido.local} ${p.local}-${p.visitante} ${partido.visitante}%0A`;
-});
+  lista.forEach(p => {
+    const partido = partidos.find(x => x.id === p.partido_id);
+    mensaje += `⚽ ${partido.local} ${p.local}-${p.visitante} ${partido.visitante}%0A`;
+  });
 
-const url = `https://wa.me/524531021052?text=${mensaje}`;
-window.location.href = url;
+  const url = `https://wa.me/524531021052?text=${mensaje}`;
+  window.location.href = url;
 }
 
-// 🔥 TABLA PRO
-async function verTabla() {
+// 🔥 TABLA
+window.verTabla = async function () {
   const cont = document.getElementById("tabla");
 
   try {
-    const res = await fetch('/tabla?jornada=${jornadaActual}');
+    const res = await fetch(`/tabla?jornada=${jornadaActual}`);
     const data = await res.json();
-
-    console.log("TABLA:", data); // 👈 DEBUG
 
     cont.innerHTML = "<h2>🏆 Tabla</h2>";
 
@@ -158,12 +161,11 @@ async function verTabla() {
       `;
     });
 
-  }
-   catch (err) {
+  } catch (err) {
     console.error("Error tabla:", err);
     cont.innerHTML = "<p style='color:red'>Error cargando tabla</p>";
   }
-}
+};
 
 // 🔒 BLOQUEO
 async function checkBloqueo() {
@@ -178,9 +180,7 @@ async function checkBloqueo() {
     estado.innerText = "🔒 Quiniela cerrada";
     estado.className = "estado closed";
 
-    // 🔥 SOLO inputs de goles
     document.querySelectorAll(".score input").forEach(i => i.disabled = true);
-
     document.getElementById("btnGuardar").disabled = true;
 
   } else {
@@ -190,7 +190,6 @@ async function checkBloqueo() {
     estado.className = "estado open";
 
     document.querySelectorAll(".score input").forEach(i => i.disabled = false);
-
     document.getElementById("btnGuardar").disabled = false;
   }
 }
