@@ -297,9 +297,43 @@ app.post('/admin/resultados', async (req, res) => {
 
 // 🔥 LÍMITE
 app.get('/limite', async (req, res) => {
-  const { jornada } = req.query;
-  const bloqueada = await jornadaBloqueada(jornada);
-  res.json({ bloqueada });
+  try {
+    const { jornada } = req.query;
+
+    // 🔥 traer el primer partido de la jornada
+    const r = await pool.query(`
+      SELECT fecha 
+      FROM partidos 
+      WHERE jornada = $1
+      ORDER BY fecha ASC
+      LIMIT 1
+    `, [jornada]);
+
+    if (r.rows.length === 0) {
+      return res.json({ bloqueada: false });
+    }
+
+    const fechaPartido = new Date(r.rows[0].fecha);
+
+    // 🔥 restar 1 día
+    const limite = new Date(fechaPartido);
+    limite.setDate(limite.getDate() - 1);
+
+    const ahora = new Date();
+
+    // 🔥 comparación real
+    const bloqueada = ahora >= limite;
+
+    res.json({
+      bloqueada,
+      limite,
+      ahora
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'error limite' });
+  }
 });
 
 app.post('/admin/partidos', async (req, res) => {

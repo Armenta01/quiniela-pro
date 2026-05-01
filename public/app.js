@@ -162,14 +162,23 @@ async function checkBloqueo() {
 
   if (d.bloqueada) {
     quinielaCerrada = true;
+
     estado.innerText = "🔒 Quiniela cerrada";
     estado.className = "estado closed";
 
-    document.querySelectorAll(".score input").forEach(i=>i.disabled=true);
+    // 🔥 SOLO inputs de goles
+    document.querySelectorAll(".score input").forEach(i => i.disabled = true);
+
     document.getElementById("btnGuardar").disabled = true;
+
   } else {
     quinielaCerrada = false;
+
     estado.innerText = "🟢 Quiniela abierta";
     estado.className = "estado open";
+
+    document.querySelectorAll(".score input").forEach(i => i.disabled = false);
+
+    document.getElementById("btnGuardar").disabled = false;
   }
 }
