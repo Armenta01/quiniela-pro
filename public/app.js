@@ -23,16 +23,65 @@ async function cargarJornadas() {
   });
 }
 
+
 // 🔥 CAMBIO
 function cambiarJornada() {
   jornadaActual = document.getElementById("jornadaSelect").value || 1;
 
   cargarPartidos();
-  verTabla();
   cargarTop4();
   checkBloqueo();
 }
+async function cargarTop4() {
+  const res = await fetch(`/top4?jornada=${jornadaActual}`);
+  const data = await res.json();
 
+  let cont = document.getElementById("top4");
+
+  if (!cont) {
+    const div = document.createElement("div");
+    div.id = "top4";
+    document.getElementById("partidos").after(div);
+    cont = div;
+  }
+
+  cont.innerHTML = "<h3>🔥 TOP 4</h3>";
+
+  data.forEach((u,i)=>{
+
+    let medal = ["🥇","🥈","🥉","🏅"][i] || "";
+
+    let detallesHTML = u.detalles.map(d => {
+      let color = {
+        verde: "#22c55e",
+        amarillo: "#eab308",
+        rojo: "#ef4444",
+        gris: "#9ca3af"
+      }[d];
+
+      return `<span style="
+        display:inline-block;
+        width:10px;
+        height:10px;
+        border-radius:50%;
+        background:${color};
+        margin:2px;
+      "></span>`;
+    }).join("");
+
+    cont.innerHTML += `
+      <div style="
+        background:#132a4f;
+        margin:10px;
+        padding:10px;
+        border-radius:10px;
+      ">
+        ${medal} ${u.nombre} - ${u.puntos} pts
+        <div>${detallesHTML}</div>
+      </div>
+    `;
+  });
+}
 // 🔥 PARTIDOS
 async function cargarPartidos() {
   const res = await fetch(`/partidos?jornada=${jornadaActual}`);
@@ -100,6 +149,57 @@ async function guardarTodo() {
     alert("No capturaste resultados");
     return;
   }
+async function cargarTop4() {
+  const res = await fetch(`/top4?jornada=${jornadaActual}`);
+  const data = await res.json();
+
+  let cont = document.getElementById("top4");
+
+  if (!cont) {
+    const div = document.createElement("div");
+    div.id = "top4";
+    document.getElementById("partidos").after(div);
+    cont = div;
+  }
+
+  cont.innerHTML = "<h3>🔥 TOP 4</h3>";
+
+  data.forEach((u,i)=>{
+
+    let medal = ["🥇","🥈","🥉","🏅"][i] || "";
+
+    let detallesHTML = u.detalles.map(d => {
+      let color = {
+        verde: "#22c55e",
+        amarillo: "#eab308",
+        rojo: "#ef4444",
+        gris: "#9ca3af"
+      }[d];
+
+      return `<span style="
+        display:inline-block;
+        width:10px;
+        height:10px;
+        border-radius:50%;
+        background:${color};
+        margin:2px;
+      "></span>`;
+    }).join("");
+
+    cont.innerHTML += `
+      <div style="
+        background:#132a4f;
+        margin:10px;
+        padding:10px;
+        border-radius:10px;
+      ">
+        ${medal} ${u.nombre} - ${u.puntos} pts
+        <div>${detallesHTML}</div>
+      </div>
+    `;
+  });
+}
+
 
   const res = await fetch('/guardar', {
     method: 'POST',
