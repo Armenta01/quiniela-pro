@@ -210,14 +210,9 @@ async function cargarTop4() {
 
   let cont = document.getElementById("top4");
 
-  if (!cont) {
-    const div = document.createElement("div");
-    div.id = "top4";
-    document.getElementById("partidos").after(div);
-    cont = div;
-  }
+  if (!cont) return;
 
-  cont.innerHTML = "<h3>🔥 TOP 4</h3>";
+  cont.innerHTML = "<h3>🔝 TOP 4</h3>";
 
   data.forEach((u,i)=>{
 
@@ -254,7 +249,6 @@ async function cargarTop4() {
     `;
   });
 }
-
 
 async function validarUsuario() {
   const nombre = document.getElementById("usuario").value;
