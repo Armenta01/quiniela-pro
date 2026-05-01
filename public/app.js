@@ -163,28 +163,79 @@ async function verTabla() {
 }
 
 // 🔥 TOP 4
-async function cargarTop4() {
-  const res = await fetch(`/top4?jornada=${jornadaActual}`);
-  const data = await res.json();
+async function verTabla() {
+  const tablaRes = await fetch(`/tabla?jornada=${jornadaActual}`);
+  const tabla = await tablaRes.json();
 
-  let cont = document.getElementById("top4");
+  const partidosRes = await fetch(`/partidos?jornada=${jornadaActual}`);
+  const partidos = await partidosRes.json();
 
-  if (!cont) {
-    const div = document.createElement("div");
-    div.id = "top4";
-    document.getElementById("partidos").after(div);
-    cont = div;
+  const cont = document.getElementById("tabla");
+
+  if (tabla.length === 0) {
+    cont.innerHTML = "<p>No hay datos aún</p>";
+    return;
   }
 
-  cont.innerHTML = "<h3>🔥 TOP 4</h3>";
+  let html = `
+    <h2>🏆 Tabla</h2>
+    <div style="overflow-x:auto;">
+    <table style="width:100%; border-collapse: collapse; text-align:center;">
+      <thead>
+        <tr>
+          <th style="padding:10px;">Jugador</th>
+  `;
 
-  data.forEach((u,i)=>{
-    cont.innerHTML += `
-      <div>
-        ${i+1}. ${u.nombre} - ${u.puntos} pts
-      </div>
+  // 🔥 ENCABEZADO PARTIDOS + RESULTADO
+  partidos.forEach(p => {
+
+    let marcador = (p.goles_local != null && p.goles_visitante != null)
+      ? `${p.goles_local} - ${p.goles_visitante}`
+      : "⚪";
+
+    html += `
+      <th style="padding:10px;">
+        ${p.local}<br>
+        <span style="font-size:14px; font-weight:bold;">
+          ${marcador}
+        </span><br>
+        ${p.visitante}
+      </th>
     `;
   });
+
+  html += `<th>Puntos</th></tr></thead><tbody>`;
+
+  // 🔥 FILAS USUARIOS
+  tabla.forEach((u, i) => {
+
+    let medal = ["🥇","🥈","🥉"][i] || "";
+
+    html += `<tr>
+      <td style="padding:10px;">${medal} ${u.nombre}</td>
+    `;
+
+    u.detalles.forEach(d => {
+
+      let color = {
+        verde: "#22c55e",
+        amarillo: "#eab308",
+        rojo: "#ef4444",
+        gris: "#ffffff"
+      }[d];
+
+      html += `
+        <td style="background:${color}; border-radius:6px;">
+        </td>
+      `;
+    });
+
+    html += `<td>${u.puntos}</td></tr>`;
+  });
+
+  html += `</tbody></table></div>`;
+
+  cont.innerHTML = html;
 }
 
 // 🔒 BLOQUEO
