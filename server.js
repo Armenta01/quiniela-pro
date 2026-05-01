@@ -81,6 +81,33 @@ async function jornadaBloqueada(jornada) {
   return new Date() >= limite;
 }
 
+async function obtenerCampeon(jornada) {
+
+  // 🔍 verificar si ya terminaron los partidos
+  const partidos = await pool.query(`
+    SELECT COUNT(*) FILTER (WHERE goles_local IS NULL OR goles_visitante IS NULL) AS pendientes
+    FROM partidos
+    WHERE jornada = $1
+  `, [jornada]);
+
+  if (parseInt(partidos.rows[0].pendientes) > 0) {
+    return []; // aún no hay campeón
+  }
+
+  // 🏆 obtener tabla
+  const tabla = await fetchTabla(jornada);
+
+  if (!tabla.length) return [];
+
+  // 🔥 obtener mayor puntaje
+  const maxPuntos = tabla[0].puntos;
+
+  // 🔥 traer TODOS los que empatan
+  const campeones = tabla.filter(u => u.puntos === maxPuntos);
+
+  return campeones;
+}
+
 
 // 🔥 JORNADAS
 app.get('/jornadas', async (req, res) => {

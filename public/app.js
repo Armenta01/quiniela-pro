@@ -31,6 +31,7 @@ function cambiarJornada() {
 
   cargarPartidos();
   cargarTop4();
+  cargarCampeon();
   checkBloqueo();
 }
 async function cargarTop4() {
@@ -201,7 +202,40 @@ async function guardarTodo() {
     if (btn) btn.disabled = false;
   }
 }
+async function cargarCampeon() {
 
+  const res = await fetch(`/campeon?jornada=${jornadaActual}`);
+  const data = await res.json();
+
+  let cont = document.getElementById("campeon");
+
+  if (!cont) return;
+
+  if (!data || data.length === 0) {
+    cont.innerHTML = "";
+    return;
+  }
+
+  // 🔥 nombres de campeones
+  const nombres = data.map(u => `${u.nombre} (${u.puntos} pts)`).join(" • ");
+
+  cont.innerHTML = `
+    <div style="
+      background:linear-gradient(90deg,#ffd700,#facc15);
+      color:black;
+      padding:15px;
+      border-radius:12px;
+      margin:15px 0;
+      font-size:18px;
+      font-weight:bold;
+      text-align:center;
+      box-shadow:0 0 15px gold;
+    ">
+      🏆 Campeón${data.length > 1 ? "es" : ""} Semana ${jornadaActual}: <br>
+      ${nombres}
+    </div>
+  `;
+}
 
 
 async function cargarTop4() {
