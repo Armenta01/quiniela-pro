@@ -121,7 +121,7 @@ app.get('/check-user', async (req, res) => {
 // 🔥 GUARDAR PRONÓSTICOS (FIX PRINCIPAL)
 app.post('/guardar', async (req, res) => {
   const { nombre, jornada, pronosticos } = req.body;
-  const envioId = Date.now() + "_" + req.body.nombre;
+  const envioId = Date.now().toString() + "_" + Math.random().toString(36).substring(2,8);
   
   try {
     if (!nombre || nombre.length < 2) {
