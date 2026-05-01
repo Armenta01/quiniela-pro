@@ -113,12 +113,7 @@
     <input type="text" id="logo_local" placeholder="URL logo local">
     <input type="text" id="logo_visitante" placeholder="URL logo visitante">
 
-    <select id="jornada">
-      <option value="1">Semana 1</option>
-      <option value="2">Semana 2</option>
-      <option value="3">Semana 3</option>
-      <option value="4">Semana 4</option>
-    </select>
+    <select id="jornada" onchange="cargarPartidos()">
 
     <button onclick="cargarPartidos()">Ver Jornada</button>
   
@@ -251,6 +246,7 @@ async function guardarResultado(id) {
     alert("❌ Error servidor");
   }
 }
+cargarPartidos();
 
 </script>
 

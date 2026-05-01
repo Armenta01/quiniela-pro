@@ -108,3 +108,7 @@ input, select, button {
 .estado.closed {
   color: #ef4444;
 }
+
+button {
+  min-width: 120px;
+}
