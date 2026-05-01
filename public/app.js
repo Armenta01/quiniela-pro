@@ -173,18 +173,19 @@ async function guardarTodo() {
   alert("🔥 Quiniela enviada");
 
   // 🔥 MENSAJE WHATSAPP
-  let mensaje = `📊 Quiniela Semana ${jornadaActual}%0A`;
-  mensaje += `👤 ${usuario}%0A%0A`;
+  let mensaje = `📊 Quiniela Semana ${jornadaActual}\n`;
+mensaje += `👤 ${usuario}\n\n`;
 
-  lista.forEach(p => {
-    const partido = partidos.find(x => x.id === p.partido_id);
-    mensaje += `⚽ ${partido.local} ${p.local}-${p.visitante} ${partido.visitante}%0A`;
-  });
+lista.forEach(p => {
+  const partido = partidos.find(x => x.id === p.partido_id);
+  mensaje += `⚽ ${partido.local} ${p.local}-${p.visitante} ${partido.visitante}\n`;
+});
 
-  const url = `https://wa.me/524531021052?text=${mensaje}`;
+ const texto = encodeURIComponent(mensaje);
+const url = `https://wa.me/524531021052?text=${texto}`;
 
-  // 🔥 ABRIR WHATSAPP SIN ROMPER FLUJO
-  window.open(url, "_blank");
+// 🔥 REDIRECCIÓN DIRECTA (NO window.open)
+window.location.href = url;
 }
 
 
