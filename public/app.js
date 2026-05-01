@@ -349,6 +349,10 @@ async function verTablaCompleta(jornada) {
   let contador = {};
 
   data.forEach((u, index) => {
+     let claseTop = index === 0 ? "top1" 
+             : index === 1 ? "top2" 
+             : index === 2 ? "top3" 
+             : "";
 
     if (!contador[u.nombre]) contador[u.nombre] = 1;
     else contador[u.nombre]++;
@@ -357,10 +361,7 @@ async function verTablaCompleta(jornada) {
       ? `${u.nombre} #${contador[u.nombre]}`
       : u.nombre;
 
-    let claseTop = index === 0 ? "top1" 
-             : index === 1 ? "top2" 
-             : index === 2 ? "top3" 
-             : "";
+   
 
 let fila = `<div class="fila ${claseTop}">`;
 
@@ -386,7 +387,7 @@ let fila = `<div class="fila ${claseTop}">`;
 
     cont.innerHTML += fila;
   });
-}
+} 
 
 function irTabla() {
   const jornada = document.getElementById("jornadaSelect").value;
