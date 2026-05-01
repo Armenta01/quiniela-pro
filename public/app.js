@@ -89,12 +89,19 @@ async function guardarTodo() {
     if (gl !== "" && gv !== "") {
       lista.push({
         partido_id: p.id,
-        local: gl,
-        visitante: gv
+        local: parseInt(gl),
+        visitante: parseInt(gv)
       });
     }
   });
 
+  // 🔥 VALIDACIÓN CORRECTA
+  if (lista.length === 0) {
+    alert("No capturaste resultados");
+    return;
+  }
+
+  // 🔥 FETCH FUERA DEL IF (AQUÍ ESTÁ EL FIX)
   const res = await fetch('/guardar', {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
@@ -112,8 +119,8 @@ async function guardarTodo() {
   confetti();
   alert("🔥 Quiniela enviada");
 
-const url = `https://wa.me/524531021052?text=Quiniela enviada`;
-window.location.href = url;
+  const url = `https://wa.me/524531021052?text=Quiniela enviada`;
+  window.location.href = url;
 }
 
 // 🔥 TABLA PRO
