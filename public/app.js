@@ -112,7 +112,8 @@ async function guardarTodo() {
   confetti();
   alert("🔥 Quiniela enviada");
 
-  window.open(`https://wa.me/524531021052?text=Quiniela enviada`, '_blank');
+const url = `https://wa.me/524531021052?text=Quiniela enviada`;
+window.location.href = url;
 }
 
 // 🔥 TABLA PRO
@@ -122,7 +123,10 @@ async function verTabla() {
 
   const cont = document.getElementById("tabla");
   cont.innerHTML = "<h2>🏆 Tabla</h2>";
-
+if (data.length === 0) {
+  cont.innerHTML += "<p>No hay datos aún</p>";
+  return;
+}
   data.forEach((u,i)=>{
     let medal = ["🥇","🥈","🥉"][i] || "";
 
