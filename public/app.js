@@ -5,6 +5,7 @@ let quinielaCerrada = false;
 window.onload = async () => {
   await cargarJornadas();
   cambiarJornada();
+  cargarTop4();
 
   const btn = document.getElementById("btnTabla");
   if (btn) btn.onclick = verTabla;
