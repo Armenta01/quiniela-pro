@@ -150,6 +150,45 @@ async function guardarTodo() {
     alert("No capturaste resultados");
     return;
   }
+    // 🔥 GUARDAR EN BACKEND
+  const res = await fetch('/guardar', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({
+      nombre: usuario,
+      jornada: jornadaActual,
+      pronosticos: lista
+    })
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    alert(data.error || "Error al guardar");
+    return;
+  }
+
+  // 🎉 CONFIRMACIÓN
+  confetti();
+  alert("🔥 Quiniela enviada");
+
+  // 🔥 MENSAJE WHATSAPP
+  let mensaje = `📊 Quiniela Semana ${jornadaActual}%0A`;
+  mensaje += `👤 ${usuario}%0A%0A`;
+
+  lista.forEach(p => {
+    const partido = partidos.find(x => x.id === p.partido_id);
+    mensaje += `⚽ ${partido.local} ${p.local}-${p.visitante} ${partido.visitante}%0A`;
+  });
+
+  const url = `https://wa.me/524531021052?text=${mensaje}`;
+
+  // 🔥 ABRIR WHATSAPP SIN ROMPER FLUJO
+  window.open(url, "_blank");
+}
+
+
+
 async function cargarTop4() {
   const res = await fetch(`/top4?jornada=${jornadaActual}`);
   const data = await res.json();

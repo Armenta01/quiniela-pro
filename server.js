@@ -133,11 +133,28 @@ app.post('/guardar', async (req, res) => {
     } else {
       userId = user.rows[0].id;
     }
+// 🔥 validar si ya mandó EXACTAMENTE lo mismo
+const existentes = await pool.query(
+  `SELECT pr.goles_local, pr.goles_visitante
+   FROM predicciones pr
+   JOIN users u ON pr.user_id = u.id
+   WHERE u.nombre = $1 AND pr.jornada = $2`,
+  [nombre, jornada]
+);
 
-    await pool.query(
-      `DELETE FROM predicciones WHERE user_id = $1 AND jornada = $2`,
-      [userId, jornada]
-    );
+// convertir lista actual a string para comparar
+const nuevo = JSON.stringify(pronosticos);
+
+const viejo = JSON.stringify(
+  existentes.rows.map(x => ({
+    local: x.goles_local,
+    visitante: x.goles_visitante
+  }))
+);
+
+if (nuevo === viejo) {
+  return res.status(400).json({ error: "Ya enviaste esta misma quiniela" });
+}
 
     // 🔥 FIX AQUÍ (error de integer "")
     for (let p of pronosticos) {
