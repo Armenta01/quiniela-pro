@@ -238,6 +238,11 @@ async function verTabla() {
   cont.innerHTML = html;
 }
 
+function irTabla() {
+  const jornada = document.getElementById("jornadaSelect").value;
+  window.location.href = `tabla.html?jornada=${jornada}`;
+}
+
 // 🔒 BLOQUEO
 async function checkBloqueo() {
   const r = await fetch(`/limite?jornada=${jornadaActual}`);

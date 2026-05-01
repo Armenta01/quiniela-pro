@@ -51,7 +51,16 @@ td {
 let jornadaActual = 1;
 
 window.onload = async () => {
+
+  const params = new URLSearchParams(window.location.search);
+  const jornadaURL = params.get("jornada");
+
   await cargarJornadas();
+
+  if (jornadaURL) {
+    document.getElementById("jornadaSelect").value = jornadaURL;
+  }
+
   cambiarJornada();
 };
 
