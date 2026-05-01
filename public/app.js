@@ -173,10 +173,6 @@ async function guardarTodo() {
       return;
     }
 
-    // 🎉 CONFIRMACIÓN
-    confetti();
-    alert("🔥 Quiniela enviada");
-
     // 🔥 MENSAJE WHATSAPP
     let mensaje = `📊 Quiniela Semana ${jornadaActual}\n`;
     mensaje += `👤 ${usuario}\n\n`;
@@ -193,6 +189,10 @@ async function guardarTodo() {
 
     // 🔥 REDIRECCIÓN SEGURA
     window.location.href = url;
+
+     // 🎉 CONFIRMACIÓN
+    confetti();
+    alert("🔥 Quiniela enviada");
 
   } catch (err) {
     console.error(err);
