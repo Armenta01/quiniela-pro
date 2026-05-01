@@ -117,3 +117,55 @@ button {
   color: orange;
   font-weight: bold;
 }
+#tabla {
+  margin-top: 20px;
+  overflow-x: auto;
+}
+
+.fila {
+  display: flex;
+  align-items: center;
+}
+
+.celda {
+  min-width: 70px;
+  padding: 10px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.jugador {
+  min-width: 140px;
+  text-align: left;
+  padding-left: 10px;
+}
+
+.puntos {
+  min-width: 70px;
+}
+
+.header {
+  background: #1e3a5f;
+  color: white;
+}
+
+/* 🎨 colores */
+.verde {
+  background: #22c55e;
+  color: white;
+}
+
+.amarillo {
+  background: #eab308;
+  color: black;
+}
+
+.rojo {
+  background: #ef4444;
+  color: white;
+}
+
+.gris {
+  background: #9ca3af;
+  color: white;
+}

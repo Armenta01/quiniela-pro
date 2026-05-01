@@ -150,12 +150,35 @@ app.post('/guardar', async (req, res) => {
     }
 // 🔥 validar si ya mandó EXACTAMENTE lo mismo
 const existentes = await pool.query(
-  `SELECT pr.goles_local, pr.goles_visitante
+  `SELECT envio_id
    FROM predicciones pr
    JOIN users u ON pr.user_id = u.id
-   WHERE u.nombre = $1 AND pr.jornada = $2`,
+   WHERE u.nombre = $1 AND pr.jornada = $2
+   GROUP BY envio_id`,
   [nombre, jornada]
 );
+
+for (let envio of existentes.rows) {
+  const rows = await pool.query(
+    `SELECT goles_local, goles_visitante 
+     FROM predicciones 
+     WHERE envio_id = $1`,
+    [envio.envio_id]
+  );
+
+  const viejo = JSON.stringify(
+    rows.rows.map(x => ({
+      local: x.goles_local,
+      visitante: x.goles_visitante
+    }))
+  );
+
+  const nuevo = JSON.stringify(pronosticos);
+
+  if (viejo === nuevo) {
+    return res.status(400).json({ error: "Ya enviaste esta misma quiniela" });
+  }
+}
 
 // convertir lista actual a string para comparar
 const nuevo = JSON.stringify(pronosticos);

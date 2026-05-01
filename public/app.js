@@ -8,7 +8,7 @@ window.onload = async () => {
   cargarTop4();
 
   const btn = document.getElementById("btnTabla");
-  if (btn) btn.onclick = verTabla;
+  if (btn) btn.onclick = () => verTablaCompleta(jornadaActual);
 };
 
 // 🔥 JORNADAS
@@ -317,79 +317,70 @@ async function verTabla() {
 }
 
 // 🔥 TOP 4
-async function verTabla() {
-  const tablaRes = await fetch(`/tabla?jornada=${jornadaActual}`);
-  const tabla = await tablaRes.json();
+async function verTablaCompleta(jornada) {
 
-  const partidosRes = await fetch(`/partidos?jornada=${jornadaActual}`);
-  const partidos = await partidosRes.json();
+  const res = await fetch(`/tabla?jornada=${jornada}`);
+  const data = await res.json();
 
   const cont = document.getElementById("tabla");
+  cont.innerHTML = "";
 
-  if (tabla.length === 0) {
-    cont.innerHTML = "<p>No hay datos aún</p>";
+  if (!data.length) {
+    cont.innerHTML = "<p>No hay datos</p>";
     return;
   }
 
-  let html = `
-    <h2>🏆 Tabla</h2>
-    <div style="overflow-x:auto;">
-    <table style="width:100%; border-collapse: collapse; text-align:center;">
-      <thead>
-        <tr>
-          <th style="padding:10px;">Jugador</th>
+  // 🔥 encabezado partidos
+  let header = `
+    <div class="fila header">
+      <div class="celda jugador">Jugador</div>
   `;
 
-  // 🔥 ENCABEZADO PARTIDOS + RESULTADO
-  partidos.forEach(p => {
-
-    let marcador = (p.goles_local != null && p.goles_visitante != null)
-      ? `${p.goles_local} - ${p.goles_visitante}`
-      : "⚪";
-
-    html += `
-      <th style="padding:10px;">
-        ${p.local}<br>
-        <span style="font-size:14px; font-weight:bold;">
-          ${marcador}
-        </span><br>
-        ${p.visitante}
-      </th>
-    `;
+  // tomar partidos del primer usuario
+  data[0].picks.forEach((_, i) => {
+    header += `<div class="celda">P${i+1}</div>`;
   });
 
-  html += `<th>Puntos</th></tr></thead><tbody>`;
+  header += `<div class="celda puntos">Pts</div></div>`;
 
-  // 🔥 FILAS USUARIOS
-  tabla.forEach((u, i) => {
+  cont.innerHTML += header;
 
-    let medal = ["🥇","🥈","🥉"][i] || "";
+  // 🔥 numerador nombres
+  let contador = {};
 
-    html += `<tr>
-      <td style="padding:10px;">${medal} ${u.nombre}</td>
-    `;
+  data.forEach((u, index) => {
 
-    u.detalles.forEach(d => {
+    if (!contador[u.nombre]) contador[u.nombre] = 1;
+    else contador[u.nombre]++;
+
+    const nombreFinal = contador[u.nombre] > 1
+      ? `${u.nombre} #${contador[u.nombre]}`
+      : u.nombre;
+
+    let fila = `<div class="fila">`;
+
+    fila += `<div class="celda jugador">
+      ${index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : ""}
+      ${nombreFinal}
+    </div>`;
+
+    u.picks.forEach((p, i) => {
 
       let color = {
-        verde: "#22c55e",
-        amarillo: "#eab308",
-        rojo: "#ef4444",
-        gris: "#ffffff"
-      }[d];
+        verde: "verde",
+        amarillo: "amarillo",
+        rojo: "rojo",
+        gris: "gris"
+      }[u.detalles[i]];
 
-      html += `
-        <td style="background:${color}; border-radius:6px;">
-        </td>
-      `;
+      fila += `<div class="celda ${color}">${p}</div>`;
     });
 
-    html += `<td>${u.puntos}</td></tr>`;
+    fila += `<div class="celda puntos">${u.puntos}</div>`;
+    fila += `</div>`;
+
+    cont.innerHTML += fila;
   });
-
-  html += `</tbody></table></div>`;
-
-  cont.innerHTML = html;
 }
 
 function irTabla() {
