@@ -6,11 +6,8 @@ window.onload = async () => {
   await cargarJornadas();
   cambiarJornada();
 
-  // 🔥 conectar botón correctamente
   const btn = document.getElementById("btnTabla");
-  if (btn) {
-    btn.onclick = verTabla;
-  }
+  if (btn) btn.onclick = verTabla;
 };
 
 // 🔥 JORNADAS
@@ -29,63 +26,50 @@ async function cargarJornadas() {
 // 🔥 CAMBIO
 function cambiarJornada() {
   jornadaActual = document.getElementById("jornadaSelect").value || 1;
+
   cargarPartidos();
   verTabla();
+  cargarTop4();
   checkBloqueo();
 }
 
 // 🔥 PARTIDOS
 async function cargarPartidos() {
-  try {
-    const res = await fetch(`/partidos?jornada=${jornadaActual}`);
-    const data = await res.json();
+  const res = await fetch(`/partidos?jornada=${jornadaActual}`);
+  const data = await res.json();
 
-    const cont = document.getElementById("partidos");
-    cont.innerHTML = "";
+  const cont = document.getElementById("partidos");
+  cont.innerHTML = "";
 
-    if (!data || data.length === 0) {
-      cont.innerHTML = "<p>No hay partidos</p>";
-      return;
-    }
+  data.forEach(p => {
+    cont.innerHTML += `
+      <div class="card">
+        <div class="match">
 
-    data.forEach(p => {
-      cont.innerHTML += `
-        <div class="card">
-          <div class="match">
-
-            <div class="team left">
-              <img src="${p.logo_local || ''}">
-              <span>${p.local}</span>
-            </div>
-
-            <div class="score">
-              <input type="number" id="l${p.id}">
-              <span>-</span>
-              <input type="number" id="v${p.id}">
-            </div>
-
-            <div class="team right">
-              <span>${p.visitante}</span>
-              <img src="${p.logo_visitante || ''}">
-            </div>
-
+          <div class="team left">
+            <img src="${p.logo_local || ''}">
+            <span>${p.local}</span>
           </div>
 
-          <div class="meta">
-            ⏰ ${new Date(p.fecha).toLocaleString()}
+          <div class="score">
+            <input type="number" id="l${p.id}">
+            <span>-</span>
+            <input type="number" id="v${p.id}">
           </div>
 
-          <div class="liga">
-            🏆 ${p.jornada_partido || ""}
+          <div class="team right">
+            <span>${p.visitante}</span>
+            <img src="${p.logo_visitante || ''}">
           </div>
+
         </div>
-      `;
-    });
 
-  } catch (err) {
-    console.error("Error partidos:", err);
-    document.getElementById("partidos").innerHTML = "❌ Error cargando partidos";
-  }
+        <div class="meta">
+          ⏰ ${new Date(p.fecha).toLocaleString()}
+        </div>
+      </div>
+    `;
+  });
 }
 
 // 🔥 GUARDAR
@@ -131,50 +115,77 @@ async function guardarTodo() {
 
   if (!res.ok) return alert(data.error);
 
-  confetti();
   alert("🔥 Quiniela enviada");
-
-  let mensaje = `📊 Quiniela Semana ${jornadaActual}%0A`;
-  mensaje += `👤 ${usuario}%0A%0A`;
-
-  lista.forEach(p => {
-    const partido = partidos.find(x => x.id === p.partido_id);
-    mensaje += `⚽ ${partido.local} ${p.local}-${p.visitante} ${partido.visitante}%0A`;
-  });
-
-  const url = `https://wa.me/524531021052?text=${mensaje}`;
-  window.location.href = url;
 }
 
-// 🔥 TABLA
-data.forEach((u, i) => {
-  let medal = ["🥇", "🥈", "🥉"][i] || "";
+// 🏆 TABLA (YA CORRECTA)
+async function verTabla() {
+  const res = await fetch(`/tabla?jornada=${jornadaActual}`);
+  const data = await res.json();
 
-  let detallesHTML = u.detalles.map(d => {
-    let color = {
-      verde: "#22c55e",
-      amarillo: "#eab308",
-      rojo: "#ef4444",
-      gris: "#9ca3af"
-    }[d];
+  const cont = document.getElementById("tabla");
+  cont.innerHTML = "<h2>🏆 Tabla</h2>";
 
-    return `<span style="
-      display:inline-block;
-      width:10px;
-      height:10px;
-      border-radius:50%;
-      background:${color};
-      margin:2px;
-    "></span>`;
-  }).join("");
+  if (data.length === 0) {
+    cont.innerHTML += "<p>No hay datos aún</p>";
+    return;
+  }
 
-  cont.innerHTML += `
-    <div class="tabla-item ${i === 0 ? 'gold' : ''}">
-      ${medal} ${u.nombre} - ${u.puntos} pts
-      <div>${detallesHTML}</div>
-    </div>
-  `;
-});
+  data.forEach((u, i) => {
+
+    let medal = ["🥇","🥈","🥉"][i] || "";
+
+    let detallesHTML = u.detalles.map(d => {
+      let color = {
+        verde: "#22c55e",
+        amarillo: "#eab308",
+        rojo: "#ef4444",
+        gris: "#9ca3af"
+      }[d];
+
+      return `<span style="
+        display:inline-block;
+        width:10px;
+        height:10px;
+        border-radius:50%;
+        background:${color};
+        margin:2px;
+      "></span>`;
+    }).join("");
+
+    cont.innerHTML += `
+      <div class="tabla-item ${i === 0 ? 'gold' : ''}">
+        ${medal} ${u.nombre} - ${u.puntos} pts
+        <div>${detallesHTML}</div>
+      </div>
+    `;
+  });
+}
+
+// 🔥 TOP 4
+async function cargarTop4() {
+  const res = await fetch(`/top4?jornada=${jornadaActual}`);
+  const data = await res.json();
+
+  let cont = document.getElementById("top4");
+
+  if (!cont) {
+    const div = document.createElement("div");
+    div.id = "top4";
+    document.getElementById("partidos").after(div);
+    cont = div;
+  }
+
+  cont.innerHTML = "<h3>🔥 TOP 4</h3>";
+
+  data.forEach((u,i)=>{
+    cont.innerHTML += `
+      <div>
+        ${i+1}. ${u.nombre} - ${u.puntos} pts
+      </div>
+    `;
+  });
+}
 
 // 🔒 BLOQUEO
 async function checkBloqueo() {
