@@ -12,9 +12,8 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
-// 🔥 INIT DB
+// 🔥 INIT DB + ÍNDICES
 async function initDB() {
-  // 🔥 TABLAS
   await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
@@ -56,18 +55,10 @@ async function initDB() {
     );
   `);
 
-  // ⚡ ÍNDICES (rendimiento PRO)
-  await pool.query(`
-    CREATE INDEX IF NOT EXISTS idx_partidos_jornada ON partidos(jornada);
-  `);
-
-  await pool.query(`
-    CREATE INDEX IF NOT EXISTS idx_predicciones_jornada ON predicciones(jornada);
-  `);
-
-  await pool.query(`
-    CREATE INDEX IF NOT EXISTS idx_users_nombre ON users(nombre);
-  `);
+  // ⚡ performance
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_partidos_jornada ON partidos(jornada);`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_predicciones_jornada ON predicciones(jornada);`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_users_nombre ON users(nombre);`);
 
   console.log("🔥 DB + índices listos");
 }
@@ -75,11 +66,12 @@ async function initDB() {
 initDB();
 
 
-// 🔒 VALIDAR BLOQUEO (1 día antes del primer partido)
+// 🔒 BLOQUEO
 async function jornadaBloqueada(jornada) {
-  const result = await pool.query(`
-    SELECT MIN(fecha) as fecha FROM partidos WHERE jornada = $1
-  `, [jornada]);
+  const result = await pool.query(
+    `SELECT MIN(fecha) as fecha FROM partidos WHERE jornada = $1`,
+    [jornada]
+  );
 
   if (!result.rows[0].fecha) return false;
 
@@ -92,9 +84,9 @@ async function jornadaBloqueada(jornada) {
 
 // 🔥 JORNADAS
 app.get('/jornadas', async (req, res) => {
-  const result = await pool.query(`
-    SELECT DISTINCT jornada FROM partidos ORDER BY jornada
-  `);
+  const result = await pool.query(
+    `SELECT DISTINCT jornada FROM partidos ORDER BY jornada`
+  );
   res.json(result.rows);
 });
 
@@ -103,61 +95,72 @@ app.get('/jornadas', async (req, res) => {
 app.get('/partidos', async (req, res) => {
   const { jornada } = req.query;
 
-  const result = await pool.query(`
-    SELECT * FROM partidos WHERE jornada = $1 ORDER BY fecha
-  `, [jornada]);
+  const result = await pool.query(
+    `SELECT * FROM partidos WHERE jornada = $1 ORDER BY fecha`,
+    [jornada]
+  );
 
   res.json(result.rows);
 });
 
 
-// 🔥 GUARDAR PRONÓSTICOS
+// 🔥 GUARDAR PRONÓSTICOS (FIX PRINCIPAL)
 app.post('/guardar', async (req, res) => {
   const { nombre, jornada, pronosticos } = req.body;
 
   try {
-    if (await jornadaBloqueada(jornada)) {
-      return res.status(400).json({ error: "Jornada bloqueada" });
+    if (!nombre || nombre.length < 2) {
+      return res.status(400).json({ error: "Nombre inválido" });
     }
 
-    // usuario único
+    if (await jornadaBloqueada(jornada)) {
+      return res.status(403).json({ error: "Jornada cerrada" });
+    }
+
     let user = await pool.query(
-      `SELECT * FROM users WHERE nombre = $1`,
+      `SELECT id FROM users WHERE nombre = $1`,
       [nombre]
     );
 
+    let userId;
+
     if (user.rows.length === 0) {
-      user = await pool.query(
-        `INSERT INTO users(nombre) VALUES($1) RETURNING *`,
+      const newUser = await pool.query(
+        `INSERT INTO users(nombre) VALUES($1) RETURNING id`,
         [nombre]
       );
+      userId = newUser.rows[0].id;
+    } else {
+      userId = user.rows[0].id;
     }
 
-    const userId = user.rows[0].id;
+    await pool.query(
+      `DELETE FROM predicciones WHERE user_id = $1 AND jornada = $2`,
+      [userId, jornada]
+    );
 
-    // borrar previos
-    await pool.query(`
-      DELETE FROM predicciones WHERE user_id = $1 AND jornada = $2
-    `, [userId, jornada]);
-
-    // insertar
+    // 🔥 FIX AQUÍ (error de integer "")
     for (let p of pronosticos) {
+
+      const goles_local = p.local === "" ? null : parseInt(p.local);
+      const goles_visitante = p.visitante === "" ? null : parseInt(p.visitante);
+
       await pool.query(`
         INSERT INTO predicciones(user_id, partido_id, goles_local, goles_visitante, jornada)
         VALUES($1,$2,$3,$4,$5)
-      `, [userId, p.partido_id, p.local, p.visitante, jornada]);
+      `, [userId, p.partido_id, goles_local, goles_visitante, jornada]);
     }
 
     res.json({ ok: true });
 
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Error guardando" });
+    res.status(500).json({ error: "Error interno" });
   }
 });
 
 
-// 🔥 TABLA GENERAL
+// 🔥 TABLA
 function calcularPuntos(p, pr) {
   if (p.goles_local === pr.goles_local && p.goles_visitante === pr.goles_visitante) return 3;
 
@@ -170,46 +173,6 @@ function calcularPuntos(p, pr) {
   return 0;
 }
 
-app.get('/tabla', async (req, res) => {
-  const { jornada } = req.query;
-
-  const result = await pool.query(`
-    SELECT u.nombre, p.*, pr.goles_local as pr_local, pr.goles_visitante as pr_visitante
-    FROM predicciones pr
-    JOIN partidos p ON pr.partido_id = p.id
-    JOIN users u ON pr.user_id = u.id
-    WHERE pr.jornada = $1
-  `, [jornada]);
-
-  const tabla = {};
-
-  result.rows.forEach(row => {
-    if (!tabla[row.nombre]) tabla[row.nombre] = 0;
-
-    tabla[row.nombre] += calcularPuntos(row, {
-      goles_local: row.pr_local,
-      goles_visitante: row.pr_visitante
-    });
-  });
-
-  const ordenado = Object.entries(tabla)
-    .map(([nombre, puntos]) => ({ nombre, puntos }))
-    .sort((a, b) => b.puntos - a.puntos);
-
-  res.json(ordenado);
-});
-
-
-// 🏆 TOP 4
-app.get('/top4', async (req, res) => {
-  const { jornada } = req.query;
-
-  const tabla = await fetchTabla(jornada);
-  res.json(tabla.slice(0, 4));
-});
-
-
-// 🧠 helper
 async function fetchTabla(jornada) {
   const result = await pool.query(`
     SELECT u.nombre, p.*, pr.goles_local as pr_local, pr.goles_visitante as pr_visitante
@@ -235,10 +198,33 @@ async function fetchTabla(jornada) {
     .sort((a, b) => b.puntos - a.puntos);
 }
 
+app.get('/tabla', async (req, res) => {
+  const { jornada } = req.query;
+  const tabla = await fetchTabla(jornada);
+  res.json(tabla);
+});
 
-// 🏆 GENERAR CAMPEÓN AUTOMÁTICO
+
+// 🏆 TOP 4
+app.get('/top4', async (req, res) => {
+  const { jornada } = req.query;
+  const tabla = await fetchTabla(jornada);
+  res.json(tabla.slice(0, 4));
+});
+
+
+// 🏆 CAMPEÓN (FIX duplicado)
 app.post('/admin/cerrar-jornada', async (req, res) => {
   const { jornada } = req.body;
+
+  const existe = await pool.query(
+    `SELECT 1 FROM campeones WHERE jornada = $1`,
+    [jornada]
+  );
+
+  if (existe.rows.length > 0) {
+    return res.json({ msg: "Ya existe campeón" });
+  }
 
   const tabla = await fetchTabla(jornada);
 
@@ -255,32 +241,35 @@ app.post('/admin/cerrar-jornada', async (req, res) => {
 });
 
 
-// 🔥 RESULTADOS ADMIN
+// 🔥 RESULTADOS ADMIN (FIX integer)
 app.post('/admin/resultados', async (req, res) => {
   const { resultados } = req.body;
 
   for (let r of resultados) {
+
+    const gl = r.local === "" ? null : parseInt(r.local);
+    const gv = r.visitante === "" ? null : parseInt(r.visitante);
+
     await pool.query(`
       UPDATE partidos
       SET goles_local = $1, goles_visitante = $2
       WHERE id = $3
-    `, [r.local, r.visitante, r.partido_id]);
+    `, [gl, gv, r.partido_id]);
   }
 
   res.json({ ok: true });
 });
 
 
-// 🔥 LÍMITE (para frontend)
+// 🔥 LÍMITE
 app.get('/limite', async (req, res) => {
   const { jornada } = req.query;
-
   const bloqueada = await jornadaBloqueada(jornada);
   res.json({ bloqueada });
 });
 
 
-// 🚀 PORT
+// 🚀 SERVER
 const PORT = process.env.PORT || 10000;
 
 app.listen(PORT, () => {
