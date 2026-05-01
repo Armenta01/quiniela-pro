@@ -121,7 +121,8 @@ app.get('/check-user', async (req, res) => {
 // 🔥 GUARDAR PRONÓSTICOS (FIX PRINCIPAL)
 app.post('/guardar', async (req, res) => {
   const { nombre, jornada, pronosticos } = req.body;
-
+  const envioId = Date.now() + "_" + req.body.nombre;
+  
   try {
     if (!nombre || nombre.length < 2) {
       return res.status(400).json({ error: "Nombre inválido" });
@@ -173,14 +174,15 @@ if (nuevo === viejo) {
     // 🔥 FIX AQUÍ (error de integer "")
     for (let p of pronosticos) {
 
-      const goles_local = p.local === "" ? null : parseInt(p.local);
-      const goles_visitante = p.visitante === "" ? null : parseInt(p.visitante);
+  const goles_local = p.local === "" ? null : parseInt(p.local);
+  const goles_visitante = p.visitante === "" ? null : parseInt(p.visitante);
 
-      await pool.query(`
-        INSERT INTO predicciones(user_id, partido_id, goles_local, goles_visitante, jornada)
-        VALUES($1,$2,$3,$4,$5)
-      `, [userId, p.partido_id, goles_local, goles_visitante, jornada]);
-    }
+  await pool.query(`
+    INSERT INTO predicciones
+    (user_id, partido_id, goles_local, goles_visitante, jornada, envio_id)
+    VALUES($1,$2,$3,$4,$5,$6)
+  `, [userId, p.partido_id, goles_local, goles_visitante, jornada, envioId]);
+}
 
     res.json({ ok: true });
 
@@ -225,7 +227,7 @@ function calcularPuntos(p, pr) {
 
 async function fetchTabla(jornada) {
   const result = await pool.query(`
-    SELECT pr.id AS quiniela_id, u.nombre,
+    SELECT pr.envio_id, u.nombre,
            p.goles_local, p.goles_visitante,
            pr.goles_local AS pr_local,
            pr.goles_visitante AS pr_visitante
@@ -233,14 +235,14 @@ async function fetchTabla(jornada) {
     JOIN partidos p ON pr.partido_id = p.id
     JOIN users u ON pr.user_id = u.id
     WHERE pr.jornada = $1
-    ORDER BY pr.partido_id
+    ORDER BY pr.envio_id
   `, [jornada]);
 
   const tabla = {};
 
   result.rows.forEach(row => {
-    if (!tabla[row.quiniela_id]) {
-      tabla[row.quiniela_id] = {
+    if (!tabla[row.envio_id]) {
+      tabla[row.envio_id] = {
         nombre: row.nombre,
         puntos: 0,
         detalles: [],
@@ -250,16 +252,16 @@ async function fetchTabla(jornada) {
 
     // ⚪ SIN RESULTADO
     if (row.goles_local == null || row.goles_visitante == null) {
-      tabla[row.quiniela_id].detalles.push("gris");
-      tabla[row.quiniela_id].picks.push(`${row.pr_local}-${row.pr_visitante}`);
+      tabla[row.envio_id].detalles.push("gris");
+      tabla[row.envio_id].picks.push(`${row.pr_local}-${row.pr_visitante}`);
       return;
     }
 
     // 🟢 3 pts
     if (row.goles_local === row.pr_local && row.goles_visitante === row.pr_visitante) {
-      tabla[row.quiniela_id].puntos += 3;
-      tabla[row.quiniela_id].detalles.push("verde");
-    tabla[row.quiniela_id].picks.push(`${row.pr_local}-${row.pr_visitante}`);
+      tabla[row.envio_id].puntos += 3;
+      tabla[row.envio_id].detalles.push("verde");
+    tabla[row.envio_id].picks.push(`${row.pr_local}-${row.pr_visitante}`);
     }
 
     // 🟡 1 pt
@@ -268,15 +270,15 @@ async function fetchTabla(jornada) {
       (row.goles_local < row.goles_visitante && row.pr_local < row.pr_visitante) ||
       (row.goles_local === row.goles_visitante && row.pr_local === row.pr_visitante)
     ) {
-      tabla[row.quiniela_id].puntos += 1;
-      tabla[row.quiniela_id].detalles.push("amarillo");
-      tabla[row.quiniela_id].picks.push(`${row.pr_local}-${row.pr_visitante}`);
+      tabla[row.envio_id].puntos += 1;
+      tabla[row.envio_id].detalles.push("amarillo");
+      tabla[row.envio_id].picks.push(`${row.pr_local}-${row.pr_visitante}`);
     }
 
     // 🔴 0 pts
     else {
-      tabla[row.quiniela_id].detalles.push("rojo");
-      tabla[row.quiniela_id].picks.push(`${row.pr_local}-${row.pr_visitante}`);
+      tabla[row.envio_id].detalles.push("rojo");
+      tabla[row.envio_id].picks.push(`${row.pr_local}-${row.pr_visitante}`);
     }
   });
 
