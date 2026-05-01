@@ -159,6 +159,25 @@ app.post('/guardar', async (req, res) => {
   }
 });
 
+app.post('/admin/resultado', async (req, res) => {
+  try {
+    const { partido_id, goles_local, goles_visitante } = req.body;
+
+    await pool.query(
+      `UPDATE partidos 
+       SET goles_local = $1, goles_visitante = $2
+       WHERE id = $3`,
+      [goles_local, goles_visitante, partido_id]
+    );
+
+    res.json({ ok: true });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al guardar resultado' });
+  }
+});
+
 
 // 🔥 TABLA
 function calcularPuntos(p, pr) {

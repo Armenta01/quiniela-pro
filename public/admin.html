@@ -190,14 +190,23 @@ async function cargarPartidos() {
 
     lista.innerHTML = '<h2>📋 Partidos</h2>';
 
-    data.forEach(p => {
-      lista.innerHTML += `
-        <div class="partido">
-          ${p.local} vs ${p.visitante} <br>
-          ${new Date(p.fecha).toLocaleString()}
-        </div>
-      `;
-    });
+   data.forEach(p => {
+  lista.innerHTML += `
+    <div class="partido">
+
+      <b>${p.local} vs ${p.visitante}</b><br>
+      ${new Date(p.fecha).toLocaleString()}<br><br>
+
+      <input type="number" id="rl${p.id}" placeholder="Goles local">
+      <input type="number" id="rv${p.id}" placeholder="Goles visitante">
+
+      <button onclick="guardarResultado(${p.id})">
+        Guardar Resultado
+      </button>
+
+    </div>
+  `;
+});
 
   } catch (err) {
     console.error(err);
@@ -206,7 +215,42 @@ async function cargarPartidos() {
 
 cargarPartidos();
 
+async function guardarResultado(id) {
+  const gl = document.getElementById("rl"+id).value;
+  const gv = document.getElementById("rv"+id).value;
+
+  if (gl === "" || gv === "") {
+    alert("Pon marcador");
+    return;
+  }
+
+  try {
+    const res = await fetch('/admin/resultado', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        partido_id: id,
+        goles_local: parseInt(gl),
+        goles_visitante: parseInt(gv)
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.ok) {
+      alert("✅ Resultado guardado");
+    } else {
+      alert("❌ Error");
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert("❌ Error servidor");
+  }
+}
+
 </script>
+
 
 </body>
 </html>
