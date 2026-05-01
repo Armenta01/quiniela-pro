@@ -112,3 +112,8 @@ input, select, button {
 button {
   min-width: 120px;
 }
+
+.estado.warning {
+  color: orange;
+  font-weight: bold;
+}

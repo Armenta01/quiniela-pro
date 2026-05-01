@@ -18,8 +18,8 @@
 
 <div class="top-bar">
   <button onclick="irTabla()">📊 Ver Tabla</button>
-  <input id="usuario" maxlength="15" placeholder="Tu nombre">
-
+  <input id="usuario" maxlength="15" placeholder="Tu nombre" onblur="validarUsuario()">
+  
   <select id="jornadaSelect" onchange="cambiarJornada()"></select>
 </div>
 

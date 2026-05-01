@@ -103,6 +103,20 @@ app.get('/partidos', async (req, res) => {
   res.json(result.rows);
 });
 
+app.get('/check-user', async (req, res) => {
+  const { nombre, jornada } = req.query;
+
+  const r = await pool.query(
+    `SELECT COUNT(*) FROM users WHERE nombre=$1`,
+    [nombre]
+  );
+
+  res.json({
+    existe: parseInt(r.rows[0].count) > 0
+  });
+});
+
+
 
 // 🔥 GUARDAR PRONÓSTICOS (FIX PRINCIPAL)
 app.post('/guardar', async (req, res) => {

@@ -241,22 +241,21 @@ async function cargarTop4() {
 }
 
 
-  const res = await fetch('/guardar', {
-    method: 'POST',
-    headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({
-      nombre: usuario,
-      jornada: jornadaActual,
-      pronosticos: lista
-    })
-  });
+async function validarUsuario() {
+  const nombre = document.getElementById("usuario").value;
+  if (!nombre) return;
 
+  const res = await fetch(`/check-user?nombre=${nombre}&jornada=${jornadaActual}`);
   const data = await res.json();
 
-  if (!res.ok) return alert(data.error);
+  const estado = document.getElementById("estadoQuiniela");
 
-  alert("🔥 Quiniela enviada");
+  if (data.existe) {
+    estado.innerText = "⚠️ Ya participaste, puedes enviar otra diferente";
+    estado.className = "estado warning";
+  }
 }
+
 
 // 🏆 TABLA (YA CORRECTA)
 async function verTabla() {
