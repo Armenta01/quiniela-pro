@@ -275,6 +275,23 @@ function calcularPuntos(p, pr) {
   return 0;
 }
 
+async function limpiarSemanaCiclo(jornada) {
+
+  const MAX_SEMANAS = 20;
+
+  if (jornada <= MAX_SEMANAS) return;
+
+  const semanaEliminar = jornada - MAX_SEMANAS;
+
+  console.log("🧹 Eliminando semana:", semanaEliminar);
+
+  await pool.query(`DELETE FROM predicciones WHERE jornada = $1`, [semanaEliminar]);
+
+  await pool.query(`DELETE FROM partidos WHERE jornada = $1`, [semanaEliminar]);
+
+  // ❗ NO borres campeones (historial)
+}
+
 async function fetchTabla(jornada) {
   const result = await pool.query(`
     SELECT pr.envio_id, u.nombre,
@@ -443,7 +460,7 @@ app.get('/limite', async (req, res) => {
 
 app.post('/admin/partidos', async (req, res) => {
   const { local, visitante, fecha, jornada } = req.body;
-
+  await limpiarSemanaCiclo(jornada);
   await pool.query(
     `INSERT INTO partidos (local, visitante, fecha, jornada)
      VALUES ($1,$2,$3,$4)`,
