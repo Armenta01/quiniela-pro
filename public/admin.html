@@ -115,7 +115,7 @@ button[onclick="resetearTodo()"]:hover {
     <input type="text" id="local" placeholder="Equipo local">
     <input type="text" id="visitante" placeholder="Equipo visitante">
 
-    <input type="datetime-local" id="fecha">
+   <input type="datetime-local" id="fecha">
 
     <input type="text" id="liga" placeholder="Ej: Liga MX J13">
 
@@ -221,11 +221,11 @@ const res = await fetch('/admin/partidos', {
       msg.style.color = "red";
     }
 
-  } catch (err) {
-    console.error(err);
-    msg.innerText = "❌ Error servidor";
-    msg.style.color = "red";
-  }
+  } 
+  catch (err) {
+  console.error("ERROR REAL:", err.message);
+  res.status(500).json({ error: err.message });
+}
 }
 
 async function resetearTodo() {
