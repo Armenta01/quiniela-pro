@@ -458,6 +458,23 @@ app.get('/limite', async (req, res) => {
   }
 });
 
+app.post('/reset', async (req, res) => {
+  try {
+
+    await pool.query('DELETE FROM predicciones');
+    await pool.query('DELETE FROM partidos');
+
+    // 🔥 OPCIONAL (si quieres borrar historial)
+    // await pool.query('DELETE FROM campeones');
+
+    res.json({ ok: true });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al resetear" });
+  }
+});
+
 app.post('/admin/partidos', async (req, res) => {
   const { local, visitante, fecha, jornada } = req.body;
   await limpiarSemanaCiclo(jornada);

@@ -93,6 +93,15 @@
       }
     }
 
+    button[onclick="resetearTodo()"] {
+  background: linear-gradient(90deg, #ff0000, #ff4d4d);
+  box-shadow: 0 0 10px red;
+}
+
+button[onclick="resetearTodo()"]:hover {
+  transform: scale(1.05);
+}
+
   </style>
 </head>
 <body>
@@ -114,32 +123,23 @@
     <input type="text" id="logo_visitante" placeholder="URL logo visitante">
 
     <select id="jornada">
-      <option value="1">Semana 1</option>
-      <option value="2">Semana 2</option>
-      <option value="3">Semana 3</option>
-      <option value="4">Semana 4</option>
-      <option value="1">Semana 5</option>
-      <option value="2">Semana 6</option>
-      <option value="3">Semana 7</option>
-      <option value="4">Semana 8</option>
-      <option value="1">Semana 9</option>
-      <option value="2">Semana 10</option>
-      <option value="3">Semana 11</option>
-      <option value="4">Semana 12</option>
-      <option value="1">Semana 13</option>
-      <option value="2">Semana 14</option>
-      <option value="3">Semana 15</option>
-      <option value="4">Semana 16</option>
-      <option value="1">Semana 17</option>
-      <option value="2">Semana 18</option>
-      <option value="3">Semana 19</option>
-      <option value="4">Semana 20</option>
+      ${Array.from({length:20}, (_,i)=> `<option value="${i+1}">Semana ${i+1}</option>`).join("")}
     </select>
 
     <button onclick="cargarPartidos()">Ver Jornada</button>
   
     <button onclick="crearPartido()">Crear Partido</button>
 
+    <button onclick="resetearTodo()" style="
+  background:red;
+  color:white;
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  margin-top:10px;
+">
+  ⚠️ Reset Temporada
+</button>
   </div>
 
   <div class="msg" id="msg"></div>
@@ -165,16 +165,23 @@ async function crearPartido() {
   }
 
   try {
-    const res = await fetch('/admin/partidos', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        local,
-        visitante,
-        fecha,
-        jornada
-      })
-    });
+    const liga = document.getElementById('liga').value;
+const logo_local = document.getElementById('logo_local').value;
+const logo_visitante = document.getElementById('logo_visitante').value;
+
+const res = await fetch('/admin/partidos', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    local,
+    visitante,
+    fecha,
+    jornada,
+    liga,
+    logo_local,
+    logo_visitante
+  })
+});
 
     const data = await res.json();
 
@@ -197,6 +204,30 @@ async function crearPartido() {
     msg.innerText = "❌ Error servidor";
     msg.style.color = "red";
   }
+}
+
+async function resetearTodo() {
+
+  const clave = prompt("Escribe ADMIN para confirmar reset");
+
+if (clave !== "ADMIN") {
+  alert("Cancelado");
+  return;
+}
+  if (!ok) return;
+
+  const res = await fetch('/reset', {
+    method: 'POST'
+  });
+
+  if (!res.ok) {
+    alert("Error al resetear");
+    return;
+  }
+
+  alert("🔥 Sistema reiniciado");
+
+  location.reload();
 }
 
 async function cargarPartidos() {
