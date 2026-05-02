@@ -479,11 +479,10 @@ app.post('/admin/partidos', async (req, res) => {
  const { local, visitante, fecha, jornada, liga, logo_local, logo_visitante } = req.body;
   try {
     await pool.query(`
-      INSERT INTO partidos
-      (local, visitante, fecha, jornada, jornada_partido, logo_local, logo_visitante)
-      VALUES ($1,$2,$3,$4,$5,$6,$7)
-    `, [local, visitante, fecha, jornada, liga, logo_local, logo_visitante]);
-
+  INSERT INTO partidos
+  (local, visitante, fecha, jornada, liga, logo_local, logo_visitante)
+  VALUES ($1,$2,$3,$4,$5,$6,$7)
+`, [local, visitante, fecha, jornada, liga, logo_local, logo_visitante]);
     res.json({ ok: true });
 
   } catch (err) {

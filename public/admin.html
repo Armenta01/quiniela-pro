@@ -225,6 +225,7 @@ const res = await fetch('/admin/partidos', {
   catch (err) {
   console.error("ERROR REAL:", err.message);
   res.status(500).json({ error: err.message });
+  console.log("FECHA:", fecha);
 }
 }
 
@@ -259,6 +260,11 @@ async function cargarPartidos() {
     const jornada = document.getElementById('jornada').value;
     const res = await fetch(`/partidos?jornada=${jornada}`);
     const data = await res.json();
+
+    if (!res.ok) {
+  alert(data.error); // 🔥 AQUÍ VERÁS EL ERROR REAL
+  return;
+}
 
     lista.innerHTML = '<h2>📋 Partidos</h2>';
 
