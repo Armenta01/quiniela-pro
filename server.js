@@ -476,15 +476,14 @@ app.post('/reset', async (req, res) => {
 });
 
 app.post('/admin/partidos', async (req, res) => {
-  const { local, visitante, fecha, jornada, logo_local, logo_visitante } = req.body;
+  const { local, visitante, fecha, jornada, liga, logo_local, logo_visitante } = req.body;
 
   try {
-
     await pool.query(`
       INSERT INTO partidos
-      (local, visitante, fecha, jornada, logo_local, logo_visitante)
-      VALUES ($1,$2,$3,$4,$5,$6)
-    `, [local, visitante, fecha, jornada, logo_local || null, logo_visitante || null]);
+      (local, visitante, fecha, jornada, liga, logo_local, logo_visitante)
+      VALUES ($1,$2,$3,$4,$5,$6,$7)
+    `, [local, visitante, fecha, jornada, liga || null, logo_local || null, logo_visitante || null]);
 
     res.json({ ok: true });
 

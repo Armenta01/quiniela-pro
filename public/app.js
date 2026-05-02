@@ -116,8 +116,22 @@ async function cargarPartidos() {
         </div>
 
         <div class="meta">
-          ⏰ ${new Date(p.fecha).toLocaleString()}
-        </div>
+
+  <div class="hora">
+    ⏰ ${new Date(p.fecha).toLocaleDateString('es-MX', {
+      day: '2-digit',
+      month: 'short'
+    })} · ${new Date(p.fecha).toLocaleTimeString('es-MX', {
+      hour: '2-digit',
+      minute: '2-digit'
+    })}
+  </div>
+
+  <div class="liga">
+    🏆 ${p.liga || "Liga"} · Jornada ${p.jornada}
+  </div>
+
+</div>
       </div>
     `;
   });
