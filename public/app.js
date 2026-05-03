@@ -141,6 +141,7 @@ async function cargarPartidos() {
   `;
 });
 
+} // 👈 🔥 ESTA LLAVE FALTABA
 // 🔥 GUARDAR
 async function guardarTodo() {
   if (quinielaCerrada) return alert("🔒 Cerrado");
