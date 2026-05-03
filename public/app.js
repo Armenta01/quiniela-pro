@@ -128,7 +128,7 @@ async function cargarPartidos() {
   </div>
 
   <div class="liga">
-    🏆 ${p.liga || "Liga"} · Jornada ${p.jornada}
+    🏆 ${p.liga || "Liga"}
   </div>
 
 </div>
