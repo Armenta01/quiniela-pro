@@ -92,55 +92,54 @@ async function cargarPartidos() {
   const cont = document.getElementById("partidos");
   cont.innerHTML = "";
 
-  data.forEach(p => {
-    cont.innerHTML += `
-      <div class="card">
-        <div class="match">
+ data.forEach(p => {
 
-          <div class="team left">
-            <img src="${p.logo_local || ''}">
-            <span>${p.local}</span>
-          </div>
+  const [fechaRaw, horaRaw] = p.fecha.split("T");
 
-          <div class="score">
-            <input type="number" id="l${p.id}">
-            <span>-</span>
-            <input type="number" id="v${p.id}">
-          </div>
+  const fecha = new Date(fechaRaw);
 
-          <div class="team right">
-            <span>${p.visitante}</span>
-            <img src="${p.logo_visitante || ''}">
-          </div>
+  const fechaFormateada = fecha.toLocaleDateString('es-MX', {
+    day: '2-digit',
+    month: 'short'
+  });
 
+  const horaFormateada = horaRaw?.slice(0,5) || "";
+
+  cont.innerHTML += `
+    <div class="card">
+      <div class="match">
+
+        <div class="team left">
+          <img src="${p.logo_local || ''}">
+          <span>${p.local}</span>
         </div>
 
-        <div class="meta">
+        <div class="score">
+          <input type="number" id="l${p.id}">
+          <span>-</span>
+          <input type="number" id="v${p.id}">
+        </div>
 
- const [fechaRaw, horaRaw] = p.fecha.split("T");
+        <div class="team right">
+          <span>${p.visitante}</span>
+          <img src="${p.logo_visitante || ''}">
+        </div>
 
-const fecha = new Date(fechaRaw);
-
-const fechaFormateada = fecha.toLocaleDateString('es-MX', {
-  day: '2-digit',
-  month: 'short'
-});
-
-const horaFormateada = horaRaw?.slice(0,5) || "";
-
-<div class="hora">
-  ⏰ ${fechaFormateada} · ${horaFormateada}
-</div>
-
-  <div class="liga">
-    🏆 ${p.liga || "Liga"}
-  </div>
-
-</div>
       </div>
-    `;
-  });
-}
+
+      <div class="meta">
+        <div class="hora">
+          ⏰ ${fechaFormateada} · ${horaFormateada}
+        </div>
+
+        <div class="liga">
+          🏆 ${p.liga || "Liga MX"}
+        </div>
+      </div>
+
+    </div>
+  `;
+});
 
 // 🔥 GUARDAR
 async function guardarTodo() {
