@@ -303,3 +303,15 @@ button {
   border-radius: 12px;
   box-shadow: 0 0 15px rgba(0,0,0,0.5);
 }
+
+.banner img {
+  width: 100%;
+  max-width: 650px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.6);
+  transition: transform 0.3s;
+}
+
+.banner img:hover {
+  transform: scale(1.02);
+}
