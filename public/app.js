@@ -117,15 +117,20 @@ async function cargarPartidos() {
 
         <div class="meta">
 
-  <div class="hora">
-    ⏰ ${new Date(p.fecha).toLocaleDateString('es-MX', {
-      day: '2-digit',
-      month: 'short'
-    })} · ${new Date(p.fecha).toLocaleTimeString('es-MX', {
-      hour: '2-digit',
-      minute: '2-digit'
-    })}
-  </div>
+ const [fechaRaw, horaRaw] = p.fecha.split("T");
+
+const fecha = new Date(fechaRaw);
+
+const fechaFormateada = fecha.toLocaleDateString('es-MX', {
+  day: '2-digit',
+  month: 'short'
+});
+
+const horaFormateada = horaRaw?.slice(0,5) || "";
+
+<div class="hora">
+  ⏰ ${fechaFormateada} · ${horaFormateada}
+</div>
 
   <div class="liga">
     🏆 ${p.liga || "Liga"}
