@@ -132,7 +132,10 @@ button {
   padding: 10px;
   text-align: center;
   font-weight: bold;
-  color: #ffffff; /* 🔥 texto blanco SIEMPRE visible */
+  color: #ffffff;
+
+  min-width: 80px; /* 🔥 CLAVE */
+  flex: 1;          /* 🔥 CLAVE */
 }
 
 .jugador {
@@ -191,10 +194,18 @@ button {
   color: black;
   font-weight: bold;
 }
+.fila {
+  background: transparent; /* 🔥 evita bloque gris */
+}
 
 /* ✨ efecto suave */
 .fila {
-  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.header .celda {
+  font-weight: bold;
 }
 
 .fila:hover {
