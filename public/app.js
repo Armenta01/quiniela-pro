@@ -8,8 +8,12 @@ window.onload = async () => {
   cargarTop4();
 
   const btn = document.getElementById("btnTabla");
-  if (btn) btn.onclick = () => verTablaCompleta(jornadaActual);
+if (btn) btn.onclick = () => verTablaCompleta(jornadaActual);
 };
+
+function irTabla() {
+  verTablaCompleta(jornadaActual);
+}
 
 // 🔥 JORNADAS
 async function cargarJornadas() {
