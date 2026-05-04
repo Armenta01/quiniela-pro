@@ -7,12 +7,12 @@ window.onload = async () => {
   cambiarJornada();
   cargarTop4();
 
-  const btn = document.getElementById("btnTabla");
-if (btn) btn.onclick = () => verTablaCompleta(jornadaActual);
+  
 };
 
 function irTabla() {
-  window.location.href = "tabla.html";
+  const jornada = document.getElementById("jornadaSelect").value;
+  window.location.href = `tabla.html?jornada=${jornada}`;
 }
 
 // 🔥 JORNADAS
