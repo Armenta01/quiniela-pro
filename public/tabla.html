@@ -24,8 +24,9 @@
 <h1>🏆 Tabla General</h1>
 
 <select id="jornadaSelect"></select>
+<div id="partidosResumen"></div>
 
-<div id="tabla"></div>
+<div id="tabla" class="tabla-scroll"></div>
 
 <!-- 🔥 IMPORTANTE: cargar tu lógica -->
 <script src="app.js"></script>
@@ -46,11 +47,51 @@ window.onload = async () => {
 
   // 🔥 usar tu función PRO
   verTablaCompleta(jornada);
-
+  cargarResumenPartidos(jornada);
+  
   document.getElementById("jornadaSelect").onchange = function() {
-    verTablaCompleta(this.value);
-  };
+  const j = this.value;
+  verTablaCompleta(j);
+  cargarResumenPartidos(j);
 };
+};
+
+async function cargarResumenPartidos(jornada) {
+
+  const res = await fetch(`/partidos?jornada=${jornada}`);
+  const partidos = await res.json();
+
+  const cont = document.getElementById("partidosResumen");
+
+  
+
+  partidos.forEach(p => {
+
+    let marcador = (p.goles_local != null && p.goles_visitante != null)
+      ? `${p.goles_local}-${p.goles_visitante}`
+      : "⚪";
+
+    html += `
+  <div style="
+    min-width:120px;
+    flex:0 0 auto;
+    background:#1e293b;
+    padding:8px;
+    border-radius:10px;
+    text-align:center;
+    font-size:12px;
+  ">
+        <div>${p.local}</div>
+        <div style="font-weight:bold">${marcador}</div>
+        <div>${p.visitante}</div>
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+
+  cont.innerHTML = html;
+}
 </script>
 
 </body>

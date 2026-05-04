@@ -369,3 +369,18 @@ button {
   background: #334155; /* 🔥 gris oscuro visible */
   color: #cbd5f5;
 }
+
+.tabla-scroll {
+  overflow-x: auto;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+.fila {
+  min-width: max-content;
+}
+
+.celda {
+  min-width: 70px;
+  flex: 0 0 auto;
+}
