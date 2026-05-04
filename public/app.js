@@ -12,9 +12,9 @@ if (btn) btn.onclick = () => verTablaCompleta(jornadaActual);
 };
 
 function irTabla() {
-  const jornada = document.getElementById("jornadaSelect").value;
-  window.location.href = `tabla.html?jornada=${jornada}`;
+  verTablaCompleta(jornadaActual);
 }
+
 // 🔥 JORNADAS
 async function cargarJornadas() {
   const r = await fetch('/jornadas');
@@ -145,7 +145,7 @@ async function verTablaCompleta(jornada) {
   }
 
   // 🔥 usar el primero seguro
-  const totalPartidos = data[0]?.picks?.length || 0;
+  const totalPartidos = Math.max(...data.map(u => u.picks.length));
 
   let header = `
     <div class="fila header">
@@ -182,11 +182,18 @@ async function verTablaCompleta(jornada) {
       ${index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : ""}
       ${nombreFinal}
     </div>`;
+    // 🔥 pintar picks existentes
+u.picks.forEach((p, i) => {
+  const valor = p || "-";
+  const color = u.detalles[i] || "gris";
 
-    u.picks.forEach((p, i) => {
-      const color = u.detalles[i] || "gris";
-      fila += `<div class="celda ${color}">${p}</div>`;
-    });
+  fila += `<div class="celda ${color}">${valor}</div>`;
+});
+
+// 🔥 completar columnas faltantes (IMPORTANTE)
+for (let i = u.picks.length; i < totalPartidos; i++) {
+  fila += `<div class="celda gris">-</div>`;
+}
 
     fila += `<div class="celda puntos">${u.puntos}</div>`;
     fila += `</div>`;
