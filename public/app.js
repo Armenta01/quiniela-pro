@@ -126,6 +126,71 @@ async function cargarPartidos() {
   });
 }
 
+async function verTablaCompleta(jornada) {
+
+  const res = await fetch(`/tabla?jornada=${jornada}`);
+  const data = await res.json();
+
+  const cont = document.getElementById("tabla");
+  cont.innerHTML = "";
+
+  // 🔥 seguridad total
+  if (!Array.isArray(data) || data.length === 0) {
+    cont.innerHTML = "<p>No hay datos</p>";
+    return;
+  }
+
+  // 🔥 usar el primero seguro
+  const totalPartidos = data[0]?.picks?.length || 0;
+
+  let header = `
+    <div class="fila header">
+      <div class="celda jugador">Jugador</div>
+  `;
+
+  for (let i = 0; i < totalPartidos; i++) {
+    header += `<div class="celda">P${i+1}</div>`;
+  }
+
+  header += `<div class="celda puntos">Pts</div></div>`;
+
+  cont.innerHTML += header;
+
+  let contador = {};
+
+  data.forEach((u, index) => {
+
+    let claseTop = index === 0 ? "top1"
+      : index === 1 ? "top2"
+      : index === 2 ? "top3"
+      : "";
+
+    if (!contador[u.nombre]) contador[u.nombre] = 1;
+    else contador[u.nombre]++;
+
+    const nombreFinal = contador[u.nombre] > 1
+      ? `${u.nombre} #${contador[u.nombre]}`
+      : u.nombre;
+
+    let fila = `<div class="fila ${claseTop}">`;
+
+    fila += `<div class="celda jugador">
+      ${index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : ""}
+      ${nombreFinal}
+    </div>`;
+
+    u.picks.forEach((p, i) => {
+      const color = u.detalles[i] || "gris";
+      fila += `<div class="celda ${color}">${p}</div>`;
+    });
+
+    fila += `<div class="celda puntos">${u.puntos}</div>`;
+    fila += `</div>`;
+
+    cont.innerHTML += fila;
+  });
+}
+
 // 🔥 GUARDAR
 async function guardarTodo() {
   if (quinielaCerrada) return alert("🔒 Cerrado");
