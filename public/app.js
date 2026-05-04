@@ -12,7 +12,7 @@ if (btn) btn.onclick = () => verTablaCompleta(jornadaActual);
 };
 
 function irTabla() {
-  window.location.href = "tabla.html";
+  verTablaCompleta(jornadaActual);
 }
 
 // 🔥 JORNADAS
