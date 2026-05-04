@@ -127,11 +127,6 @@ button {
   align-items: center;
 }
 
-.celda span,
-.celda {
-  color: #111 !important; /* 🔥 negro fuerte */
-}
-
 /* 🔥 celdas de la tabla */
 .celda {
   border-radius: 6px;
@@ -331,4 +326,45 @@ button {
 
 .banner img:hover {
   transform: scale(1.02);
+}
+
+/* 🔥 SOLUCIÓN FINAL VISUAL TABLA */
+
+.celda {
+  min-width: 80px;
+  flex: 1;
+  padding: 12px;
+  text-align: center;
+  font-weight: bold;
+
+  background: #0f172a; /* 🔥 fondo oscuro base */
+  color: #ffffff;
+}
+
+/* 🔥 asegura que el contenido se vea */
+.celda span {
+  display: inline-block;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+
+/* 🔥 COLORES REALES */
+.verde span {
+  background: #22c55e;
+  color: #fff;
+}
+
+.amarillo span {
+  background: #eab308;
+  color: #000;
+}
+
+.rojo span {
+  background: #ef4444;
+  color: #fff;
+}
+
+.gris span {
+  background: #334155; /* 🔥 gris oscuro visible */
+  color: #cbd5f5;
 }
