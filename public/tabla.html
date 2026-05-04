@@ -5,37 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tabla Quiniela</title>
 
-<style>
-body {
-  font-family: Arial;
-  background: #0b1d3a;
-  color: white;
-  text-align: center;
-  padding: 20px;
-}
+<link rel="stylesheet" href="styles.css">
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-th, td {
-  padding: 10px;
-}
-
-th {
-  background: #132a4f;
-}
-
-td {
-  background: #1f3c6b;
-}
-
-.scroll {
-  overflow-x: auto;
-}
-</style>
 </head>
 
 <body>
@@ -46,10 +17,10 @@ td {
 
 <div id="tabla"></div>
 
+<!-- 🔥 IMPORTANTE: cargar tu lógica -->
+<script src="app.js"></script>
+
 <script>
-
-let jornadaActual = 1;
-
 window.onload = async () => {
 
   const params = new URLSearchParams(window.location.search);
@@ -61,105 +32,15 @@ window.onload = async () => {
     document.getElementById("jornadaSelect").value = jornadaURL;
   }
 
-  cambiarJornada();
+  const jornada = document.getElementById("jornadaSelect").value;
+
+  // 🔥 usar tu función PRO
+  verTablaCompleta(jornada);
+
+  document.getElementById("jornadaSelect").onchange = function() {
+    verTablaCompleta(this.value);
+  };
 };
-
-async function cargarJornadas() {
-  const r = await fetch('/jornadas');
-  const data = await r.json();
-
-  const select = document.getElementById('jornadaSelect');
-  select.innerHTML = '';
-
-  data.forEach(j => {
-    select.innerHTML += `<option value="${j.jornada}">Semana ${j.jornada}</option>`;
-  });
-
-  select.onchange = cambiarJornada;
-}
-
-function cambiarJornada() {
-  jornadaActual = document.getElementById("jornadaSelect").value;
-  verTabla();
-}
-
-async function verTabla() {
-
-  const tablaRes = await fetch(`/tabla?jornada=${jornadaActual}`);
-  const tabla = await tablaRes.json();
-
-  const partidosRes = await fetch(`/partidos?jornada=${jornadaActual}`);
-  const partidos = await partidosRes.json();
-
-  const cont = document.getElementById("tabla");
-
-  if (tabla.length === 0) {
-    cont.innerHTML = "<p>No hay datos aún</p>";
-    return;
-  }
-
-  let html = `
-    <div class="scroll">
-    <table>
-      <thead>
-        <tr>
-          <th>Jugador</th>
-  `;
-
-  partidos.forEach(p => {
-
-    let marcador = (p.goles_local != null && p.goles_visitante != null)
-      ? `${p.goles_local} - ${p.goles_visitante}`
-      : "⚪";
-
-    html += `
-      <th>
-        ${p.local}<br>
-        <b>${marcador}</b><br>
-        ${p.visitante}
-      </th>
-    `;
-  });
-
-  html += `<th>Puntos</th></tr></thead><tbody>`;
-
-  tabla.forEach((u, i) => {
-
-    let medal = ["🥇","🥈","🥉"][i] || "";
-
-    html += `<tr>
-      <td>${medal} ${u.nombre}</td>
-    `;
-
-    u.detalles.forEach((d, index) => {
-
-  let color = {
-    verde: "#22c55e",
-    amarillo: "#eab308",
-    rojo: "#ef4444",
-    gris: "#ffffff"
-  }[d];
-
-  let marcador = u.picks[index] || "-";
-
-  html += `
-    <td style="
-      background:${color};
-      font-weight:bold;
-    ">
-      ${marcador}
-    </td>
-  `;
-});
-
-    html += `<td>${u.puntos}</td></tr>`;
-  });
-
-  html += `</tbody></table></div>`;
-
-  cont.innerHTML = html;
-}
-
 </script>
 
 </body>
