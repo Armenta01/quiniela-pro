@@ -127,11 +127,12 @@ button {
   align-items: center;
 }
 
+/* 🔥 celdas de la tabla */
 .celda {
   padding: 10px;
   text-align: center;
   font-weight: bold;
-  color: white; /* 🔥 esto es clave */
+  color: #ffffff; /* 🔥 texto blanco SIEMPRE visible */
 }
 
 .jugador {
@@ -149,27 +150,28 @@ button {
   color: white;
 }
 
-/* 🎨 colores */
+
+/* 🔥 colores de resultados */
 .verde {
   background: #22c55e;
-  color: white;
+  color: #ffffff;
 }
 
 .amarillo {
   background: #eab308;
-  color: black;
+  color: #000000;
 }
 
 .rojo {
   background: #ef4444;
-  color: white;
+  color: #ffffff;
 }
 
+/* 🔥 ESTE ES EL QUE TE ESTÁ FALLANDO */
 .gris {
-  background: #1e293b;
-  color: #94a3b8;
+  background: #1e293b;   /* 🔥 oscuro (ANTES era claro) */
+  color: #94a3b8;        /* gris visible */
 }
-
 /* 🏆 TOP 3 */
 
 .top1 {
