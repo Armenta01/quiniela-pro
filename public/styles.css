@@ -127,15 +127,18 @@ button {
   align-items: center;
 }
 
+.celda span,
+.celda {
+  color: #111 !important; /* 🔥 negro fuerte */
+}
+
 /* 🔥 celdas de la tabla */
 .celda {
-  padding: 10px;
-  text-align: center;
-  font-weight: bold;
-  color: #ffffff;
+  border-radius: 6px;
+}
 
-  min-width: 80px; /* 🔥 CLAVE */
-  flex: 1;          /* 🔥 CLAVE */
+.celda span {
+  font-weight: bold;
 }
 
 .jugador {
@@ -171,9 +174,10 @@ button {
 }
 
 /* 🔥 ESTE ES EL QUE TE ESTÁ FALLANDO */
+/* 🔥 fondo para gris */
 .gris {
-  background: #1e293b;   /* 🔥 oscuro (ANTES era claro) */
-  color: #94a3b8;        /* gris visible */
+  background: #e5e7eb !important; /* gris claro */
+  color: #111 !important;
 }
 /* 🏆 TOP 3 */
 
