@@ -147,7 +147,9 @@ app.get('/check-user', async (req, res) => {
 
 // 🔥 GUARDAR PRONÓSTICOS (FIX PRINCIPAL)
 app.post('/guardar', async (req, res) => {
-  const { nombre, jornada, pronosticos } = req.body;
+  let { nombre, jornada, pronosticos } = req.body;
+
+nombre = nombre.trim();
   const envioId = Date.now().toString() + "_" + Math.random().toString(36).substring(2,8);
   
   try {
@@ -476,8 +478,12 @@ app.post('/reset', async (req, res) => {
 });
 
 app.post('/admin/partidos', async (req, res) => {
-  const { local, visitante, fecha, jornada, liga, logo_local, logo_visitante } = req.body;
+  let { local, visitante, fecha, jornada, liga, logo_local, logo_visitante } = req.body;
 
+// limpiar espacios
+local = local.trim();
+visitante = visitante.trim();
+liga = liga ? liga.trim() : null;
   try {
     await pool.query(`
       INSERT INTO partidos
