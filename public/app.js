@@ -24,7 +24,6 @@ async function cargarJornadas() {
   });
 }
 
-
 // 🔥 CAMBIO
 function cambiarJornada() {
   jornadaActual = document.getElementById("jornadaSelect").value || 1;
@@ -34,56 +33,34 @@ function cambiarJornada() {
   cargarCampeon();
   checkBloqueo();
 }
-async function cargarTop4() {
-  const res = await fetch(`/top4?jornada=${jornadaActual}`);
-  const data = await res.json();
 
-  let cont = document.getElementById("top4");
+// 🔥 ESTADO PARTIDO
+function getEstadoPartido(fechaStr) {
 
-  if (!cont) {
-    const div = document.createElement("div");
-    div.id = "top4";
-    document.getElementById("partidos").after(div);
-    cont = div;
+  const ahora = new Date();
+
+  const [fechaRaw, horaRaw] = fechaStr.split("T");
+
+  const partidoFecha = new Date(fechaRaw + "T" + horaRaw);
+
+  const diffMin = (ahora - partidoFecha) / 60000;
+
+  if (diffMin > 120) {
+    return { texto: "FINALIZADO", clase: "finalizado", icono: "🔒" };
   }
 
-  cont.innerHTML = "<h3>🔥 TOP 4</h3>";
+  if (diffMin >= 0 && diffMin <= 120) {
+    return { texto: "EN VIVO", clase: "envivo", icono: "🟢" };
+  }
 
-  data.forEach((u,i)=>{
+  const hoy = new Date();
+  if (partidoFecha.toDateString() === hoy.toDateString()) {
+    return { texto: "HOY", clase: "hoy", icono: "🕒" };
+  }
 
-    let medal = ["🥇","🥈","🥉","🏅"][i] || "";
-
-    let detallesHTML = u.detalles.map(d => {
-      let color = {
-        verde: "#22c55e",
-        amarillo: "#eab308",
-        rojo: "#ef4444",
-        gris: "#9ca3af"
-      }[d];
-
-      return `<span style="
-        display:inline-block;
-        width:10px;
-        height:10px;
-        border-radius:50%;
-        background:${color};
-        margin:2px;
-      "></span>`;
-    }).join("");
-
-    cont.innerHTML += `
-      <div style="
-        background:#132a4f;
-        margin:10px;
-        padding:10px;
-        border-radius:10px;
-      ">
-        ${medal} ${u.nombre} - ${u.puntos} pts
-        <div>${detallesHTML}</div>
-      </div>
-    `;
-  });
+  return { texto: "PRÓXIMO", clase: "futuro", icono: "📅" };
 }
+
 // 🔥 PARTIDOS
 async function cargarPartidos() {
   const res = await fetch(`/partidos?jornada=${jornadaActual}`);
@@ -92,61 +69,77 @@ async function cargarPartidos() {
   const cont = document.getElementById("partidos");
   cont.innerHTML = "";
 
- data.forEach(p => {
+  data.forEach(p => {
 
-  const [fechaRaw, horaRaw] = p.fecha.split("T");
+    const estado = getEstadoPartido(p.fecha);
 
-  const fecha = new Date(fechaRaw);
+    const [fechaRaw, horaRaw] = p.fecha.split("T");
 
-  const fechaFormateada = fecha.toLocaleDateString('es-MX', {
-    day: '2-digit',
-    month: 'short'
+    const fecha = new Date(fechaRaw);
+
+    const fechaFormateada = fecha.toLocaleDateString('es-MX', {
+      day: '2-digit',
+      month: 'short'
+    });
+
+    const horaFormateada = horaRaw?.slice(0,5) || "";
+
+    cont.innerHTML += `
+      <div class="card">
+
+        <div class="estado ${estado.clase}">
+          ${estado.icono} ${estado.texto}
+        </div>
+
+        <div class="match">
+
+          <div class="team left">
+            <img src="${p.logo_local || ''}">
+            <span>${p.local}</span>
+          </div>
+
+          <div class="score">
+  <input type="number" min="0" max="20" id="l${p.id}">
+  <span>-</span>
+  <input type="number" min="0" max="20" id="v${p.id}">
+</div>
+
+          <div class="team right">
+            <span>${p.visitante}</span>
+            <img src="${p.logo_visitante || ''}">
+          </div>
+
+        </div>
+
+        <div class="meta">
+          <div class="hora">
+            ⏰ ${fechaFormateada} · ${horaFormateada}
+          </div>
+
+          <div class="liga">
+            🏆 ${p.liga || "Liga MX"}
+          </div>
+        </div>
+
+      </div>
+    `;
   });
+}
 
-  const horaFormateada = horaRaw?.slice(0,5) || "";
-
-  cont.innerHTML += `
-    <div class="card">
-      <div class="match">
-
-        <div class="team left">
-          <img src="${p.logo_local || ''}">
-          <span>${p.local}</span>
-        </div>
-
-        <div class="score">
-          <input type="number" id="l${p.id}">
-          <span>-</span>
-          <input type="number" id="v${p.id}">
-        </div>
-
-        <div class="team right">
-          <span>${p.visitante}</span>
-          <img src="${p.logo_visitante || ''}">
-        </div>
-
-      </div>
-
-      <div class="meta">
-        <div class="hora">
-          ⏰ ${fechaFormateada} · ${horaFormateada}
-        </div>
-
-        <div class="liga">
-          🏆 ${p.liga || "Liga MX"}
-        </div>
-      </div>
-
-    </div>
-  `;
-});
-
-} // 👈 🔥 ESTA LLAVE FALTABA
 // 🔥 GUARDAR
 async function guardarTodo() {
   if (quinielaCerrada) return alert("🔒 Cerrado");
 
-  const usuario = document.getElementById("usuario").value;
+  let usuario = document.getElementById("usuario").value.trim();
+
+// limpiar caracteres raros
+usuario = usuario.replace(/[^a-zA-Z0-9\s]/g, "");
+
+if (usuario.length < 3) {
+  alert("Nombre mínimo 3 caracteres");
+  return;
+}
+
   if (!usuario) return alert("Pon tu nombre");
 
   const btn = document.getElementById("btnGuardar");
@@ -158,24 +151,42 @@ async function guardarTodo() {
     const lista = [];
 
     partidos.forEach(p => {
-      const gl = document.getElementById("l" + p.id).value;
-      const gv = document.getElementById("v" + p.id).value;
+  const gl = document.getElementById("l" + p.id).value;
+  const gv = document.getElementById("v" + p.id).value;
 
-      if (gl !== "" && gv !== "") {
-        lista.push({
-          partido_id: p.id,
-          local: parseInt(gl),
-          visitante: parseInt(gv)
-        });
-      }
-    });
+  // si no llenó ambos → lo ignora
+  if (gl === "" || gv === "") return;
+
+  const local = parseInt(gl);
+  const visitante = parseInt(gv);
+
+  // 🚫 no números
+  if (isNaN(local) || isNaN(visitante)) return;
+
+  // 🚫 negativos
+  if (local < 0 || visitante < 0) {
+    alert("No se permiten goles negativos");
+    return;
+  }
+
+  // 🚫 marcadores irreales
+  if (local > 20 || visitante > 20) {
+    alert("Marcador fuera de rango (máx 20)");
+    return;
+  }
+
+  lista.push({
+    partido_id: p.id,
+    local,
+    visitante
+  });
+});
 
     if (lista.length === 0) {
       alert("No capturaste resultados");
       return;
     }
 
-    // 🔥 GUARDAR EN BACKEND
     const res = await fetch('/guardar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -193,7 +204,6 @@ async function guardarTodo() {
       return;
     }
 
-    // 🔥 MENSAJE WHATSAPP
     let mensaje = `📊 Quiniela Semana ${jornadaActual}\n`;
     mensaje += `👤 ${usuario}\n\n`;
 
@@ -203,14 +213,16 @@ async function guardarTodo() {
       mensaje += `⚽ ${partido.local} ${p.local}-${p.visitante} ${partido.visitante}\n`;
     });
 
-    const phone = "524531021052"; // tu número
+    const phone = "524531021052";
     const texto = encodeURIComponent(mensaje);
     const url = `https://wa.me/${phone}?text=${texto}`;
 
-    // 🔥 REDIRECCIÓN SEGURA
-    window.location.href = url;
+    if (/Android|iPhone/i.test(navigator.userAgent)) {
+  window.location.href = url;   // 📱 móvil
+} else {
+  window.open(url, "_blank");   // 💻 computadora
+}
 
-     // 🎉 CONFIRMACIÓN
     confetti();
     alert("🔥 Quiniela enviada");
 
@@ -221,13 +233,13 @@ async function guardarTodo() {
     if (btn) btn.disabled = false;
   }
 }
-async function cargarCampeon() {
 
+// 🔥 CAMPEÓN
+async function cargarCampeon() {
   const res = await fetch(`/campeon?jornada=${jornadaActual}`);
   const data = await res.json();
 
   let cont = document.getElementById("campeon");
-
   if (!cont) return;
 
   if (!data || data.length === 0) {
@@ -235,7 +247,6 @@ async function cargarCampeon() {
     return;
   }
 
-  // 🔥 nombres de campeones
   const nombres = data.map(u => `${u.nombre} (${u.puntos} pts)`).join(" • ");
 
   cont.innerHTML = `
@@ -256,13 +267,12 @@ async function cargarCampeon() {
   `;
 }
 
-
+// 🔥 TOP 4 (SOLO UNA)
 async function cargarTop4() {
   const res = await fetch(`/top4?jornada=${jornadaActual}`);
   const data = await res.json();
 
   let cont = document.getElementById("top4");
-
   if (!cont) return;
 
   cont.innerHTML = "<h3>🔝 TOP 4</h3>";
@@ -301,144 +311,6 @@ async function cargarTop4() {
       </div>
     `;
   });
-}
-
-async function validarUsuario() {
-  const nombre = document.getElementById("usuario").value;
-  if (!nombre) return;
-
-  const res = await fetch(`/check-user?nombre=${nombre}&jornada=${jornadaActual}`);
-  const data = await res.json();
-
-  const estado = document.getElementById("estadoQuiniela");
-
-  if (data.existe) {
-    estado.innerText = "⚠️ Ya participaste, puedes enviar otra diferente";
-    estado.className = "estado warning";
-  }
-}
-
-
-// 🏆 TABLA (YA CORRECTA)
-async function verTabla() {
-  const res = await fetch(`/tabla?jornada=${jornadaActual}`);
-  const data = await res.json();
-
-  const cont = document.getElementById("tabla");
-  cont.innerHTML = "<h2>🏆 Tabla</h2>";
-
-  if (data.length === 0) {
-    cont.innerHTML += "<p>No hay datos aún</p>";
-    return;
-  }
-
-  data.forEach((u, i) => {
-
-    let medal = ["🥇","🥈","🥉"][i] || "";
-
-    let detallesHTML = u.detalles.map(d => {
-      let color = {
-        verde: "#22c55e",
-        amarillo: "#eab308",
-        rojo: "#ef4444",
-        gris: "#9ca3af"
-      }[d];
-
-      return `<span style="
-        display:inline-block;
-        width:10px;
-        height:10px;
-        border-radius:50%;
-        background:${color};
-        margin:2px;
-      "></span>`;
-    }).join("");
-
-    cont.innerHTML += `
-      <div class="tabla-item ${i === 0 ? 'gold' : ''}">
-        ${medal} ${u.nombre} - ${u.puntos} pts
-        <div>${detallesHTML}</div>
-      </div>
-    `;
-  });
-}
-
-// 🔥 TOP 4
-async function verTablaCompleta(jornada) {
-
-  const res = await fetch(`/tabla?jornada=${jornada}`);
-  const data = await res.json();
-
-  const cont = document.getElementById("tabla");
-  cont.innerHTML = "";
-
-  if (!data.length) {
-    cont.innerHTML = "<p>No hay datos</p>";
-    return;
-  }
-
-  // 🔥 encabezado partidos
-  let header = `
-    <div class="fila header">
-      <div class="celda jugador">Jugador</div>
-  `;
-
-  // tomar partidos del primer usuario
-  data[0].picks.forEach((_, i) => {
-    header += `<div class="celda">P${i+1}</div>`;
-  });
-
-  header += `<div class="celda puntos">Pts</div></div>`;
-
-  cont.innerHTML += header;
-
-  // 🔥 numerador nombres
-  let contador = {};
-
-  data.forEach((u, index) => {
-     let claseTop = index === 0 ? "top1" 
-             : index === 1 ? "top2" 
-             : index === 2 ? "top3" 
-             : "";
-
-    if (!contador[u.nombre]) contador[u.nombre] = 1;
-    else contador[u.nombre]++;
-
-    const nombreFinal = contador[u.nombre] > 1
-      ? `${u.nombre} #${contador[u.nombre]}`
-      : u.nombre;
-
-   
-
-let fila = `<div class="fila ${claseTop}">`;
-
-    fila += `<div class="celda jugador">
-      ${index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : ""}
-      ${nombreFinal}
-    </div>`;
-
-    u.picks.forEach((p, i) => {
-
-      let color = {
-        verde: "verde",
-        amarillo: "amarillo",
-        rojo: "rojo",
-        gris: "gris"
-      }[u.detalles[i]];
-
-      fila += `<div class="celda ${color}">${p}</div>`;
-    });
-
-    fila += `<div class="celda puntos">${u.puntos}</div>`;
-    fila += `</div>`;
-
-    cont.innerHTML += fila;
-  });
-} 
-
-function irTabla() {
-  const jornada = document.getElementById("jornadaSelect").value;
-  window.location.href = `tabla.html?jornada=${jornada}`;
 }
 
 // 🔒 BLOQUEO

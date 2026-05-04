@@ -493,6 +493,29 @@ app.post('/admin/partidos', async (req, res) => {
   }
 });
 
+app.get('/backup', async (req, res) => {
+  try {
+
+    const users = await pool.query(`SELECT * FROM users`);
+    const partidos = await pool.query(`SELECT * FROM partidos`);
+    const predicciones = await pool.query(`SELECT * FROM predicciones`);
+
+    const backup = {
+      fecha: new Date(),
+      users: users.rows,
+      partidos: partidos.rows,
+      predicciones: predicciones.rows
+    };
+
+    res.json(backup);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 
 // 🚀 SERVER
 const PORT = process.env.PORT || 10000;
