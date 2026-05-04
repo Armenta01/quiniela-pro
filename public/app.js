@@ -12,9 +12,9 @@ if (btn) btn.onclick = () => verTablaCompleta(jornadaActual);
 };
 
 function irTabla() {
-  verTablaCompleta(jornadaActual);
+  const jornada = document.getElementById("jornadaSelect").value;
+  window.location.href = `tabla.html?jornada=${jornada}`;
 }
-
 // 🔥 JORNADAS
 async function cargarJornadas() {
   const r = await fetch('/jornadas');
