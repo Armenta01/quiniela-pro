@@ -400,3 +400,35 @@ button {
   background: linear-gradient(90deg, #cd7f32, #f59e0b) !important;
   color: black !important;
 }
+
+/* 🔥 espacio entre columnas */
+.celda {
+  margin: 4px;
+  border-radius: 10px;
+}
+
+/* 🔥 espacio entre filas */
+.fila {
+  margin-bottom: 8px;
+}
+
+/* contenedor más ordenado */
+#tabla {
+  padding: 10px;
+}
+
+/* separar bloques */
+.fila {
+  gap: 6px;
+}
+
+/* que no se vean pegadas */
+.celda {
+  padding: 12px;
+}
+
+.fila {
+  background: rgba(255,255,255,0.03);
+  border-radius: 12px;
+  padding: 5px;
+}
