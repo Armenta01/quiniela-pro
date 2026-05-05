@@ -146,18 +146,28 @@ async function verTablaCompleta(jornada) {
 
   // 🔥 usar el primero seguro
   const totalPartidos = Math.max(...data.map(u => u.picks.length));
+  const partidos = await (await fetch(`/partidos?jornada=${jornada}`)).json();
+  
+  let header = `<div class="fila header">
+  <div class="celda jugador">Jugador</div>`;
+  
+partidos.forEach(p => {
 
-  let header = `
-    <div class="fila header">
-      <div class="celda jugador">Jugador</div>
+  let marcador = (p.goles_local != null && p.goles_visitante != null)
+    ? `${p.goles_local}-${p.goles_visitante}`
+    : "⏳";
+
+  header += `
+    <div class="celda">
+      <div style="font-size:11px">${p.local}</div>
+      <div style="font-weight:bold">${marcador}</div>
+      <div style="font-size:11px">${p.visitante}</div>
+    </div>
   `;
+});
 
-  for (let i = 0; i < totalPartidos; i++) {
-    header += `<div class="celda">P${i+1}</div>`;
-  }
-
-  header += `<div class="celda puntos">Pts</div></div>`;
-
+header += `<div class="celda puntos">Pts</div></div>`;
+  
   cont.innerHTML += header;
 
   let contador = {};
