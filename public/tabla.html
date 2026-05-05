@@ -68,8 +68,8 @@ async function cargarResumenPartidos(jornada) {
   partidos.forEach(p => {
 
     let marcador = (p.goles_local != null && p.goles_visitante != null)
-      ? `${p.goles_local}-${p.goles_visitante}`
-      : "⚪";
+  ? `${p.goles_local}-${p.goles_visitante}`
+  : "⏳";
 
     html += `
   <div style="
