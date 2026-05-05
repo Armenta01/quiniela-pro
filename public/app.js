@@ -147,7 +147,7 @@ async function verTablaCompleta(jornada) {
   // 🔥 usar el primero seguro
   const totalPartidos = Math.max(...data.map(u => u.picks.length));
   const partidos = await (await fetch(`/partidos?jornada=${jornada}`)).json();
-  
+
   let header = `<div class="fila header">
   <div class="celda jugador">Jugador</div>`;
   
@@ -172,33 +172,44 @@ header += `<div class="celda puntos">Pts</div></div>`;
 
   let contador = {};
 
-  data.forEach((u, index) => {
+  let posicionReal = 0;
+let ultimoPuntaje = null;
 
-    let claseTop = index === 0 ? "top1"
-      : index === 1 ? "top2"
-      : index === 2 ? "top3"
-      : "";
+data.forEach((u, index) => {
 
-    if (!contador[u.nombre]) contador[u.nombre] = 1;
-    else contador[u.nombre]++;
+  // 🔥 detectar empates reales
+  if (u.puntos !== ultimoPuntaje) {
+    posicionReal = index;
+    ultimoPuntaje = u.puntos;
+  }
 
-    const nombreFinal = contador[u.nombre] > 1
-      ? `${u.nombre} #${contador[u.nombre]}`
-      : u.nombre;
+  let claseTop = posicionReal === 0 ? "top1"
+    : posicionReal === 1 ? "top2"
+    : posicionReal === 2 ? "top3"
+    : "";
 
-    let fila = `<div class="fila ${claseTop}">`;
+  if (!contador[u.nombre]) contador[u.nombre] = 1;
+  else contador[u.nombre]++;
 
-    fila += `<div class="celda jugador">
-      ${index === 0 ? "🥇" : index === 1 ? "🥈" : index === 2 ? "🥉" : ""}
-      ${nombreFinal}
-    </div>`;
-    // 🔥 pintar picks existentes
-u.picks.forEach((p, i) => {
-  const valor = p || "-";
-  const color = u.detalles[i] || "gris";
+  const nombreFinal = contador[u.nombre] > 1
+    ? `${u.nombre} #${contador[u.nombre]}`
+    : u.nombre;
 
-  fila += `<div class="celda ${color}">${valor}</div>`;
-});
+  let fila = `<div class="fila ${claseTop}">`;
+
+  fila += `<div class="celda jugador">
+    ${posicionReal === 0 ? "🥇" : posicionReal === 1 ? "🥈" : posicionReal === 2 ? "🥉" : ""}
+    ${nombreFinal}
+  </div>`;
+
+  // 🔥 pintar picks existentes
+  u.picks.forEach((p, i) => {
+    const valor = p || "-";
+    const color = u.detalles[i] || "gris";
+
+    fila += `<div class="celda ${color}">${valor}</div>`;
+  });
+  
 
 // 🔥 completar columnas faltantes (IMPORTANTE)
 for (let i = u.picks.length; i < totalPartidos; i++) {

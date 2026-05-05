@@ -384,3 +384,19 @@ button {
   min-width: 70px;
   flex: 0 0 auto;
 }
+
+/* 🔥 FORZAR COLORES TOP COMPLETOS */
+.fila.top1 .celda {
+  background: linear-gradient(90deg, #ffd700, #facc15) !important;
+  color: black !important;
+}
+
+.fila.top2 .celda {
+  background: linear-gradient(90deg, #c0c0c0, #e5e7eb) !important;
+  color: black !important;
+}
+
+.fila.top3 .celda {
+  background: linear-gradient(90deg, #cd7f32, #f59e0b) !important;
+  color: black !important;
+}
