@@ -524,7 +524,7 @@ app.get('/backup', async (req, res) => {
 
 app.get('/exportar-excel', async (req, res) => {
 
-  const jornada = req.query.jornada;
+  const jornada = req.query.jornada || 1;
 
   try {
 
