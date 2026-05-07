@@ -523,74 +523,77 @@ app.get('/backup', async (req, res) => {
   }
 });
 
+
 app.get('/exportar-excel', async (req, res) => {
 
   const jornada = req.query.jornada || 1;
 
   try {
 
-    // 🔥 obtenemos la tabla desde tu API actual
     const workbook = new ExcelJS.Workbook();
-const sheet = workbook.addWorksheet(`Semana ${jornada}`);
+    const sheet = workbook.addWorksheet(`Semana ${jornada}`);
 
-const partidosRes = await fetch(`https://quiniela-pro.onrender.com/partidos?jornada=${jornada}`);
-const partidos = await partidosRes.json();
+    // 🔥 obtener datos directo DB
+    const partidosResult = await pool.query(
+      `SELECT * FROM partidos WHERE jornada = $1 ORDER BY fecha`,
+      [jornada]
+    );
 
-const response = await fetch(`https://quiniela-pro.onrender.com/tabla?jornada=${jornada}`);
-const tabla = await response.json();
+    const partidos = partidosResult.rows;
 
-    // 🔥 encabezados
+    const tabla = await fetchTabla(jornada);
+
+    if (!tabla || tabla.length === 0) {
+      return res.status(400).send("No hay datos para exportar");
+    }
+
+    // 🔥 HEADER
     const headers = ["Jugador"];
 
-partidos.forEach(p => {
+    partidos.forEach(p => {
+      let marcador = (p.goles_local != null && p.goles_visitante != null)
+        ? `${p.goles_local}-${p.goles_visitante}`
+        : "⏳";
 
-  let marcador = (p.goles_local != null && p.goles_visitante != null)
-    ? `${p.goles_local}-${p.goles_visitante}`
-    : "⏳";
+      headers.push(`${p.local} ${marcador} ${p.visitante}`);
+    });
 
-  headers.push(`${p.local} ${marcador} ${p.visitante}`);
-});
+    headers.push("Puntos");
 
-headers.push("Puntos");
+    sheet.addRow(headers);
 
-sheet.addRow(headers);
+    // 🔥 estilos
+    sheet.getRow(1).font = { bold: true };
 
-// 🔥 encabezado en negrita
-sheet.getRow(1).font = { bold: true };
+    sheet.columns = headers.map(() => ({ width: 18 }));
 
-// 🔥 ancho de columnas
-sheet.columns.forEach(col => {
-  col.width = 18;
-});
-
-    // 🔥 filas
+    // 🔥 FILAS
     tabla.forEach(u => {
 
-  const fila = [u.nombre, ...u.picks, u.puntos];
-  const row = sheet.addRow(fila);
+      const fila = [u.nombre, ...u.picks, u.puntos];
+      const row = sheet.addRow(fila);
 
-  // 🔥 aplicar colores
-  u.detalles.forEach((d, i) => {
+      u.detalles.forEach((d, i) => {
 
-    const cell = row.getCell(i + 2); // +2 porque columna 1 es nombre
+        const cell = row.getCell(i + 2);
 
-    let color = {
-      verde: "22c55e",
-      amarillo: "eab308",
-      rojo: "ef4444",
-      gris: "9ca3af"
-    }[d] || "ffffff";
+        let color = {
+          verde: "FF22C55E",
+          amarillo: "FFEAB308",
+          rojo: "FFEF4444",
+          gris: "FF9CA3AF"
+        }[d] || "FFFFFFFF";
 
-    cell.fill = {
-      type: 'pattern',
-      pattern: 'solid',
-      fgColor: { argb: color }
-    };
-  });
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: color }
+        };
+      });
 
-});
+    });
 
-    // 🔥 descargar archivo
+    // 🔥 HEADERS HTTP (ANTES de enviar)
     res.setHeader(
       'Content-Type',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -601,15 +604,16 @@ sheet.columns.forEach(col => {
       `attachment; filename=quiniela-semana-${jornada}.xlsx`
     );
 
-    await workbook.xlsx.write(res);
-    res.end();
+    // 🔥 CLAVE: usar buffer (NO stream directo)
+    const buffer = await workbook.xlsx.writeBuffer();
+
+    res.send(buffer);
 
   } catch (err) {
-    console.error(err);
+    console.error("🔥 ERROR REAL EXCEL:", err);
     res.status(500).send("Error al generar Excel");
   }
 });
-
 
 
 // 🚀 SERVER
