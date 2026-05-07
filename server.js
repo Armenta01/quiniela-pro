@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const { Pool } = require('pg');
+const ExcelJS = require('exceljs');
 
 const app = express();
 app.use(express.json());
@@ -518,6 +519,59 @@ app.get('/backup', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
+  }
+});
+
+app.get('/exportar-excel', async (req, res) => {
+
+  const jornada = req.query.jornada;
+
+  try {
+
+    // 🔥 obtenemos la tabla desde tu API actual
+    const response = await fetch(`https://quiniela-pro.onrender.com/tabla?jornada=${jornada}`);
+    const tabla = await response.json();
+
+
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet(`Semana ${jornada}`);
+
+    // 🔥 encabezados
+    const headers = ["Jugador"];
+
+    const totalPartidos = tabla[0]?.picks.length || 0;
+
+    for (let i = 0; i < totalPartidos; i++) {
+      headers.push(`P${i+1}`);
+    }
+
+    headers.push("Puntos");
+
+    sheet.addRow(headers);
+
+    // 🔥 filas
+    tabla.forEach(u => {
+      const fila = [u.nombre, ...u.picks, u.puntos];
+      sheet.addRow(fila);
+    });
+
+    // 🔥 descargar archivo
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    );
+
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=quiniela-semana-${jornada}.xlsx`
+    );
+
+    await workbook.xlsx.write(res);
+    res.end();
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error al generar Excel");
   }
 });
 
