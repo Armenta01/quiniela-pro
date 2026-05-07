@@ -149,6 +149,16 @@ button[onclick="resetearTodo()"]:hover {
   
     <button onclick="crearPartido()">Crear Partido</button>
 
+    <button onclick="descargarExcelAdmin()" style="
+  margin:10px;
+  padding:10px;
+  border-radius:10px;
+  background:#22c55e;
+  color:white;
+">
+📥 Descargar Excel
+</button>
+
     <button onclick="resetearTodo()" style="
   background:red;
   color:white;
@@ -168,6 +178,17 @@ button[onclick="resetearTodo()"]:hover {
 <div class="lista" id="lista"></div>
 
 <script>
+
+  function descargarExcelAdmin() {
+  const jornada = document.getElementById("jornada").value;
+
+  if (!jornada) {
+    alert("Selecciona una jornada");
+    return;
+  }
+
+  window.open(`/exportar-excel?jornada=${jornada}`, "_blank");
+}
 
 async function crearPartido() {
   const local = document.getElementById('local').value;

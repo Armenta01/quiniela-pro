@@ -529,15 +529,35 @@ app.get('/exportar-excel', async (req, res) => {
   try {
 
     // 🔥 obtenemos la tabla desde tu API actual
+    const workbook = new ExcelJS.Workbook();
+    const sheet = workbook.addWorksheet(`Semana ${jornada}`);
+    
     const response = await fetch(`https://quiniela-pro.onrender.com/tabla?jornada=${jornada}`);
     const tabla = await response.json();
 
-
-    const workbook = new ExcelJS.Workbook();
-    const sheet = workbook.addWorksheet(`Semana ${jornada}`);
-
     // 🔥 encabezados
     const headers = ["Jugador"];
+
+partidos.forEach(p => {
+
+  let marcador = (p.goles_local != null && p.goles_visitante != null)
+    ? `${p.goles_local}-${p.goles_visitante}`
+    : "⏳";
+
+  headers.push(`${p.local} ${marcador} ${p.visitante}`);
+});
+
+headers.push("Puntos");
+
+sheet.addRow(headers);
+
+// 🔥 encabezado en negrita
+sheet.getRow(1).font = { bold: true };
+
+// 🔥 ancho de columnas
+sheet.columns.forEach(col => {
+  col.width = 18;
+});
 
     const totalPartidos = tabla[0]?.picks.length || 0;
 
@@ -551,9 +571,30 @@ app.get('/exportar-excel', async (req, res) => {
 
     // 🔥 filas
     tabla.forEach(u => {
-      const fila = [u.nombre, ...u.picks, u.puntos];
-      sheet.addRow(fila);
-    });
+
+  const fila = [u.nombre, ...u.picks, u.puntos];
+  const row = sheet.addRow(fila);
+
+  // 🔥 aplicar colores
+  u.detalles.forEach((d, i) => {
+
+    const cell = row.getCell(i + 2); // +2 porque columna 1 es nombre
+
+    let color = {
+      verde: "22c55e",
+      amarillo: "eab308",
+      rojo: "ef4444",
+      gris: "9ca3af"
+    }[d] || "ffffff";
+
+    cell.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: color }
+    };
+  });
+
+});
 
     // 🔥 descargar archivo
     res.setHeader(
