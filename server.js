@@ -531,10 +531,13 @@ app.get('/exportar-excel', async (req, res) => {
 
     // 🔥 obtenemos la tabla desde tu API actual
     const workbook = new ExcelJS.Workbook();
-    const sheet = workbook.addWorksheet(`Semana ${jornada}`);
-    
-    const response = await fetch(`https://quiniela-pro.onrender.com/tabla?jornada=${jornada}`);
-    const tabla = await response.json();
+const sheet = workbook.addWorksheet(`Semana ${jornada}`);
+
+const partidosRes = await fetch(`https://quiniela-pro.onrender.com/partidos?jornada=${jornada}`);
+const partidos = await partidosRes.json();
+
+const response = await fetch(`https://quiniela-pro.onrender.com/tabla?jornada=${jornada}`);
+const tabla = await response.json();
 
     // 🔥 encabezados
     const headers = ["Jugador"];
@@ -559,16 +562,6 @@ sheet.getRow(1).font = { bold: true };
 sheet.columns.forEach(col => {
   col.width = 18;
 });
-
-    const totalPartidos = tabla[0]?.picks.length || 0;
-
-    for (let i = 0; i < totalPartidos; i++) {
-      headers.push(`P${i+1}`);
-    }
-
-    headers.push("Puntos");
-
-    sheet.addRow(headers);
 
     // 🔥 filas
     tabla.forEach(u => {
