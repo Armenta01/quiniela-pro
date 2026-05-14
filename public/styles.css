@@ -514,3 +514,8 @@ button {
 .form-row {
   gap: 12px;
 }
+
+button:not([onclick="resetearTodo()"]):not([onclick="logout()"]) {
+  background: #22c55e;
+  color: white;
+}
