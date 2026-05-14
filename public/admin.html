@@ -32,21 +32,15 @@
 
     /* 🔥 NUEVO: contenedor flexible */
     .form-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-    }
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
-    .form-row input,
-    .form-row select,
-    .form-row button {
-      flex: 1;
-      min-width: 140px;
-    }
 
     input, select, button {
       width: 100%;
+      box-sizing: border-box;
       padding: 10px;
       border-radius: 10px;
       border: none;
@@ -109,7 +103,7 @@ button[onclick="resetearTodo()"]:hover {
 </head>
 <body>
 <div class="admin-container">
-  
+
 <h1>⚙️ Control de Jornadas</h1>
 
 <div class="card">
