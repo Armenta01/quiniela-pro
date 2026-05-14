@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  <link rel="stylesheet" href="styles.css">
   <script>
     
 </script>
@@ -8,99 +9,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Centro de Control</title>
 
-  <style>
-    body {
-      font-family: Arial;
-      background: #0b1d3a;
-      color: white;
-      text-align: center;
-      padding: 20px;
-    }
-
-    h1 {
-      margin-bottom: 20px;
-    }
-
-    .card {
-      background: #132a4f;
-      padding: 20px;
-      border-radius: 15px;
-      max-width: 500px;
-      margin: auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
-    }
-
-    /* 🔥 NUEVO: contenedor flexible */
-    .form-row {
-  display: block;
-}
-
-
-    input, select, button {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 10px;
-      border-radius: 10px;
-      border: none;
-      font-size: 16px;
-    }
-
-    input, select {
-      background: #eee;
-      color: black;
-    }
-
-    button {
-      background: #00c853;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    button:hover {
-      background: #00a844;
-    }
-
-    .msg {
-      margin-top: 10px;
-      font-weight: bold;
-    }
-
-    .lista {
-      margin-top: 30px;
-    }
-
-    .partido {
-      background: #1f3c6b;
-      padding: 10px;
-      border-radius: 10px;
-      margin: 5px;
-    }
-
-    /* 📱 RESPONSIVE */
-    @media (max-width: 768px) {
-      .form-row {
-        flex-direction: column;
-      }
-
-      .card {
-  width: 100%;
-  max-width: 500px;
-  margin: auto;
-}
-
-    }
-
-    button[onclick="resetearTodo()"] {
-  background: linear-gradient(90deg, #ff0000, #ff4d4d);
-  box-shadow: 0 0 10px red;
-}
-
-button[onclick="resetearTodo()"]:hover {
-  transform: scale(1.05);
-}
-
-  </style>
 </head>
 <body>
 <div class="admin-container">
