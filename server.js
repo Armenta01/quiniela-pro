@@ -636,6 +636,30 @@ app.post('/admin/login', (req, res) => {
   res.status(401).json({ error: "Credenciales incorrectas" });
 });
 
+app.get('/jornada-actual', async (req, res) => {
+  try {
+
+    const result = await pool.query(`
+      SELECT jornada 
+      FROM partidos 
+      WHERE fecha > NOW()
+      ORDER BY jornada ASC
+      LIMIT 1
+    `);
+
+    if (result.rows.length === 0) {
+      return res.json({ jornada: 1 });
+    }
+
+    res.json({ jornada: result.rows[0].jornada });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error obteniendo jornada" });
+  }
+});
+
+
 
 // 🚀 SERVER
 const PORT = process.env.PORT || 10000;

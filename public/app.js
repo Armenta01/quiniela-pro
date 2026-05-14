@@ -1,11 +1,25 @@
 let jornadaActual = 1;
 let quinielaCerrada = false;
 
+async function obtenerJornadaActual() {
+  const res = await fetch('/jornada-actual');
+  const data = await res.json();
+
+  jornadaActual = data.jornada;
+
+  document.getElementById("jornadaSelect").value = jornadaActual;
+
+  cargarPartidos();
+}
+
 // 🔥 INIT
 window.onload = async () => {
   await cargarJornadas();
+  await obtenerJornadaActual();
+  
   cambiarJornada();
   cargarTop4();
+  
 
   
 };
