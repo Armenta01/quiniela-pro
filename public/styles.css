@@ -515,6 +515,18 @@ button {
   gap: 12px;
 }
 
+button {
+  background: #22c55e !important; /* verde */
+  color: white !important;
+  font-weight: bold;
+}
+
+button:hover {
+  background: #16a34a !important; /* verde más oscuro */
+}
+
+
+
 button:not([onclick="resetearTodo()"]):not([onclick="logout()"]) {
   background: #22c55e;
   color: white;
