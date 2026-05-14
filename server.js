@@ -628,12 +628,18 @@ app.get('/exportar-excel', async (req, res) => {
 
 app.post('/admin/login', (req, res) => {
 
-  const { user, password } = req.body;
+  let { user, password } = req.body;
 
-  const ADMIN_USER = process.env.ADMIN_USER;
-  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+  user = user.trim();
+  password = password.trim();
 
-  if (user === ADMIN_USER && password === ADMIN_PASSWORD) {
+  const ADMIN_USER = process.env.ADMIN_USER.trim();
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD.trim();
+
+  if (
+    user === ADMIN_USER &&
+    password === ADMIN_PASSWORD
+  ) {
     return res.json({ ok: true });
   }
 
