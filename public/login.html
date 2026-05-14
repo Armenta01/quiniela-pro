@@ -55,29 +55,47 @@ button {
 <script>
 async function login() {
 
-  const user = document.getElementById("user").value;
-  const password = document.getElementById("pass").value;
+  try {
 
-  const res = await fetch('/admin/login', {
-    method:'POST',
-    headers:{ 'Content-Type':'application/json' },
-    body: JSON.stringify({ user, password })
-  });
+    const user = document.getElementById("user").value.trim();
+    const password = document.getElementById("pass").value.trim();
 
-  const data = await res.json();
+    console.log("LOGIN CLICK");
 
-  if (res.ok) {
+    const res = await fetch('/admin/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ user, password })
+    });
 
-    // 🔥 tiempo de expiración (1 hora)
-    const expiracion = Date.now() + (60 * 60 * 1000);
+    console.log("STATUS:", res.status);
 
-    localStorage.setItem("admin", "true");
-    localStorage.setItem("expira", expiracion);
+    const data = await res.json();
 
-    window.location.href = "admin.html";
+    console.log(data);
 
-  } else {
-    alert(data.error);
+    if (data.ok) {
+
+      const expiracion = Date.now() + (60 * 60 * 1000);
+
+      localStorage.setItem("admin", "true");
+      localStorage.setItem("expira", expiracion);
+
+      window.location.href = "admin.html";
+
+    } else {
+
+      alert(data.error || "Error login");
+
+    }
+
+  } catch (err) {
+
+    console.error(err);
+    alert("Error conexión servidor");
+
   }
 }
 </script>
