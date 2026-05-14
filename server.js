@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const { Pool } = require('pg');
@@ -626,8 +627,8 @@ app.post('/admin/login', (req, res) => {
 
   const { user, password } = req.body;
 
-  const ADMIN_USER = "Armenta";
-  const ADMIN_PASSWORD = "Armenta01"; // 🔥 cámbiala si quieres
+  const ADMIN_USER = process.env.ADMIN_USER;
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
   if (user === ADMIN_USER && password === ADMIN_PASSWORD) {
     return res.json({ ok: true });
