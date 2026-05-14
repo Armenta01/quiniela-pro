@@ -463,13 +463,20 @@ app.get('/limite', async (req, res) => {
 });
 
 app.post('/reset', async (req, res) => {
+
+  const { password } = req.body;
+
+  // 🔐 contraseña segura (cámbiala tú)
+  const ADMIN_PASSWORD = "Armenta01";
+
+  if (password !== ADMIN_PASSWORD) {
+    return res.status(403).json({ error: "Contraseña incorrecta" });
+  }
+
   try {
 
     await pool.query('DELETE FROM predicciones');
     await pool.query('DELETE FROM partidos');
-
-    // 🔥 OPCIONAL (si quieres borrar historial)
-    // await pool.query('DELETE FROM campeones');
 
     res.json({ ok: true });
 

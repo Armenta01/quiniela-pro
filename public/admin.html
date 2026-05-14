@@ -252,20 +252,25 @@ const res = await fetch('/admin/partidos', {
 
 async function resetearTodo() {
 
-  const clave = prompt("Escribe ADMIN para confirmar reset");
+  const password = prompt("🔐 Ingresa la contraseña:");
 
-if (clave !== "ADMIN") {
-  alert("Cancelado");
-  return;
-}
-  if (!ok) return;
+  if (!password) return;
+
+  const confirmacion = confirm("⚠️ Esto borrará TODO ¿Estás seguro?");
+  if (!confirmacion) return;
 
   const res = await fetch('/reset', {
-    method: 'POST'
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ password })
   });
 
+  const data = await res.json();
+
   if (!res.ok) {
-    alert("Error al resetear");
+    alert(data.error || "❌ Error al resetear");
     return;
   }
 
