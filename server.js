@@ -628,13 +628,13 @@ app.get('/exportar-excel', async (req, res) => {
 
 app.post('/admin/login', (req, res) => {
 
-  let { user, password } = req.body;
+  const user = (req.body.user || "").trim();
+  const password = (req.body.password || "").trim();
 
-  user = user.trim();
-  password = password.trim();
+  const ADMIN_USER = (process.env.ADMIN_USER || "").trim();
+  const ADMIN_PASSWORD = (process.env.ADMIN_PASSWORD || "").trim();
 
-  const ADMIN_USER = process.env.ADMIN_USER.trim();
-  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD.trim();
+  console.log("LOGIN:", user, password);
 
   if (
     user === ADMIN_USER &&
@@ -645,6 +645,7 @@ app.post('/admin/login', (req, res) => {
 
   res.status(401).json({ error: "Credenciales incorrectas" });
 });
+
 
 app.get('/jornada-actual', async (req, res) => {
   try {
