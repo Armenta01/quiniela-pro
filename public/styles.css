@@ -478,3 +478,11 @@ button {
 * {
   box-sizing: border-box;
 }
+
+.form-row input,
+.form-row select,
+.form-row button {
+  width: 100% !important;
+  margin-bottom: 10px;
+  display: block;
+}

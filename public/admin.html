@@ -32,9 +32,7 @@
 
     /* 🔥 NUEVO: contenedor flexible */
     .form-row {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  display: block;
 }
 
 
@@ -86,8 +84,11 @@
       }
 
       .card {
-        width: 90%;
-      }
+  width: 100%;
+  max-width: 500px;
+  margin: auto;
+}
+
     }
 
     button[onclick="resetearTodo()"] {
