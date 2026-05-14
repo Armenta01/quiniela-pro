@@ -34,7 +34,7 @@ input, select, button {
 .card {
   background: #1e293b;
   margin: 10px;
-  padding: 15px;
+  padding: 30px;
   border-radius: 15px;
 }
 
@@ -111,6 +111,7 @@ input, select, button {
 
 button {
   min-width: 120px;
+  margin-bottom: 10px;
 }
 
 .estado.warning {
@@ -486,4 +487,12 @@ button {
   width: 100% !important;
   margin-bottom: 15px;
   display: block;
+}
+
+.form-row {
+  gap: 12px;
+}
+
+.card {
+  padding: 35px;
 }
