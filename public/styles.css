@@ -531,3 +531,59 @@ button:not([onclick="resetearTodo()"]):not([onclick="logout()"]) {
   background: #22c55e;
   color: white;
 }
+
+/* 🟢 BOTONES VERDES */
+.btn-verde {
+  background: #22c55e;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.btn-verde:hover {
+  background: #16a34a;
+}
+
+/* 🔴 CERRAR SESIÓN */
+.btn-rojo {
+  background: #ef4444;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.btn-rojo:hover {
+  background: #dc2626;
+}
+
+/* 🔥 RESET */
+.btn-reset {
+  background: #ff0000;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  margin-top: 10px;
+  width: 100%;
+  font-weight: bold;
+  box-shadow: 0 0 10px red;
+}
+
+.btn-reset:hover {
+  background: #cc0000;
+}
+
+button {
+  transition: all 0.2s ease;
+}
+
+button:active {
+  transform: scale(0.97);
+}
