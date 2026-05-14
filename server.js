@@ -14,7 +14,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 // 🔥 DB
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  ssl: process.env.DATABASE_URL?.includes("render.com")
+    ? { rejectUnauthorized: false }
+    : false
 });
 
 // 🔥 INIT DB + ÍNDICES
@@ -68,8 +70,9 @@ async function initDB() {
   console.log("🔥 DB + índices listos");
 }
 
-initDB();
-
+initDB().catch(err => {
+  console.error("🔥 ERROR INIT DB:", err);
+});
 
 // 🔒 BLOQUEO
 async function jornadaBloqueada(jornada) {
@@ -470,7 +473,7 @@ app.post('/reset', async (req, res) => {
   const { password } = req.body;
 
   // 🔐 contraseña segura (cámbiala tú)
-  const ADMIN_PASSWORD = "Armenta01";
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 
   if (password !== ADMIN_PASSWORD) {
     return res.status(403).json({ error: "Contraseña incorrecta" });
