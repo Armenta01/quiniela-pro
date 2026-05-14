@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Login Admin</title>
+
+<style>
+body {
+  background:#0f172a;
+  color:white;
+  font-family:Arial;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.box {
+  background:#1e293b;
+  padding:30px;
+  border-radius:15px;
+  width:300px;
+}
+
+input {
+  width:100%;
+  padding:10px;
+  margin:10px 0;
+  border:none;
+  border-radius:8px;
+}
+
+button {
+  width:100%;
+  padding:10px;
+  background:#22c55e;
+  border:none;
+  border-radius:8px;
+  color:white;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2>🔐 Admin Login</h2>
+
+  <input id="user" placeholder="Usuario">
+  <input id="pass" type="password" placeholder="Contraseña">
+
+  <button onclick="login()">Entrar</button>
+</div>
+
+<script>
+async function login() {
+
+  const user = document.getElementById("user").value;
+  const password = document.getElementById("pass").value;
+
+  const res = await fetch('/admin/login', {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify({ user, password })
+  });
+
+  const data = await res.json();
+
+  if (res.ok) {
+
+    // 🔥 tiempo de expiración (1 hora)
+    const expiracion = Date.now() + (60 * 60 * 1000);
+
+    localStorage.setItem("admin", "true");
+    localStorage.setItem("expira", expiracion);
+
+    window.location.href = "admin.html";
+
+  } else {
+    alert(data.error);
+  }
+}
+</script>
+
+</body>
+</html>

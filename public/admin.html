@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  <script>
+    
+</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Quiniela</title>
@@ -159,6 +162,17 @@ button[onclick="resetearTodo()"]:hover {
 📥 Descargar Excel
 </button>
 
+<button onclick="logout()" style="
+  background:#ef4444;
+  color:white;
+  padding:8px 12px;
+  border:none;
+  border-radius:8px;
+  margin-bottom:10px;
+">
+🚪 Cerrar sesión
+</button>
+
     <button onclick="resetearTodo()" style="
   background:red;
   color:white;
@@ -178,6 +192,11 @@ button[onclick="resetearTodo()"]:hover {
 <div class="lista" id="lista"></div>
 
 <script>
+
+  function logout() {
+  localStorage.removeItem("admin");
+  window.location.href = "login.html";
+}
 
   function descargarExcelAdmin() {
   const jornada = document.getElementById("jornada").value;

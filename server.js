@@ -622,6 +622,20 @@ app.get('/exportar-excel', async (req, res) => {
   }
 });
 
+app.post('/admin/login', (req, res) => {
+
+  const { user, password } = req.body;
+
+  const ADMIN_USER = "Armenta";
+  const ADMIN_PASSWORD = "Armenta01"; // 🔥 cámbiala si quieres
+
+  if (user === ADMIN_USER && password === ADMIN_PASSWORD) {
+    return res.json({ ok: true });
+  }
+
+  res.status(401).json({ error: "Credenciales incorrectas" });
+});
+
 
 // 🚀 SERVER
 const PORT = process.env.PORT || 10000;
