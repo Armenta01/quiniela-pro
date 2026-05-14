@@ -1,7 +1,4 @@
 require('dotenv').config();
-console.log("USER:", process.env.ADMIN_USER);
-console.log("PASS:", process.env.ADMIN_PASSWORD);
-console.log("DATABASE:", process.env.DATABASE_URL);
 const express = require('express');
 const path = require('path');
 const { Pool } = require('pg');
