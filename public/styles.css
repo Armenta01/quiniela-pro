@@ -516,8 +516,8 @@ button {
 }
 
 button {
-  background: #22c55e !important; /* verde */
-  color: white !important;
+  background: #22c55e; /* verde */
+  color: white;
   font-weight: bold;
 }
 
