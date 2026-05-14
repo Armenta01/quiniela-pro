@@ -432,3 +432,27 @@ button {
   border-radius: 12px;
   padding: 5px;
 }
+
+.admin-container {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 25px;
+  background: #1e293b;
+  border-radius: 15px;
+}
+
+.admin-container input,
+.admin-container select,
+.admin-container button {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.admin-container input,
+.admin-container select {
+  margin-bottom: 10px;
+}
+
+.admin-container button {
+  margin-top: 10px;
+}
