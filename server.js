@@ -627,15 +627,15 @@ app.get('/exportar-excel', async (req, res) => {
 });
 
 app.post('/admin/login', (req, res) => {
-  
 
   const user = (req.body.user || "").trim();
   const password = (req.body.password || "").trim();
-  console.log("ENV USER:", ADMIN_USER);
-console.log("ENV PASS:", ADMIN_PASSWORD);
 
   const ADMIN_USER = (process.env.ADMIN_USER || "").trim();
   const ADMIN_PASSWORD = (process.env.ADMIN_PASSWORD || "").trim();
+
+  console.log("ENV USER:", ADMIN_USER);
+  console.log("ENV PASS:", ADMIN_PASSWORD);
 
   console.log("LOGIN:", user, password);
 
@@ -647,6 +647,7 @@ console.log("ENV PASS:", ADMIN_PASSWORD);
   }
 
   res.status(401).json({ error: "Credenciales incorrectas" });
+
 });
 
 
