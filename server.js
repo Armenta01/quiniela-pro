@@ -9,6 +9,11 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
+
+
 // 🔥 DB
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -668,25 +673,6 @@ app.get('/jornada-actual', async (req, res) => {
     res.status(500).json({ error: "Error obteniendo jornada" });
   }
 });
-
-app.use(express.static('public'));
-
-app.get('/admin', (req, res) => {
-  res.sendFile(__dirname + '/public/admin.html');
-});
-
-app.get('/tabla', (req, res) => {
-  res.sendFile(__dirname + '/public/tabla.html');
-});
-
-app.get('/historial', (req, res) => {
-  res.sendFile(__dirname + '/public/historial.html');
-});
-
-app.get('/login', (req, res) => {
-  res.sendFile(__dirname + '/public/login.html');
-});
-
 
 // 🚀 SERVER
 const PORT = process.env.PORT || 10000;
