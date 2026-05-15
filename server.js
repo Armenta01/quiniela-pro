@@ -646,7 +646,7 @@ app.post('/admin/login', (req, res) => {
     return res.json({ ok: true });
   }
 
-  res.status(401).json({ error: "Credenciales incorrectas" });
+  res.status(401).json({ error: "Usuario Incorrecto" });
 
 });
 
