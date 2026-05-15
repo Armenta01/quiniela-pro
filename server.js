@@ -634,11 +634,6 @@ app.post('/admin/login', (req, res) => {
   const ADMIN_USER = (process.env.ADMIN_USER || "").trim();
   const ADMIN_PASSWORD = (process.env.ADMIN_PASSWORD || "").trim();
 
-  console.log("ENV USER:", ADMIN_USER);
-  console.log("ENV PASS:", ADMIN_PASSWORD);
-
-  console.log("LOGIN:", user, password);
-
   if (
     user === ADMIN_USER &&
     password === ADMIN_PASSWORD
@@ -674,6 +669,23 @@ app.get('/jornada-actual', async (req, res) => {
   }
 });
 
+app.use(express.static('public'));
+
+app.get('/admin', (req, res) => {
+  res.sendFile(__dirname + '/public/admin.html');
+});
+
+app.get('/tabla', (req, res) => {
+  res.sendFile(__dirname + '/public/tabla.html');
+});
+
+app.get('/historial', (req, res) => {
+  res.sendFile(__dirname + '/public/historial.html');
+});
+
+app.get('/login', (req, res) => {
+  res.sendFile(__dirname + '/public/login.html');
+});
 
 
 // 🚀 SERVER
