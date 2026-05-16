@@ -4,6 +4,7 @@ const path = require('path');
 const { Pool } = require('pg');
 const ExcelJS = require('exceljs');
 const fetch = require('node-fetch');
+const moment = require('moment-timezone');
 
 const app = express();
 app.use(express.json());
@@ -79,6 +80,7 @@ initDB().catch(err => {
 
 // 🔒 BLOQUEO
 async function jornadaBloqueada(jornada) {
+
   const result = await pool.query(
     `SELECT MIN(fecha) as fecha FROM partidos WHERE jornada = $1`,
     [jornada]
@@ -86,10 +88,16 @@ async function jornadaBloqueada(jornada) {
 
   if (!result.rows[0].fecha) return false;
 
-  const limite = new Date(result.rows[0].fecha);
-  limite.setDate(limite.getDate() - 1);
+  const fechaPartido = moment.tz(
+    result.rows[0].fecha,
+    "America/Mexico_City"
+  );
 
-  return new Date() >= limite;
+  const limite = fechaPartido.clone().subtract(1, 'day');
+
+  const ahora = moment.tz("America/Mexico_City");
+
+  return ahora.isAfter(limite);
 }
 
 async function obtenerCampeon(jornada) {
@@ -435,7 +443,6 @@ app.get('/limite', async (req, res) => {
   try {
     const { jornada } = req.query;
 
-    // 🔥 traer el primer partido de la jornada
     const r = await pool.query(`
       SELECT fecha 
       FROM partidos 
@@ -448,21 +455,25 @@ app.get('/limite', async (req, res) => {
       return res.json({ bloqueada: false });
     }
 
-    const fechaPartido = new Date(r.rows[0].fecha);
+    // 🔥 FECHA DEL PARTIDO EN MÉXICO
+    const fechaPartido = moment.tz(
+      r.rows[0].fecha,
+      "America/Mexico_City"
+    );
 
-    // 🔥 restar 1 día
-    const limite = new Date(fechaPartido);
-    limite.setDate(limite.getDate() - 1);
+    // 🔥 RESTAR 1 DÍA
+    const limite = fechaPartido.clone().subtract(1, 'day');
 
-    const ahora = new Date();
+    // 🔥 HORA ACTUAL MÉXICO
+    const ahora = moment.tz("America/Mexico_City");
 
-    // 🔥 comparación real
-    const bloqueada = ahora >= limite;
+    // 🔥 COMPARACIÓN REAL
+    const bloqueada = ahora.isAfter(limite);
 
     res.json({
       bloqueada,
-      limite,
-      ahora
+      limite: limite.format(),
+      ahora: ahora.format()
     });
 
   } catch (err) {
