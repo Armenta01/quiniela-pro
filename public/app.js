@@ -91,17 +91,20 @@ async function cargarPartidos() {
 
     const estado = getEstadoPartido(p.fecha);
 
-    const fechaTexto = p.fecha.substring(0,16).replace('T',' ');
+   const fechaTexto = p.fecha;
 
-    const [fechaParte, horaParte] = fechaTexto.split(' ');
+const [fechaParte, horaParte] = fechaTexto.split(' ');
 
-    const [anio, mes, dia] = fechaParte.split('-');
+const [anio, mes, dia] = fechaParte.split('-');
 
-    const fechaFormateada = `${dia}-${['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][parseInt(mes)-1]}`;
+const meses = [
+  'ene','feb','mar','abr','may','jun',
+  'jul','ago','sep','oct','nov','dic'
+];
 
-    const horaFormateada = horaParte.substring(0,5);
+const fechaFormateada = `${dia}-${meses[parseInt(mes)-1]}`;
 
-    
+const horaFormateada = horaParte;
 
     cont.innerHTML += `
       <div class="card">

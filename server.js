@@ -139,12 +139,25 @@ app.get('/jornadas', async (req, res) => {
 
 // 🔥 PARTIDOS
 app.get('/partidos', async (req, res) => {
+
   const { jornada } = req.query;
 
-  const result = await pool.query(
-    `SELECT * FROM partidos WHERE jornada = $1 ORDER BY fecha`,
-    [jornada]
-  );
+  const result = await pool.query(`
+    SELECT 
+      id,
+      local,
+      visitante,
+      TO_CHAR(fecha, 'YYYY-MM-DD HH24:MI') as fecha,
+      logo_local,
+      logo_visitante,
+      goles_local,
+      goles_visitante,
+      jornada,
+      liga
+    FROM partidos
+    WHERE jornada = $1
+    ORDER BY fecha
+  `, [jornada]);
 
   res.json(result.rows);
 });
