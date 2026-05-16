@@ -91,22 +91,15 @@ async function cargarPartidos() {
 
     const estado = getEstadoPartido(p.fecha);
 
-    const [fechaRaw, horaRaw] = p.fecha.split("T");
+    const fechaTexto = p.fecha.replace('T', ' ');
 
-    const fechaLocal = p.fecha.replace('Z', '');
+    const [fechaParte, horaParte] = fechaTexto.split(' ');
 
-const fecha = new Date(fechaLocal);
+    const [anio, mes, dia] = fechaParte.split('-');
 
-const fechaFormateada = fecha.toLocaleDateString('es-MX', {
-  day: '2-digit',
-  month: 'short'
-});
+    const fechaFormateada = `${dia}-${['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][parseInt(mes)-1]}`;
 
-const horaFormateada = fecha.toLocaleTimeString('es-MX', {
-  hour: '2-digit',
-  minute: '2-digit',
-  hour12: false
-});
+    const horaFormateada = horaParte.substring(0,5);
 
     
 
