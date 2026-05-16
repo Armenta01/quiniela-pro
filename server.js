@@ -507,18 +507,38 @@ app.post('/reset', async (req, res) => {
 });
 
 app.post('/admin/partidos', async (req, res) => {
-  let { local, visitante, fecha, jornada, liga, logo_local, logo_visitante } = req.body;
+  let {
+    local,
+    visitante,
+    fecha,
+    jornada,
+    liga,
+    logo_local,
+    logo_visitante
+  } = req.body;
 
-// limpiar espacios
-local = local.trim();
-visitante = visitante.trim();
-liga = liga ? liga.trim() : null;
+  local = local.trim();
+  visitante = visitante.trim();
+  liga = liga ? liga.trim() : null;
+
+  // FIX HORARIO MEXICO
+  const fechaMexico = fecha.replace('T', ' ') + ':00';
+
   try {
+
     await pool.query(`
       INSERT INTO partidos
       (local, visitante, fecha, jornada, liga, logo_local, logo_visitante)
       VALUES ($1,$2,$3,$4,$5,$6,$7)
-    `, [local, visitante, fecha, jornada, liga || null, logo_local || null, logo_visitante || null]);
+    `, [
+      local,
+      visitante,
+      fechaMexico,
+      jornada,
+      liga || null,
+      logo_local || null,
+      logo_visitante || null
+    ]);
 
     res.json({ ok: true });
 
