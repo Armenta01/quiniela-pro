@@ -91,7 +91,7 @@ async function cargarPartidos() {
 
     const estado = getEstadoPartido(p.fecha);
 
-    const fechaTexto = p.fecha.replace('T', ' ');
+    const fechaTexto = p.fecha.substring(0,16).replace('T',' ');
 
     const [fechaParte, horaParte] = fechaTexto.split(' ');
 

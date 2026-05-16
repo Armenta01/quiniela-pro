@@ -203,9 +203,7 @@ async function cargarPartidos() {
     <div class="partido">
 
       <b>${p.local} vs ${p.visitante}</b><br>
-      ${new Date(p.fecha).toLocaleString('es-MX', {
-  timeZone: 'America/Mexico_City'
-})} <br><br>
+      ${p.fecha.substring(0,16).replace('T',' ')}<br><br>
 
       <input type="number" id="rl${p.id}" placeholder="Goles local">
       <input type="number" id="rv${p.id}" placeholder="Goles visitante">
