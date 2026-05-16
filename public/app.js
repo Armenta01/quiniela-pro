@@ -93,22 +93,20 @@ async function cargarPartidos() {
 
     const [fechaRaw, horaRaw] = p.fecha.split("T");
 
-    const fecha = new Date(p.fecha);
+    const fechaLocal = p.fecha.replace('Z', '');
 
-    const fechaFormateada = fecha.toLocaleDateString('es-MX', {
-     timeZone: 'America/Mexico_City',
-     day: '2-digit',
-     month: 'short'
-    });
+const fecha = new Date(fechaLocal);
 
+const fechaFormateada = fecha.toLocaleDateString('es-MX', {
+  day: '2-digit',
+  month: 'short'
+});
 
-    const horaFormateada = fecha.toLocaleTimeString('es-MX', {
-     timeZone: 'America/Mexico_City',
-     hour: '2-digit',
-     minute: '2-digit',
-     hour12: false
-    
-    });
+const horaFormateada = fecha.toLocaleTimeString('es-MX', {
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false
+});
 
     
 
