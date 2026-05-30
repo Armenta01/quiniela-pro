@@ -459,22 +459,10 @@ const social = document.getElementById("socialFloat");
 
 window.addEventListener("scroll", () => {
 
-  console.log("SCROLL:", window.scrollY);
-
-  if (window.scrollY > 150) {
-
-    console.log("OCULTAR");
-
+  if (window.scrollY > 100) {
     social.style.display = "none";
-
   } else {
-
-    console.log("MOSTRAR");
-
     social.style.display = "flex";
-
   }
 
 });
-
-alert("APP JS NUEVO CARGADO");
