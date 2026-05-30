@@ -637,3 +637,13 @@ button:active {
 .instagram{
   background: #E4405F;
 }
+
+.social-float{
+  transition: all .35s ease;
+}
+
+.social-hide{
+  opacity: 0;
+  transform: translateY(-50%) translateX(100px);
+  pointer-events: none;
+}
