@@ -457,9 +457,11 @@ async function checkBloqueo() {
 
 const social = document.getElementById("socialFloat");
 
-window.addEventListener("scroll", () => {
+window.addEventListener("scroll", function() {
 
-  if (window.scrollY > 100) {
+  const posicion = window.pageYOffset || document.documentElement.scrollTop;
+
+  if (posicion > 150) {
     social.style.display = "none";
   } else {
     social.style.display = "flex";
