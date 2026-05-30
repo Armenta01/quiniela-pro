@@ -641,8 +641,7 @@ button:active {
 .social-float{
   position: fixed;
   right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 180px;
 
   display: flex;
   flex-direction: column;
@@ -650,7 +649,7 @@ button:active {
 
   z-index: 9999;
 
-  transition: all .3s ease;
+  transition: all .4s ease;
 }
 
 .social-hide{
