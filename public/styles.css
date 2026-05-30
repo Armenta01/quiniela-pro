@@ -650,12 +650,11 @@ button:active {
 
   z-index: 9999;
 
-  transition: all .4s ease;
+  transition: all .3s ease;
 }
 
 .social-hide{
   opacity: 0;
-  visibility: hidden;
   pointer-events: none;
 }
 
