@@ -1,41 +1,78 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<div class="banner">
-  <img src="banner.jpg" alt="Quiniela Pro">
-</div>
-<link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css">
 
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- Iconos redes sociales -->
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <title>Quiniela Pro</title>
 </head>
 
 <body>
 
+<div class="banner">
+  <img src="banner.jpg" alt="Quiniela Pro">
+</div>
+
 <header class="header">
-  
 </header>
 
 <div class="top-bar">
-<button onclick="irTabla()">📊 Ver Tabla</button>
-  <input id="usuario" maxlength="15" placeholder="Tu nombre" onblur="validarUsuario()">
-  
+  <button onclick="irTabla()">📊 Ver Tabla</button>
+
+  <input id="usuario"
+         maxlength="15"
+         placeholder="Tu nombre"
+         onblur="validarUsuario()">
+
   <select id="jornadaSelect" onchange="cambiarJornada()"></select>
 </div>
 
 <div id="estadoQuiniela" class="estado"></div>
 
 <div id="partidos"></div>
-<button id="btnGuardar" class="btn-main" onclick="guardarTodo()">Guardar Quiniela</button>
+
+<button id="btnGuardar"
+        class="btn-main"
+        onclick="guardarTodo()">
+  Guardar Quiniela
+</button>
 
 <div id="top4"></div>
 <div id="campeon"></div>
 
-
-
 <div id="tabla"></div>
+
+<!-- Redes sociales flotantes -->
+<div class="social-float">
+
+  <a href="https://wa.me/524531021052"
+     target="_blank"
+     class="social-btn whatsapp">
+     <i class="fab fa-whatsapp"></i>
+  </a>
+
+  <a href="https://facebook.com/TUFACEBOOK"
+     target="_blank"
+     class="social-btn facebook">
+     <i class="fab fa-facebook-f"></i>
+  </a>
+
+  <a href="https://instagram.com/quinielaselinge?igsh=MzFwc2s1cWE2ZWtz&utm_source=qr"
+     target="_blank"
+     class="social-btn instagram">
+     <i class="fab fa-instagram"></i>
+  </a>
+
+</div>
 
 <script src="app.js"></script>
 
