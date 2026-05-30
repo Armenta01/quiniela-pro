@@ -476,3 +476,5 @@ window.addEventListener("scroll", () => {
   }
 
 });
+
+alert("APP JS NUEVO CARGADO");
