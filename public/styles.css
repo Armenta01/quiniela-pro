@@ -641,7 +641,7 @@ button:active {
 .social-float{
   position: fixed;
   right: 15px;
-  top: 140px;
+  top: 120px;
 
   display: flex;
   flex-direction: column;
