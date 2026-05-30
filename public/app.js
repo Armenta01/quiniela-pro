@@ -454,3 +454,31 @@ async function checkBloqueo() {
     document.getElementById("btnGuardar").disabled = false;
   }
 }
+
+let ultimoScroll = 0;
+
+window.addEventListener("scroll", () => {
+
+  const social = document.getElementById("socialFloat");
+
+  const scrollActual = window.pageYOffset;
+
+  // si está arriba de todo
+  if (scrollActual < 50) {
+    social.classList.remove("social-hide");
+    ultimoScroll = scrollActual;
+    return;
+  }
+
+  // bajando
+  if (scrollActual > ultimoScroll) {
+    social.classList.add("social-hide");
+  }
+
+  // subiendo
+  else {
+    social.classList.remove("social-hide");
+  }
+
+  ultimoScroll = scrollActual;
+});
