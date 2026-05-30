@@ -460,15 +460,9 @@ const social = document.getElementById("socialFloat");
 window.addEventListener("scroll", () => {
 
   if (window.scrollY > 150) {
-
-    social.style.opacity = "0";
-    social.style.pointerEvents = "none";
-
+    social.style.display = "none";
   } else {
-
-    social.style.opacity = "1";
-    social.style.pointerEvents = "auto";
-
+    social.style.display = "flex";
   }
 
 });
