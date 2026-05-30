@@ -455,30 +455,20 @@ async function checkBloqueo() {
   }
 }
 
-let ultimoScroll = 0;
+const social = document.getElementById("socialFloat");
 
 window.addEventListener("scroll", () => {
 
-  const social = document.getElementById("socialFloat");
+  if (window.scrollY > 150) {
 
-  const scrollActual = window.pageYOffset;
+    social.style.opacity = "0";
+    social.style.pointerEvents = "none";
 
-  // si está arriba de todo
-  if (scrollActual < 50) {
-    social.classList.remove("social-hide");
-    ultimoScroll = scrollActual;
-    return;
+  } else {
+
+    social.style.opacity = "1";
+    social.style.pointerEvents = "auto";
+
   }
 
-  // bajando
-  if (scrollActual > ultimoScroll) {
-    social.classList.add("social-hide");
-  }
-
-  // subiendo
-  else {
-    social.classList.remove("social-hide");
-  }
-
-  ultimoScroll = scrollActual;
 });
