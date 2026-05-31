@@ -657,3 +657,29 @@ button:active {
   pointer-events: none;
 }
 
+.acciones-quiniela{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  justify-content:center;
+  margin:20px 0;
+}
+
+.btn-limpiar,
+.btn-random{
+  border:none;
+  border-radius:14px;
+  padding:14px 18px;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  min-width:140px;
+}
+
+.btn-limpiar{
+  background:#dc2626;
+}
+
+.btn-random{
+  background:#2563eb;
+}

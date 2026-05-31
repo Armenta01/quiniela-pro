@@ -495,3 +495,31 @@ window.addEventListener("scroll", function() {
   }
 
 });
+
+function limpiarPronosticos() {
+
+  if (!confirm("¿Deseas borrar todos tus pronósticos?")) {
+    return;
+  }
+
+  document.querySelectorAll('input[id^="l"]').forEach(i => {
+    i.value = "";
+  });
+
+  document.querySelectorAll('input[id^="v"]').forEach(i => {
+    i.value = "";
+  });
+
+}
+
+function generarAleatorio() {
+
+  document.querySelectorAll('input[id^="l"]').forEach(i => {
+    i.value = Math.floor(Math.random() * 6);
+  });
+
+  document.querySelectorAll('input[id^="v"]').forEach(i => {
+    i.value = Math.floor(Math.random() * 6);
+  });
+
+}
