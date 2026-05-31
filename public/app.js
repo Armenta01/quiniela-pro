@@ -166,6 +166,32 @@ async function verTablaCompleta(jornada) {
   const totalPartidos = Math.max(...data.map(u => u.picks.length));
   const partidos = await (await fetch(`/partidos?jornada=${jornada}`)).json();
 
+  // 🔥 No mostrar tabla hasta que exista al menos un resultado
+
+const hayResultados = partidos.some(
+  p => p.goles_local != null &&
+       p.goles_visitante != null
+);
+
+if (!hayResultados) {
+
+  cont.innerHTML = `
+    <div style="
+      text-align:center;
+      padding:50px;
+      color:white;
+      font-size:22px;
+      background:#1e293b;
+      border-radius:15px;
+      margin-top:20px;
+    ">
+      ⏳ La tabla general se habilitará cuando finalice el primer partido.
+    </div>
+  `;
+
+  return;
+}
+
   let header = `<div class="fila header">
   <div class="celda jugador">Jugador</div>`;
   
