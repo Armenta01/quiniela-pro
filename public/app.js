@@ -185,7 +185,7 @@ if (!hayResultados) {
       border-radius:15px;
       margin-top:20px;
     ">
-      ⏳ La tabla general se habilitará cuando finalice el primer partido.
+      ⏳ La tabla general se mostrara al finalizar el primer partido.
     </div>
   `;
 
