@@ -659,27 +659,33 @@ button:active {
 
 .acciones-quiniela{
   display:flex;
-  gap:12px;
-  align-items:center;
   justify-content:center;
-  margin:20px 0;
-}
-
-.btn-limpiar,
-.btn-random{
-  border:none;
-  border-radius:14px;
-  padding:14px 18px;
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
-  min-width:140px;
+  gap:20px;
+  margin-top:15px;
 }
 
 .btn-limpiar{
-  background:#dc2626;
+  background:#dc2626 !important;
+  color:white;
 }
 
 .btn-random{
-  background:#2563eb;
+  background:#000 !important;
+  color:white;
+}
+
+
+.acciones-quiniela .btn-main{
+  width:auto !important;
+  margin:0 !important;
+  flex:1;
+  max-width:600px;
+}
+
+.acciones-quiniela .btn-limpiar{
+  background:#dc2626 !important;
+}
+
+.acciones-quiniela .btn-random{
+  background:#000000 !important;
 }

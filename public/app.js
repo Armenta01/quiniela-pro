@@ -514,12 +514,30 @@ function limpiarPronosticos() {
 
 function generarAleatorio() {
 
-  document.querySelectorAll('input[id^="l"]').forEach(i => {
-    i.value = Math.floor(Math.random() * 6);
-  });
+  const marcadores = [
+    [1,0],[1,0],[1,0],
+    [0,1],[0,1],
+    [1,1],[1,1],[1,1],
+    [2,1],[2,1],
+    [1,2],
+    [2,0],[0,2],
+    [2,2],
+    [3,1],
+    [1,3],
+    [3,2]
+  ];
 
-  document.querySelectorAll('input[id^="v"]').forEach(i => {
-    i.value = Math.floor(Math.random() * 6);
+  document.querySelectorAll('input[id^="l"]').forEach(inputLocal => {
+
+    const id = inputLocal.id.replace("l","");
+    const inputVisitante = document.getElementById("v" + id);
+
+    const resultado =
+      marcadores[Math.floor(Math.random() * marcadores.length)];
+
+    inputLocal.value = resultado[0];
+    inputVisitante.value = resultado[1];
+
   });
 
 }
