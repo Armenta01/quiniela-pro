@@ -185,7 +185,8 @@ if (!hayResultados) {
       border-radius:15px;
       margin-top:20px;
     ">
-      ⏳ La tabla general se mostrara al finalizar el primer partido.
+      🏆 La batalla por el liderato aún no comienza.
+         La clasificación aparecerá tras el primer resultado oficial.
     </div>
   `;
 
