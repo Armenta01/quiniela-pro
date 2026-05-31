@@ -689,3 +689,21 @@ button:active {
 .acciones-quiniela .btn-random{
   background:#000000 !important;
 }
+
+.btn-limpiar{
+  background:#dc2626 !important;
+  color:white !important;
+}
+
+.btn-random{
+  background:#000000 !important;
+  color:white !important;
+}
+
+.btn-limpiar:hover{
+  background:#b91c1c !important;
+}
+
+.btn-random:hover{
+  background:#222222 !important;
+}
