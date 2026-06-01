@@ -781,3 +781,17 @@ button:active {
   margin-top:30px;
   color:#94a3b8;
 }
+
+.estado.envivo{
+  color:#ef4444;
+  font-weight:bold;
+}
+
+.estado.finalizado{
+  color:#22c55e;
+  font-weight:bold;
+}
+
+.estado.futuro{
+  color:white;
+}

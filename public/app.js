@@ -62,26 +62,32 @@ function getEstadoPartido(fechaStr) {
 
   const ahora = new Date();
 
-  const [fechaRaw, horaRaw] = fechaStr.split("T");
-
-  const partidoFecha = new Date(fechaRaw + "T" + horaRaw);
+  // convertir "2026-06-03 12:45" a fecha válida
+  const partidoFecha = new Date(fechaStr.replace(" ", "T"));
 
   const diffMin = (ahora - partidoFecha) / 60000;
 
-  if (diffMin > 120) {
-    return { texto: "FINALIZADO", clase: "finalizado", icono: "🔒" };
+  if (diffMin > 130) {
+    return {
+      texto: "FINALIZADO",
+      clase: "finalizado",
+      icono: "🔒"
+    };
   }
 
-  if (diffMin >= 0 && diffMin <= 120) {
-    return { texto: "EN VIVO", clase: "envivo", icono: "🟢" };
+  if (diffMin >= 0) {
+    return {
+      texto: "EN VIVO",
+      clase: "envivo",
+      icono: "🔴"
+    };
   }
 
-  const hoy = new Date();
-  if (partidoFecha.toDateString() === hoy.toDateString()) {
-    return { texto: "HOY", clase: "hoy", icono: "🕒" };
-  }
-
-  return { texto: "PRÓXIMO", clase: "futuro", icono: "📅" };
+  return {
+    texto: "PRÓXIMO",
+    clase: "futuro",
+    icono: "📅"
+  };
 }
 
 // 🔥 PARTIDOS
