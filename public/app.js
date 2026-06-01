@@ -553,6 +553,8 @@ async function actualizarContador() {
 
   if (!info) return;
 
+  info.style.display = "block";
+
   const r = await fetch(`/limite?jornada=${jornadaActual}`);
   const d = await r.json();
 
