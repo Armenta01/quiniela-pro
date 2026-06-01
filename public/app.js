@@ -389,6 +389,7 @@ if (usuario.length < 3) {
 
 // 🔥 CAMPEÓN
 async function cargarCampeon() {
+
   const res = await fetch(`/campeon?jornada=${jornadaActual}`);
   const data = await res.json();
 
@@ -400,7 +401,11 @@ async function cargarCampeon() {
     return;
   }
 
-  const nombres = data.map(u => `${u.nombre} (${u.puntos} pts)`).join(" • ");
+  const nombres = data
+    .map(u => `${u.nombre} (${u.puntos} pts)`)
+    .join(" • ");
+
+  const esLider = data[0].estado === "lider";
 
   cont.innerHTML = `
     <div style="
@@ -414,7 +419,12 @@ async function cargarCampeon() {
       text-align:center;
       box-shadow:0 0 15px gold;
     ">
-      🏆 Campeón${data.length > 1 ? "es" : ""} Semana ${jornadaActual}: <br>
+      ${
+        esLider
+          ? `🥇 Líder${data.length > 1 ? "es" : ""} Actual${data.length > 1 ? "es" : ""} Semana ${jornadaActual}:`
+          : `🏆 Campeón${data.length > 1 ? "es" : ""} Semana ${jornadaActual}:`
+      }
+      <br>
       ${nombres}
     </div>
   `;

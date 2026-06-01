@@ -110,8 +110,23 @@ async function obtenerCampeon(jornada) {
   `, [jornada]);
 
   if (parseInt(partidos.rows[0].pendientes) > 0) {
-    return []; // aún no hay campeón
-  }
+
+  const tabla = await fetchTabla(jornada);
+
+  if (!tabla.length) return [];
+
+  const maxPuntos = tabla[0].puntos;
+
+  const lideres = tabla.filter(
+    u => u.puntos === maxPuntos
+  );
+
+  lideres.forEach(l => {
+    l.estado = "lider";
+  });
+
+  return lideres;
+}
 
   // 🏆 obtener tabla
   const tabla = await fetchTabla(jornada);
@@ -122,9 +137,15 @@ async function obtenerCampeon(jornada) {
   const maxPuntos = tabla[0].puntos;
 
   // 🔥 traer TODOS los que empatan
-  const campeones = tabla.filter(u => u.puntos === maxPuntos);
+ const campeones = tabla.filter(
+  u => u.puntos === maxPuntos
+);
 
-  return campeones;
+campeones.forEach(c => {
+  c.estado = "campeon";
+});
+
+return campeones;
 }
 
 
