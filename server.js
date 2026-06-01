@@ -402,6 +402,20 @@ app.get('/top4', async (req, res) => {
   res.json(tabla.slice(0, 4));
 });
 
+app.get('/campeon', async (req, res) => {
+  try {
+
+    const { jornada } = req.query;
+
+    const campeones = await obtenerCampeon(jornada);
+
+    res.json(campeones);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error obteniendo campeón" });
+  }
+});
 
 // 🏆 CAMPEÓN (FIX duplicado)
 app.post('/admin/cerrar-jornada', async (req, res) => {
