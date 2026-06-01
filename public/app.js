@@ -53,6 +53,8 @@ function cambiarJornada() {
   cargarTop4();
   cargarCampeon();
   checkBloqueo();
+
+  actualizarContador();
 }
 
 // 🔥 ESTADO PARTIDO
