@@ -581,7 +581,11 @@ async function actualizarContador() {
     / (1000 * 60)
   );
 
-  info.innerHTML =
-    `💰 Costo: $50 MXN | ⏰ Cierra en: ${dias}d ${horas}h ${minutos}m`;
-
+  info.innerHTML = `
+  <span class="costo">💰 $50 MXN</span>
+  <span class="separador">•</span>
+  <span class="contador">
+    ⏰ ${dias}d ${horas}h ${minutos}m
+  </span>
+`;
 }

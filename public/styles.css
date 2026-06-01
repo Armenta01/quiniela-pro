@@ -727,3 +727,47 @@ button:active {
 
   box-shadow:0 0 10px rgba(0,0,0,.3);
 }
+
+.info-quiniela{
+  width:90%;
+  margin:20px auto;
+
+  background:linear-gradient(
+    90deg,
+    #1e293b,
+    #24354f
+  );
+
+  border:2px solid #facc15;
+
+  border-radius:16px;
+
+  padding:18px;
+
+  text-align:center;
+
+  color:white;
+
+  font-size:28px;
+  font-weight:800;
+
+  box-shadow:
+    0 0 15px rgba(250,204,21,.35);
+
+  letter-spacing:.5px;
+}
+
+.costo{
+  color:#facc15;
+  font-weight:800;
+}
+
+.separador{
+  margin:0 12px;
+  color:#64748b;
+}
+
+.contador{
+  color:#22c55e;
+  font-weight:800;
+}
