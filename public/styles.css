@@ -759,6 +759,7 @@ button:active {
 
 .costo{
   color:#facc15;
+  font-size:28px;
   font-weight:800;
 }
 
@@ -769,5 +770,8 @@ button:active {
 
 .contador{
   color:#22c55e;
-  font-weight:800;
+  font-size:15px;
+  font-weight:600;
+  opacity:.9;
+
 }
