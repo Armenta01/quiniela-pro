@@ -19,6 +19,9 @@ window.onload = async () => {
   
   cambiarJornada();
   cargarTop4();
+
+  actualizarContador();
+  setInterval(actualizarContador, 60000);
   
 
   
@@ -539,5 +542,42 @@ function generarAleatorio() {
     inputVisitante.value = resultado[1];
 
   });
+
+}
+
+async function actualizarContador() {
+
+  const info = document.getElementById("infoQuiniela");
+
+  if (!info) return;
+
+  const r = await fetch(`/limite?jornada=${jornadaActual}`);
+  const d = await r.json();
+
+  // Si ya cerró, ocultar la barra
+  if (d.bloqueada) {
+    info.style.display = "none";
+    return;
+  }
+
+  const limite = new Date(d.limite);
+  const ahora = new Date();
+
+  const diff = limite - ahora;
+
+  const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+  const horas = Math.floor(
+    (diff % (1000 * 60 * 60 * 24))
+    / (1000 * 60 * 60)
+  );
+
+  const minutos = Math.floor(
+    (diff % (1000 * 60 * 60))
+    / (1000 * 60)
+  );
+
+  info.innerHTML =
+    `💰 Costo: $50 MXN | ⏰ Cierra en: ${dias}d ${horas}h ${minutos}m`;
 
 }

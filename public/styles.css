@@ -707,3 +707,23 @@ button:active {
 .btn-random:hover{
   background:#222222 !important;
 }
+
+.info-quiniela{
+  width:90%;
+  margin:15px auto;
+
+  background:#1e293b;
+
+  padding:15px;
+
+  border-radius:12px;
+
+  text-align:center;
+
+  font-size:20px;
+  font-weight:bold;
+
+  color:white;
+
+  box-shadow:0 0 10px rgba(0,0,0,.3);
+}
