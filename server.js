@@ -209,7 +209,7 @@ nombre = nombre.trim();
     } else {
       userId = user.rows[0].id;
     }
-// 🔥 validar si ya mandó EXACTAMENTE lo mismo
+// 🔥 validar si ya mandó EXACTfAMENTE lo mismo
 const existentes = await pool.query(
   `SELECT envio_id
    FROM predicciones pr
@@ -298,7 +298,7 @@ app.post('/admin/resultado', async (req, res) => {
 
 // 🔥 TABLA
 function calcularPuntos(p, pr) {
-  if (p.goles_local === pr.goles_local && p.goles_visitante === pr.goles_visitante) return 3;
+  if (p.goles_local === pr.goles_local && p.goles_visitante === pr.goles_visitante) return 2;
 
   if (
     (p.goles_local > p.goles_visitante && pr.goles_local > pr.goles_visitante) ||
@@ -358,9 +358,9 @@ async function fetchTabla(jornada) {
       return;
     }
 
-    // 🟢 3 pts
+    // 🟢 2 pts
     if (row.goles_local === row.pr_local && row.goles_visitante === row.pr_visitante) {
-      tabla[row.envio_id].puntos += 3;
+      tabla[row.envio_id].puntos += 2;
       tabla[row.envio_id].detalles.push("verde");
     tabla[row.envio_id].picks.push(`${row.pr_local}-${row.pr_visitante}`);
     }
