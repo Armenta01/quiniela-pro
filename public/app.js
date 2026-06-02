@@ -54,6 +54,8 @@ function cambiarJornada() {
   checkBloqueo();
 
   actualizarContador();
+
+  setTimeout(mostrarRankingPopup, 500);
 }
 
 // 🔥 ESTADO PARTIDO
@@ -618,8 +620,6 @@ async function mostrarRankingPopup() {
 
   if (!data || data.length === 0) return;
 
-  // No mostrar si nadie tiene puntos
-  if ((data[0].puntos || 0) <= 0) return;
 
   const primerPuntaje = data[0].puntos;
 
