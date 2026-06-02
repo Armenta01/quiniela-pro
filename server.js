@@ -505,12 +505,17 @@ app.get('/limite', async (req, res) => {
 
     // 🔥 FECHA DEL PARTIDO EN MÉXICO
     const fechaPartido = moment.tz(
-      r.rows[0].fecha,
-      "America/Mexico_City"
-    );
+  r.rows[0].fecha,
+  "America/Mexico_City"
+);
 
-    // 🔥 RESTAR 1 DÍA
-    const limite = fechaPartido.clone().subtract(1, 'day');
+// Día anterior a las 22:00
+const limite = fechaPartido
+  .clone()
+  .subtract(1, 'day')
+  .hour(22)
+  .minute(0)
+  .second(0);
 
     // 🔥 HORA ACTUAL MÉXICO
     const ahora = moment.tz("America/Mexico_City");
