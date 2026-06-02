@@ -877,15 +877,18 @@ button:active {
 
 }
 
+.popup-oro{
+  background: linear-gradient(
+    90deg,
+    #ffd700,
+    #facc15
+  );
+}
 
-background: linear-gradient(
-  90deg,
-  #ffd700,
-  #facc15
-);
-
-background: linear-gradient(
-  90deg,
-  #c0c0c0,
-  #e5e7eb
-);
+.popup-plata{
+  background: linear-gradient(
+    90deg,
+    #c0c0c0,
+    #e5e7eb
+  );
+}
