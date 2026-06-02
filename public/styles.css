@@ -1058,3 +1058,26 @@ button:active {
 .overlay-menu.activo{
   display:block;
 }
+.bolsa-box{
+
+  width:90%;
+  margin:15px auto;
+
+  background:#17315d;
+
+  border:2px solid gold;
+
+  border-radius:20px;
+
+  padding:18px;
+
+  text-align:center;
+
+  color:white;
+
+  font-size:20px;
+
+  font-weight:bold;
+
+  box-shadow:0 0 15px rgba(255,215,0,.4);
+}

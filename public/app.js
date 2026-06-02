@@ -14,17 +14,23 @@ async function obtenerJornadaActual() {
 
 // 🔥 INIT
 window.onload = async () => {
+
   await cargarJornadas();
+
   await obtenerJornadaActual();
-  
+
   cambiarJornada();
+
   cargarTop4();
 
+  cargarBolsa(jornadaActual);
+
   actualizarContador();
+
   setInterval(actualizarContador, 60000);
 
   setTimeout(mostrarRankingPopup, 1000);
-  
+
 };
 
 function irTabla() {
@@ -47,15 +53,21 @@ async function cargarJornadas() {
 
 // 🔥 CAMBIO
 function cambiarJornada() {
+
   jornadaActual = document.getElementById("jornadaSelect").value || 1;
 
   cargarPartidos();
+
   cargarTop4();
+
+  cargarBolsa(jornadaActual);
+
   checkBloqueo();
 
   actualizarContador();
 
   setTimeout(mostrarRankingPopup, 500);
+
 }
 
 // 🔥 ESTADO PARTIDO
@@ -695,6 +707,18 @@ async function mostrarRankingPopup() {
     }, 500);
 
   }, 5000);
+}
+
+async function cargarBolsa(jornada) {
+
+  const res = await fetch(`/bolsa?jornada=${jornada}`);
+  const bolsa = await res.json();
+
+  document.getElementById("bolsaInfo").innerHTML = `
+    <div class="bolsa-box">
+      💰 Bolsa: $${bolsa.recaudado}<br>
+    </div>
+  `;
 }
 
 function toggleMenu() {
