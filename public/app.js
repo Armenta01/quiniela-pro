@@ -22,8 +22,8 @@ window.onload = async () => {
 
   actualizarContador();
   setInterval(actualizarContador, 60000);
-  
 
+  setTimeout(mostrarRankingPopup, 1000);
   
 };
 
@@ -606,4 +606,94 @@ async function actualizarContador() {
     ⏰ Cierra en: ${dias}d ${horas}h ${minutos}m
   </div>
 `;
+}
+
+async function mostrarRankingPopup() {
+
+  const key = `popupSemana${jornadaActual}`;
+
+  if (localStorage.getItem(key)) return;
+
+  const res = await fetch(`/top4?jornada=${jornadaActual}`);
+  const data = await res.json();
+
+  if (!data || data.length === 0) return;
+
+  // No mostrar si nadie tiene puntos
+  if ((data[0].puntos || 0) <= 0) return;
+
+  const primerPuntaje = data[0].puntos;
+
+  const primeros = data.filter(
+    u => u.puntos === primerPuntaje
+  );
+
+  const segundoPuntaje = data.find(
+    u => u.puntos < primerPuntaje
+  )?.puntos;
+
+  const segundos = segundoPuntaje == null
+    ? []
+    : data.filter(u => u.puntos === segundoPuntaje);
+
+  const popup = document.getElementById("popupRanking");
+
+  popup.innerHTML = `
+    <div class="popup-ranking">
+
+      <div class="popup-card popup-oro">
+
+        <div class="popup-titulo">
+          🥇 PRIMER LUGAR
+        </div>
+
+        <div class="popup-nombre">
+          ${primeros.map(x => x.nombre).join("<br>")}
+        </div>
+
+        <div class="popup-puntos">
+          ${primerPuntaje} pts
+        </div>
+
+      </div>
+
+      ${
+        segundos.length > 0
+        ? `
+        <div class="popup-card popup-plata">
+
+          <div class="popup-titulo">
+            🥈 SEGUNDO LUGAR
+          </div>
+
+          <div class="popup-nombre">
+            ${segundos.map(x => x.nombre).join("<br>")}
+          </div>
+
+          <div class="popup-puntos">
+            ${segundoPuntaje} pts
+          </div>
+
+        </div>
+        `
+        : ""
+      }
+
+    </div>
+  `;
+
+  popup.style.display = "block";
+
+  localStorage.setItem(key, "ok");
+
+  setTimeout(() => {
+
+    popup.style.opacity = "0";
+
+    setTimeout(() => {
+      popup.style.display = "none";
+      popup.style.opacity = "1";
+    }, 500);
+
+  }, 5000);
 }
