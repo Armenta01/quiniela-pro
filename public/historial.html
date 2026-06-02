@@ -37,22 +37,21 @@ async function cargarHistorial() {
       </tr>
   `;
 
-  data.forEach((h, i) => {
-    let medalla = "";
+  data.forEach((h) => {
 
-    if (i === 0) medalla = "🥇";
-    else if (i === 1) medalla = "🥈";
-    else if (i === 2) medalla = "🥉";
-
-    html += `
-      <tr class="${i === 0 ? 'top' : ''}">
-        <td>${medalla || i + 1}</td>
-        <td>Semana ${h.jornada}</td>
-        <td>${h.nombre}</td>
-        <td><strong>${h.puntos}</strong></td>
-      </tr>
-    `;
-  });
+  html += `
+    <tr class="campeon-row">
+      <td>🏆</td>
+      <td>Semana ${h.jornada}</td>
+      <td>
+        <strong>${h.nombre}</strong>
+      </td>
+      <td>
+        ${h.puntos} pts
+      </td>
+    </tr>
+  `;
+});
 
   html += "</table>";
 
