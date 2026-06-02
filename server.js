@@ -494,6 +494,49 @@ app.get('/ranking-historico', async (req, res) => {
   }
 });
 
+app.get('/bolsa', async (req, res) => {
+  try {
+
+    const { jornada } = req.query;
+
+    const result = await pool.query(`
+      SELECT COUNT(DISTINCT nombre) AS participantes
+      FROM pronosticos
+      WHERE jornada = $1
+    `, [jornada]);
+
+    const participantes =
+      parseInt(result.rows[0].participantes || 0);
+
+    const recaudado = participantes * 50;
+
+    const administracion = recaudado * 0.20;
+
+    const bolsaPremios = recaudado * 0.80;
+
+    const primerLugar = bolsaPremios * 0.75;
+
+    const segundoLugar = bolsaPremios * 0.25;
+
+    res.json({
+      participantes,
+      recaudado,
+      administracion,
+      bolsaPremios,
+      primerLugar,
+      segundoLugar
+    });
+
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      error: 'Error bolsa'
+    });
+  }
+});
+
+
 // 🏆 CAMPEÓN (FIX duplicado)
 app.post('/admin/cerrar-jornada', async (req, res) => {
   const { jornada } = req.body;
