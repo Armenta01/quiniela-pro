@@ -104,48 +104,63 @@ async function obtenerCampeon(jornada) {
 
   // 🔍 verificar si ya terminaron los partidos
   const partidos = await pool.query(`
-    SELECT COUNT(*) FILTER (WHERE goles_local IS NULL OR goles_visitante IS NULL) AS pendientes
+    SELECT COUNT(*) FILTER (
+      WHERE goles_local IS NULL
+      OR goles_visitante IS NULL
+    ) AS pendientes
     FROM partidos
     WHERE jornada = $1
   `, [jornada]);
 
+  // 🥇 Si aún hay partidos pendientes → líderes
   if (parseInt(partidos.rows[0].pendientes) > 0) {
 
+    const tabla = await fetchTabla(jornada);
+
+    if (!tabla.length) return [];
+
+    const maxPuntos = tabla[0].puntos;
+
+    const lideres = tabla.filter(
+      u => u.puntos === maxPuntos
+    );
+
+    lideres.forEach(l => {
+      l.estado = "lider";
+    });
+
+    return lideres;
+  }
+
+  // 🏆 Jornada terminada → campeones
   const tabla = await fetchTabla(jornada);
 
   if (!tabla.length) return [];
 
   const maxPuntos = tabla[0].puntos;
 
-  const lideres = tabla.filter(
+  const campeones = tabla.filter(
     u => u.puntos === maxPuntos
   );
 
-  lideres.forEach(l => {
-    l.estado = "lider";
-  });
+  for (const c of campeones) {
 
-  return lideres;
-}
+    await pool.query(`
+      INSERT INTO campeones
+      (jornada, nombre, puntos)
+      VALUES ($1,$2,$3)
+      ON CONFLICT (jornada,nombre)
+      DO NOTHING
+    `, [
+      jornada,
+      c.nombre,
+      c.puntos
+    ]);
 
-  // 🏆 obtener tabla
-  const tabla = await fetchTabla(jornada);
+    c.estado = "campeon";
+  }
 
-  if (!tabla.length) return [];
-
-  // 🔥 obtener mayor puntaje
-  const maxPuntos = tabla[0].puntos;
-
-  // 🔥 traer TODOS los que empatan
- const campeones = tabla.filter(
-  u => u.puntos === maxPuntos
-);
-
-campeones.forEach(c => {
-  c.estado = "campeon";
-});
-
-return campeones;
+  return campeones;
 }
 
 
