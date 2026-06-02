@@ -500,8 +500,8 @@ app.get('/bolsa', async (req, res) => {
     const { jornada } = req.query;
 
     const result = await pool.query(`
-      SELECT COUNT(DISTINCT nombre) AS participantes
-      FROM pronosticos
+      SELECT COUNT(DISTINCT user_id) AS participantes
+      FROM predicciones
       WHERE jornada = $1
     `, [jornada]);
 
@@ -528,14 +528,14 @@ app.get('/bolsa', async (req, res) => {
     });
 
   } catch (err) {
+
     console.error(err);
 
-res.status(500).json({
-  error: err.message
+    res.status(500).json({
+      error: err.message
     });
   }
 });
-
 
 // 🏆 CAMPEÓN (FIX duplicado)
 app.post('/admin/cerrar-jornada', async (req, res) => {
