@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>👑 Salón de la Fama</title>
+
+<link rel="stylesheet" href="styles.css">
+
+</head>
+
+<body>
+
+<div class="banner">
+  <img src="banner.jpg" alt="Quinielas El Inge">
+</div>
+
+<h1>👑 Salón de la Fama</h1>
+
+<div id="ranking"></div>
+
+<button class="btn-main"
+        onclick="window.location.href='/'">
+  ⬅️ Volver a Quiniela
+</button>
+
+<script>
+
+async function cargarRanking() {
+
+  const res = await fetch('/ranking-historico');
+  const data = await res.json();
+
+  const cont = document.getElementById('ranking');
+
+  let html = '';
+
+  data.forEach((u, i) => {
+
+    let medalla = "🏅";
+
+    if (i === 0) medalla = "🥇";
+    else if (i === 1) medalla = "🥈";
+    else if (i === 2) medalla = "🥉";
+
+    html += `
+      <div class="ranking-card">
+
+        <div class="ranking-medalla">
+          ${medalla}
+        </div>
+
+        <div class="ranking-nombre">
+          ${u.nombre}
+        </div>
+
+        <div class="ranking-titulos">
+          ${u.titulos} título${u.titulos > 1 ? 's' : ''}
+        </div>
+
+      </div>
+    `;
+  });
+
+  cont.innerHTML = html;
+}
+
+cargarRanking();
+
+</script>
+
+</body>
+</html>

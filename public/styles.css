@@ -924,3 +924,29 @@ button:active {
 .campeon-row td:first-child{
   font-size:24px;
 }
+
+.ranking-card{
+  background:#132d5c;
+  margin:15px auto;
+  max-width:700px;
+  padding:20px;
+  border-radius:16px;
+  text-align:center;
+  box-shadow:0 0 15px rgba(0,0,0,.3);
+}
+
+.ranking-medalla{
+  font-size:40px;
+}
+
+.ranking-nombre{
+  font-size:28px;
+  font-weight:bold;
+  color:white;
+}
+
+.ranking-titulos{
+  font-size:20px;
+  color:#ffd700;
+  margin-top:10px;
+}
