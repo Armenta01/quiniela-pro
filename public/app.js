@@ -696,3 +696,17 @@ async function mostrarRankingPopup() {
 
   }, 5000);
 }
+
+function toggleMenu() {
+
+  document
+    .getElementById("menuLateral")
+    .classList
+    .toggle("abierto");
+
+  document
+    .getElementById("overlayMenu")
+    .classList
+    .toggle("activo");
+}
+

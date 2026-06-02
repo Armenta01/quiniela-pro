@@ -950,3 +950,111 @@ button:active {
   color:#ffd700;
   margin-top:10px;
 }
+
+/* BOTON MENU */
+
+.menu-btn{
+  position:absolute;
+  top:20px;
+  left:20px;
+
+  width:55px;
+  height:55px;
+
+  background:rgba(255,255,255,.15);
+  backdrop-filter:blur(12px);
+
+  border-radius:12px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:30px;
+  color:white;
+
+  z-index:1000;
+  cursor:pointer;
+}
+
+
+/* MENU */
+
+.menu-lateral{
+
+  position:fixed;
+  top:0;
+  left:-320px;
+
+  width:300px;
+  height:100vh;
+
+  background:rgba(10,20,50,.85);
+  backdrop-filter:blur(18px);
+
+  transition:.35s;
+
+  z-index:2000;
+
+  padding-top:20px;
+}
+
+.menu-lateral.abierto{
+  left:0;
+}
+
+.menu-header{
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  padding:20px;
+
+  color:#ffd700;
+  font-size:26px;
+  font-weight:bold;
+
+  border-bottom:1px solid rgba(255,255,255,.15);
+}
+
+.menu-header span{
+  cursor:pointer;
+}
+
+.menu-lateral a{
+
+  display:block;
+
+  padding:20px;
+
+  color:white;
+  text-decoration:none;
+
+  font-size:20px;
+
+  transition:.2s;
+}
+
+.menu-lateral a:hover{
+  background:rgba(255,255,255,.08);
+}
+
+
+/* FONDO OSCURO */
+
+.overlay-menu{
+
+  position:fixed;
+  inset:0;
+
+  background:rgba(0,0,0,.45);
+
+  display:none;
+
+  z-index:1500;
+}
+
+.overlay-menu.activo{
+  display:block;
+}
