@@ -11,11 +11,13 @@
 
 <div id="historial"></div>
 
-<button onclick="volver()">⬅️ Regresar</button>
+<button class="btn-volver" onclick="volver()">
+⬅️ Volver a Quiniela
+</button>
 
 <script>
 async function cargarHistorial() {
-  const res = await fetch('/historial');
+  const res = await fetch('/historial-campeones');
   const data = await res.json();
 
   const cont = document.getElementById('historial');
@@ -30,7 +32,7 @@ async function cargarHistorial() {
       <tr>
         <th>#</th>
         <th>Jornada</th>
-        <th>Campeón</th>
+        <th>Jugador</th>
         <th>Puntos</th>
       </tr>
   `;

@@ -438,6 +438,25 @@ app.get('/campeon', async (req, res) => {
   }
 });
 
+app.get('/historial-campeones', async (req, res) => {
+  try {
+
+    const result = await pool.query(`
+      SELECT jornada, nombre, puntos
+      FROM campeones
+      ORDER BY jornada DESC
+    `);
+
+    res.json(result.rows);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      error: 'Error obteniendo historial'
+    });
+  }
+});
+
 // 🏆 CAMPEÓN (FIX duplicado)
 app.post('/admin/cerrar-jornada', async (req, res) => {
   const { jornada } = req.body;
