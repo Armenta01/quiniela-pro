@@ -51,7 +51,6 @@ function cambiarJornada() {
 
   cargarPartidos();
   cargarTop4();
-  cargarCampeon();
   checkBloqueo();
 
   actualizarContador();
