@@ -715,10 +715,20 @@ async function cargarBolsa(jornada) {
   const bolsa = await res.json();
 
   document.getElementById("bolsaInfo").innerHTML = `
-    <div class="bolsa-box">
-      💰 Bolsa: $${bolsa.recaudado}<br>
+  <div class="bolsa-box">
+
+     BOLSA ACUMULADA:
+
+    <div style="
+      font-size:32px;
+      color:#FFD700;
+      margin:10px 0;
+    ">
+      $${bolsa.recaudado} MXN
     </div>
-  `;
+   
+  </div>
+`;
 }
 
 function toggleMenu() {
