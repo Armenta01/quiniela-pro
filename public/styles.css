@@ -7,12 +7,13 @@ body {
 
 .header {
   background: #1f3b67;
-  height: 55px;
+
+  height: 35px;
 
   display: flex;
   align-items: center;
 
-  padding-left: 15px;
+  padding-left: 12px;
 }
 
 .top-bar {
@@ -951,28 +952,28 @@ button:active {
 }
 
 /* BOTON MENU */
-
 .menu-btn {
 
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
 
   margin: 0;
 
   background: rgba(255,255,255,.15);
   backdrop-filter: blur(12px);
 
-  border-radius: 8px;
+  border-radius: 6px;
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  font-size: 24px;
+  font-size: 18px;
   color: white;
 
   cursor: pointer;
 }
+
 
 
 /* MENU */
