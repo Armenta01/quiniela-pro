@@ -1,70 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="styles.css">
+<title>Estadísticas | Quinielas El Inge</title>
 
-  <title>Estadísticas</title>
+<link rel="stylesheet" href="styles.css">
+
+<style>
+
+body{
+  background:#020617;
+  color:white;
+  font-family:Arial, Helvetica, sans-serif;
+  margin:0;
+  padding:30px 15px;
+}
+
+h1{
+  text-align:center;
+  margin-bottom:30px;
+  color:#ffd700;
+  text-shadow:0 0 15px rgba(255,215,0,.4);
+}
+
+.stats-container{
+  max-width:900px;
+  margin:auto;
+
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:20px;
+}
+
+.stat-card{
+
+  background:linear-gradient(
+    135deg,
+    rgba(30,58,138,.95),
+    rgba(15,23,42,.95)
+  );
+
+  border:2px solid #ffd700;
+
+  border-radius:20px;
+
+  padding:25px;
+
+  text-align:center;
+
+  box-shadow:
+    0 0 20px rgba(255,215,0,.25),
+    0 0 40px rgba(59,130,246,.15);
+
+  transition:.25s;
+}
+
+.stat-card:hover{
+  transform:translateY(-5px);
+}
+
+.stat-numero{
+
+  font-size:42px;
+  font-weight:bold;
+  color:#ffd700;
+
+  margin-bottom:10px;
+
+  text-shadow:
+    0 0 10px rgba(255,215,0,.5);
+}
+
+.stat-texto{
+
+  font-size:18px;
+  color:#fff;
+}
+
+.btn-volver{
+
+  display:block;
+
+  max-width:320px;
+
+  margin:40px auto 0;
+
+  text-align:center;
+
+  padding:15px;
+
+  background:#22c55e;
+
+  color:white;
+
+  text-decoration:none;
+
+  border-radius:15px;
+
+  font-weight:bold;
+
+  font-size:18px;
+
+  box-shadow:0 0 20px rgba(34,197,94,.4);
+}
+
+.btn-volver:hover{
+  transform:scale(1.03);
+}
+
+.footer{
+
+  text-align:center;
+
+  margin-top:40px;
+
+  color:#94a3b8;
+
+  font-size:14px;
+}
+
+</style>
+
 </head>
 
-<div id="estadisticas"></div>
+<body>
 
-<a href="/" class="btn-main">
+<div class="banner">
+  <img src="banner.jpg" alt="Quinielas El Inge">
+</div>
+
+<h1>📊 Estadísticas Generales</h1>
+
+<div class="stats-container">
+
+  <div class="stat-card">
+    <div class="stat-numero" id="usuarios">0</div>
+    <div class="stat-texto">Usuarios Registrados</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-numero" id="quinielas">0</div>
+    <div class="stat-texto">Quinielas Capturadas</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-numero" id="campeones">0</div>
+    <div class="stat-texto">Campeonatos Entregados</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-numero" id="recordNombre">-</div>
+    <div class="stat-texto">Récord Histórico</div>
+  </div>
+
+  <div class="stat-card">
+    <div class="stat-numero" id="recordPuntos">0</div>
+    <div class="stat-texto">Mayor Puntaje Registrado</div>
+  </div>
+
+</div>
+
+<a href="/" class="btn-volver">
   ⬅️ Volver al Inicio
 </a>
 
+<div class="footer">
+  Quinielas El Inge © 2026
+</div>
+
 <script>
 
-async function cargarEstadisticas() {
+fetch('/estadisticas')
+.then(r => r.json())
+.then(data => {
 
-  try {
+  document.getElementById('usuarios').textContent =
+    data.usuarios;
 
-    const res = await fetch('/estadisticas');
-    const data = await res.json();
+  document.getElementById('quinielas').textContent =
+    data.quinielas;
 
-    document.getElementById('estadisticas').innerHTML = `
+  document.getElementById('campeones').textContent =
+    data.campeones;
 
-      <div class="stat-card">
-        <div class="stat-numero">${data.usuarios}</div>
-        <div class="stat-texto">Usuarios Registrados</div>
-      </div>
+  document.getElementById('recordNombre').textContent =
+    data.recordNombre;
 
-      <div class="stat-card">
-        <div class="stat-numero">${data.quinielas}</div>
-        <div class="stat-texto">Quinielas Capturadas</div>
-      </div>
+  document.getElementById('recordPuntos').textContent =
+    data.recordPuntos + " pts";
 
-      <div class="stat-card">
-        <div class="stat-numero">${data.campeones}</div>
-        <div class="stat-texto">Campeonatos Entregados</div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-numero">${data.recordNombre}</div>
-        <div class="stat-texto">Récord Histórico</div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-numero">${data.recordPuntos} pts</div>
-        <div class="stat-texto">Mayor Puntaje Registrado</div>
-      </div>
-
-    `;
-
-  } catch (err) {
-
-    console.error(err);
-
-    document.getElementById('estadisticas').innerHTML = `
-      <div class="stat-card">
-        <div class="stat-texto">
-          Error cargando estadísticas
-        </div>
-      </div>
-    `;
-  }
-}
-
-cargarEstadisticas();
+});
 
 </script>
+
+</body>
+</html>
