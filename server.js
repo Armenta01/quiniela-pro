@@ -836,14 +836,12 @@ app.post('/admin/login', (req, res) => {
 
 app.get('/jornada-actual', async (req, res) => {
   try {
-
     const result = await pool.query(`
-      SELECT jornada 
-      FROM partidos 
-      WHERE fecha > NOW()
-      ORDER BY jornada ASC
-      LIMIT 1
-    `);
+  SELECT DISTINCT jornada
+  FROM partidos
+  ORDER BY jornada DESC
+  LIMIT 1
+`);
 
     if (result.rows.length === 0) {
       return res.json({ jornada: 1 });
