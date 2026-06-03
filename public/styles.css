@@ -1081,3 +1081,22 @@ button:active {
 
   box-shadow:0 0 15px rgba(255,215,0,.4);
 }
+
+.bolsa-titulo{
+  font-size:40px;
+  font-weight:bold;
+  color:white;
+}
+
+.bolsa-total{
+  font-size:60px;
+  font-weight:bold;
+  color:#FFD700;
+  margin:15px 0;
+}
+
+.premios{
+  font-size:28px;
+  color:white;
+  line-height:1.8;
+}

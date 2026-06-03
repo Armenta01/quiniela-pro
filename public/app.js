@@ -717,16 +717,20 @@ async function cargarBolsa(jornada) {
   document.getElementById("bolsaInfo").innerHTML = `
   <div class="bolsa-box">
 
-     BOLSA ACUMULADA:
+    <div class="bolsa-titulo">
+      🏆 BOLSA ACUMULADA
+    </div>
 
-    <div style="
-      font-size:32px;
-      color:#FFD700;
-      margin:10px 0;
-    ">
+    <div class="bolsa-total">
       $${bolsa.recaudado} MXN
     </div>
-   
+
+    <div class="premios">
+      🥇 1er Lugar: $${Math.round(bolsa.primerLugar)} MXN
+      <br>
+      🥈 2do Lugar: $${Math.round(bolsa.segundoLugar)} MXN
+    </div>
+
   </div>
 `;
 }
