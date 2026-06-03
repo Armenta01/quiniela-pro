@@ -949,12 +949,11 @@ button:active {
 /* BOTON MENU */
 
 .menu-btn{
-  position:absolute;
-  top:20px;
-  left:20px;
 
   width:55px;
   height:55px;
+
+  margin:10px 0 10px 15px;
 
   background:rgba(255,255,255,.15);
   backdrop-filter:blur(12px);
@@ -968,7 +967,6 @@ button:active {
   font-size:30px;
   color:white;
 
-  z-index:1000;
   cursor:pointer;
 }
 
