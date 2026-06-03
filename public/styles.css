@@ -6,9 +6,13 @@ body {
 }
 
 .header {
-  background: #020617;
-  padding: 15px;
-  text-align: center;
+  background: #1f3b67;
+  height: 55px;
+
+  display: flex;
+  align-items: center;
+
+  padding-left: 15px;
 }
 
 .top-bar {
@@ -948,26 +952,26 @@ button:active {
 
 /* BOTON MENU */
 
-.menu-btn{
+.menu-btn {
 
-  width:55px;
-  height:55px;
+  width: 40px;
+  height: 40px;
 
-  margin:10px 0 10px 15px;
+  margin: 0;
 
-  background:rgba(255,255,255,.15);
-  backdrop-filter:blur(12px);
+  background: rgba(255,255,255,.15);
+  backdrop-filter: blur(12px);
 
-  border-radius:12px;
+  border-radius: 8px;
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  font-size:30px;
-  color:white;
+  font-size: 24px;
+  color: white;
 
-  cursor:pointer;
+  cursor: pointer;
 }
 
 
