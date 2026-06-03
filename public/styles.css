@@ -1083,20 +1083,20 @@ button:active {
 }
 
 .bolsa-titulo{
-  font-size:40px;
+  font-size:22px;
   font-weight:bold;
   color:white;
 }
 
 .bolsa-total{
-  font-size:60px;
+  font-size:38px;
   font-weight:bold;
   color:#FFD700;
-  margin:15px 0;
+  margin:10px 0;
 }
 
 .premios{
-  font-size:28px;
+  font-size:18px;
   color:white;
-  line-height:1.8;
+  line-height:1.6;
 }
