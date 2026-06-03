@@ -855,6 +855,45 @@ app.get('/jornada-actual', async (req, res) => {
   }
 });
 
+app.get('/estadisticas', async (req, res) => {
+  try {
+
+    const usuarios = await pool.query(`
+      SELECT COUNT(*) total
+      FROM users
+    `);
+
+    const quinielas = await pool.query(`
+      SELECT COUNT(*) total
+      FROM predicciones
+    `);
+
+    const campeones = await pool.query(`
+      SELECT COUNT(*) total
+      FROM campeones
+    `);
+
+    const record = await pool.query(`
+      SELECT nombre, puntos
+      FROM campeones
+      ORDER BY puntos DESC
+      LIMIT 1
+    `);
+
+    res.json({
+      usuarios: parseInt(usuarios.rows[0].total),
+      quinielas: parseInt(quinielas.rows[0].total),
+      campeones: parseInt(campeones.rows[0].total),
+      recordNombre: record.rows[0]?.nombre || "-",
+      recordPuntos: record.rows[0]?.puntos || 0
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // 🚀 SERVER
 const PORT = process.env.PORT || 10000;
 
