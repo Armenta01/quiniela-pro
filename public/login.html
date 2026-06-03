@@ -80,7 +80,7 @@ async function login() {
 
       const expiracion = Date.now() + (60 * 60 * 1000);
 
-      localStorage.setItem("admin", "true");
+      sessionStorage.setItem("admin", "true");
       localStorage.setItem("expira", expiracion);
 
       window.location.href = "admin.html";
