@@ -379,7 +379,7 @@ if (usuario.length < 3) {
       mensaje += `⚽ ${partido.local} ${p.local}-${p.visitante} ${partido.visitante}\n`;
     });
 
-    const phone = "524531021052";
+    const phone = "524531336012";
     const texto = encodeURIComponent(mensaje);
     const url = `https://wa.me/${phone}?text=${texto}`;
 
