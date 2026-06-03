@@ -1125,3 +1125,26 @@ body h1{
   color:#FFD700;
   margin-top:20px;
 }
+
+.stat-card{
+  background:#1e3a5f;
+  border:2px solid gold;
+  border-radius:20px;
+  padding:25px;
+  margin:20px auto;
+  max-width:500px;
+  text-align:center;
+  box-shadow:0 0 20px rgba(255,215,0,.3);
+}
+
+.stat-numero{
+  font-size:42px;
+  font-weight:bold;
+  color:#facc15;
+  margin-bottom:10px;
+}
+
+.stat-texto{
+  color:white;
+  font-size:18px;
+}
