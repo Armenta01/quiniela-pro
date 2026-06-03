@@ -155,10 +155,42 @@ h1{
     <div class="stat-texto">Récord Histórico</div>
   </div>
 
+  
+
   <div class="stat-card">
     <div class="stat-numero" id="recordPuntos">0</div>
     <div class="stat-texto">Mayor Puntaje Registrado</div>
   </div>
+
+  <div class="stat-card">
+  <div class="stat-numero" id="ultimoCampeon">-</div>
+  <div class="stat-texto">Último Campeón</div>
+</div>
+
+<div class="stat-card">
+  <div class="stat-numero" id="reyQuiniela">-</div>
+  <div class="stat-texto">Usuario con Más Campeonatos</div>
+</div>
+
+<div class="stat-card">
+  <div class="stat-numero" id="mejorRacha">-</div>
+  <div class="stat-texto">Mejor Racha de Victorias</div>
+</div>
+
+<div class="stat-card">
+  <div class="stat-numero" id="ultimoCampeon">-</div>
+  <div class="stat-texto"> Último Campeón</div>
+</div>
+
+<div class="stat-card">
+  <div class="stat-numero" id="reyQuiniela">-</div>
+  <div class="stat-texto"> Más Campeonatos</div>
+</div>
+
+<div class="stat-card">
+  <div class="stat-numero" id="mejorRacha">-</div>
+  <div class="stat-texto"> Mejor Racha</div>
+</div>
 
 </div>
 
@@ -190,6 +222,26 @@ fetch('/estadisticas')
 
   document.getElementById('recordPuntos').textContent =
     data.recordPuntos + " pts";
+
+
+    document.getElementById('ultimoCampeon').textContent =
+  data.ultimoCampeon;
+
+document.getElementById('reyQuiniela').textContent =
+  `${data.reyQuiniela} (${data.titulos})`;
+
+document.getElementById('mejorRacha').textContent =
+  `${data.rachaNombre} (${data.racha})`;
+
+  document.getElementById('ultimoCampeon').textContent =
+  data.ultimoCampeon;
+
+document.getElementById('reyQuiniela').textContent =
+  `${data.reyQuiniela} (${data.titulos})`;
+
+document.getElementById('mejorRacha').textContent =
+  `${data.rachaNombre} (${data.racha})`;
+
 
 });
 

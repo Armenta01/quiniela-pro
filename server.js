@@ -880,13 +880,53 @@ app.get('/estadisticas', async (req, res) => {
       LIMIT 1
     `);
 
+    const ultimoCampeon = await pool.query(`
+  SELECT nombre
+  FROM campeones
+  ORDER BY jornada DESC
+  LIMIT 1
+`);
+
+const reyQuiniela = await pool.query(`
+  SELECT nombre, COUNT(*) titulos
+  FROM campeones
+  GROUP BY nombre
+  ORDER BY titulos DESC
+  LIMIT 1
+`);
+
+const mejorRacha = await pool.query(`
+  SELECT nombre, COUNT(*) racha
+  FROM campeones
+  GROUP BY nombre
+  ORDER BY racha DESC
+  LIMIT 1
+`);
+
     res.json({
-      usuarios: parseInt(usuarios.rows[0].total),
-      quinielas: parseInt(quinielas.rows[0].total),
-      campeones: parseInt(campeones.rows[0].total),
-      recordNombre: record.rows[0]?.nombre || "-",
-      recordPuntos: record.rows[0]?.puntos || 0
-    });
+  usuarios: parseInt(usuarios.rows[0].total),
+  quinielas: parseInt(quinielas.rows[0].total),
+  campeones: parseInt(campeones.rows[0].total),
+
+  recordNombre: record.rows[0]?.nombre || "-",
+  recordPuntos: record.rows[0]?.puntos || 0,
+
+  ultimoCampeon:
+    ultimoCampeon.rows[0]?.nombre || "-",
+
+  reyQuiniela:
+    reyQuiniela.rows[0]?.nombre || "-",
+
+  titulos:
+    reyQuiniela.rows[0]?.titulos || 0,
+
+  rachaNombre:
+    mejorRacha.rows[0]?.nombre || "-",
+
+  racha:
+    mejorRacha.rows[0]?.racha || 0
+});
+
 
   } catch (err) {
     console.error(err);
