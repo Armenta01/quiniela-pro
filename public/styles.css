@@ -1164,22 +1164,23 @@ body h1{
 /* 🏅 SALON DE LA FAMA */
 
 .fama-card{
-  width:80%;
-  max-width:650px;
 
-  margin:20px auto;
+  width:75%;
+  max-width:500px;
+
+  margin:12px auto;
 
   background:#1e3a8a;
 
-  border:4px solid gold;
-  border-radius:25px;
+  border:3px solid gold;
+  border-radius:18px;
 
-  padding:25px;
+  padding:15px;
 
   text-align:center;
 
   box-shadow:
-    0 0 25px rgba(255,215,0,.45);
+    0 0 15px rgba(255,215,0,.35);
 }
 
 /* medalla centrada */
@@ -1223,15 +1224,25 @@ body h1{
   }
 
   .fama-medalla{
-    font-size:55px;
-  }
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  font-size:50px;
+
+  margin-bottom:6px;
+}
 
   .fama-nombre{
-    font-size:38px;
-  }
+  font-size:28px;
+  font-weight:bold;
+  color:#ffd700;
+  margin:5px 0;
+}
 
   .fama-titulos{
-    font-size:22px;
-  }
+  font-size:16px;
+  color:white;
+}
 }
 
