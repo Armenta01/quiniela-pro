@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Salón de la Fama</title>
+
+<style>
+
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#020617;
+  color:white;
+  text-align:center;
+}
+
+h1{
+  margin:30px 0;
+  color:#ffd700;
+}
+
+.contenedor{
+  max-width:800px;
+  margin:auto;
+  padding:20px;
+}
+
+.card{
+  background:linear-gradient(180deg,#1e3a8a,#172554);
+  border:3px solid #ffd700;
+  border-radius:20px;
+  padding:20px;
+  margin:15px 0;
+
+  box-shadow:
+    0 0 20px rgba(255,215,0,.4);
+}
+
+.posicion{
+  font-size:40px;
+  margin-bottom:10px;
+}
+
+.nombre{
+  font-size:32px;
+  font-weight:bold;
+  color:#ffd700;
+}
+
+.campeonatos{
+  font-size:20px;
+  margin-top:10px;
+}
+
+.btn-main{
+  display:inline-block;
+  margin:30px 0;
+  background:#22c55e;
+  color:white;
+  text-decoration:none;
+  padding:12px 25px;
+  border-radius:12px;
+  font-weight:bold;
+}
+
+</style>
+</head>
+<body>
+
+<div class="banner">
+  <img src="banner.jpg" alt="Quinielas El Inge">
+</div>
+
+<h1>🏅 Salón de la Fama</h1>
+
+<div id="ranking" class="contenedor">
+
+Cargando...
+
+</div>
+
+<a href="/" class="btn-main">
+⬅️ Volver al Inicio
+</a>
+
+<script>
+
+async function cargar() {
+
+  const res = await fetch('/salon-fama');
+  const data = await res.json();
+
+  const div = document.getElementById('ranking');
+
+  div.innerHTML = '';
+
+  data.forEach((u, i) => {
+
+    let emoji = '🏅';
+
+    if(i===0) emoji='🥇';
+    if(i===1) emoji='🥈';
+    if(i===2) emoji='🥉';
+
+    div.innerHTML += `
+      <div class="card">
+        <div class="posicion">${emoji}</div>
+        <div class="nombre">${u.nombre}</div>
+        <div class="campeonatos">
+          ${u.titulos} campeonato(s)
+        </div>
+      </div>
+    `;
+  });
+
+}
+
+cargar();
+
+</script>
+
+</body>
+</html>

@@ -855,6 +855,32 @@ app.get('/jornada-actual', async (req, res) => {
   }
 });
 
+app.get('/salon-fama', async (req, res) => {
+
+  try {
+
+    const resultado = await pool.query(`
+      SELECT
+        nombre,
+        COUNT(*) AS titulos
+      FROM campeones
+      GROUP BY nombre
+      ORDER BY titulos DESC, nombre ASC
+    `);
+
+    res.json(resultado.rows);
+
+  } catch (err) {
+
+    console.error(err);
+    res.status(500).json({
+      error: err.message
+    });
+
+  }
+
+});
+
 app.get('/estadisticas', async (req, res) => {
   try {
 
