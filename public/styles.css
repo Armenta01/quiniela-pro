@@ -149,7 +149,10 @@ button {
 }
 
 .puntos {
+  width: 70px;
   min-width: 70px;
+  max-width: 70px;
+  text-align: center;
 }
 
 .header {
@@ -337,8 +340,9 @@ button {
 /* 🔥 SOLUCIÓN FINAL VISUAL TABLA */
 
 .celda {
+    width: 80px;
   min-width: 80px;
-  flex: 1;
+  flex: 0 0 80px;
   padding: 12px;
   text-align: center;
   font-weight: bold;
@@ -383,7 +387,7 @@ button {
 }
 
 .fila {
-  min-width: max-content;
+  width: fit-content;
 }
 
 .celda {
