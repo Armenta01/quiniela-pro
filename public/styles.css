@@ -1154,9 +1154,9 @@ body h1{
 }
 
 .posicion{
-  width:60px;
-  min-width:60px;
+  width:45px;
+  min-width:45px;
   text-align:center;
-  font-size:24px;
+  font-size:22px;
   font-weight:bold;
 }
