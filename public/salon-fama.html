@@ -105,16 +105,23 @@ async function cargar() {
     if(i===0) emoji='🥇';
     if(i===1) emoji='🥈';
     if(i===2) emoji='🥉';
+div.innerHTML += `
+  <div class="fama-card">
 
-    div.innerHTML += `
-      <div class="card">
-        <div class="posicion">${emoji}</div>
-        <div class="nombre">${u.nombre}</div>
-        <div class="campeonatos">
-          ${u.titulos} campeonato(s)
-        </div>
-      </div>
-    `;
+    <div class="fama-medalla">
+      ${emoji}
+    </div>
+
+    <div class="fama-nombre">
+      ${u.nombre}
+    </div>
+
+    <div class="fama-titulos">
+      ${u.titulos} campeonato(s)
+    </div>
+
+  </div>
+`;
   });
 
 }

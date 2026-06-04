@@ -1164,9 +1164,8 @@ body h1{
 /* 🏅 SALON DE LA FAMA */
 
 .fama-card{
-
-  width:85%;
-  max-width:800px;
+  width:80%;
+  max-width:650px;
 
   margin:20px auto;
 
@@ -1186,13 +1185,13 @@ body h1{
 /* medalla centrada */
 .fama-medalla{
 
-  display:block;
+  display:flex;
+  justify-content:center;
+  align-items:center;
 
   font-size:70px;
 
-  text-align:center;
-
-  margin-bottom:10px;
+  margin-bottom:12px;
 }
 
 /* nombre */
@@ -1235,3 +1234,4 @@ body h1{
     font-size:22px;
   }
 }
+
