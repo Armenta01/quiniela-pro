@@ -295,7 +295,9 @@ ranking.forEach((u) => {
     const valor = p || "-";
     const color = u.detalles[i] || "gris";
 
-    fila += `<div class="celda ${color}">${valor}</div>`;
+    fila += `<div class="celda ${color}">
+    ${valor}
+    </div>`;
   });
   
 
