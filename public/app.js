@@ -217,7 +217,8 @@ if (!hayResultados) {
   return;
 }
 
-  let header = `<div class="fila header">
+ let header = `<div class="fila header">
+  <div class="celda posicion">Pos</div>
   <div class="celda jugador">Jugador</div>`;
   
 partidos.forEach(p => {
@@ -274,12 +275,20 @@ ranking.forEach((u) => {
 
   let fila = `<div class="fila ${claseTop}">`;
 
-  fila += `<div class="celda jugador">
-    ${u.lugar === 1 ? "🥇" :
+  fila += `
+<div class="celda posicion">
+  ${
+    u.lugar === 1 ? "🥇" :
     u.lugar === 2 ? "🥈" :
-    u.lugar === 3 ? "🥉" : ""}
-    ${nombreFinal}
-  </div>`;
+    u.lugar === 3 ? "🥉" :
+    "#" + u.lugar
+  }
+</div>
+
+<div class="celda jugador">
+  ${nombreFinal}
+</div>
+`;
 
   // 🔥 pintar picks existentes
   u.picks.forEach((p, i) => {

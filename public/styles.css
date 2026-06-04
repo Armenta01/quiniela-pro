@@ -1152,3 +1152,11 @@ body h1{
   color:white;
   font-size:18px;
 }
+
+.posicion{
+  width:60px;
+  min-width:60px;
+  text-align:center;
+  font-size:24px;
+  font-weight:bold;
+}
