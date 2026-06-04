@@ -239,23 +239,31 @@ header += `<div class="celda puntos">Pts</div></div>`;
   
   cont.innerHTML += header;
 
-  let contador = {};
+let contador = {};
 
-  let posicionReal = 0;
+let ranking = [];
 let ultimoPuntaje = null;
+let lugar = 0;
 
-data.forEach((u, index) => {
+data.forEach((u) => {
 
-  // 🔥 detectar empates reales
   if (u.puntos !== ultimoPuntaje) {
-    posicionReal = index;
+    lugar++;
     ultimoPuntaje = u.puntos;
   }
 
-  let claseTop = posicionReal === 0 ? "top1"
-    : posicionReal === 1 ? "top2"
-    : posicionReal === 2 ? "top3"
-    : "";
+  ranking.push({
+    ...u,
+    lugar
+  });
+});
+
+ranking.forEach((u) => {
+
+  let claseTop =
+  u.lugar === 1 ? "top1" :
+  u.lugar === 2 ? "top2" :
+  u.lugar === 3 ? "top3" : "";
 
   if (!contador[u.nombre]) contador[u.nombre] = 1;
   else contador[u.nombre]++;
@@ -267,7 +275,9 @@ data.forEach((u, index) => {
   let fila = `<div class="fila ${claseTop}">`;
 
   fila += `<div class="celda jugador">
-    ${posicionReal === 0 ? "🥇" : posicionReal === 1 ? "🥈" : posicionReal === 2 ? "🥉" : ""}
+    ${u.lugar === 1 ? "🥇" :
+    u.lugar === 2 ? "🥈" :
+    u.lugar === 3 ? "🥉" : ""}
     ${nombreFinal}
   </div>`;
 
