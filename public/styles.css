@@ -1254,7 +1254,7 @@ body h1{
 }
 
 .encabezado-partido{
-  min-height: 140px;
+  min-height: 160px;
   display:flex;
   flex-direction:column;
   justify-content:center;
@@ -1285,5 +1285,5 @@ body h1{
 }
 
 #tabla{
-  padding-top: 50px;
+  padding-top: 70px;
 }
