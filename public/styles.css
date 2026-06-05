@@ -1254,8 +1254,11 @@ body h1{
 }
 
 .encabezado-partido{
-  min-width:140px;
-  padding:10px;
+  min-height: 140px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
 }
 
 .logo-header{
@@ -1279,4 +1282,8 @@ body h1{
   font-weight:bold;
   color:#ffd700;
   margin:8px 0;
+}
+
+#tabla{
+  padding-top: 50px;
 }
