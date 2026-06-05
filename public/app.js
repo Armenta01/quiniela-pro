@@ -329,6 +329,8 @@ if (usuario.length < 3) {
 
   if (!usuario) return alert("Pon tu nombre");
 
+  localStorage.setItem("miNombre", usuario);
+
   const btn = document.getElementById("btnGuardar");
   if (btn) btn.disabled = true;
 
@@ -769,3 +771,75 @@ function toggleMenu() {
     .toggle("activo");
 }
 
+document.addEventListener("input", function(e){
+
+  if(e.target.id !== "buscarJugador") return;
+
+  const texto = e.target.value.toLowerCase();
+
+  document.querySelectorAll(".fila").forEach(fila => {
+
+    if(fila.classList.contains("header")) return;
+
+    const jugador =
+      fila.querySelector(".jugador")
+      ?.innerText
+      .toLowerCase() || "";
+
+    fila.style.display =
+      jugador.includes(texto)
+      ? "flex"
+      : "none";
+  });
+
+});
+
+function verMiPosicion(){
+
+  const nombre =
+    localStorage.getItem("miNombre");
+
+  if(!nombre){
+    alert("No se encontró tu nombre");
+    return;
+  }
+
+  const filas =
+    document.querySelectorAll(".fila");
+
+  let encontrada = null;
+
+  filas.forEach(fila => {
+
+    const jugador =
+      fila.querySelector(".jugador");
+
+    if(!jugador) return;
+
+    if(
+      jugador.innerText
+      .toLowerCase()
+      .includes(nombre.toLowerCase())
+    ){
+      encontrada = fila;
+    }
+
+  });
+
+  if(!encontrada){
+    alert("No apareces en esta jornada");
+    return;
+  }
+
+  encontrada.scrollIntoView({
+    behavior:"smooth",
+    block:"center"
+  });
+
+  encontrada.style.boxShadow =
+    "0 0 25px #22c55e";
+
+  setTimeout(()=>{
+    encontrada.style.boxShadow="";
+  },4000);
+}

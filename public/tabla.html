@@ -24,6 +24,33 @@
 <h1>🏆 Tabla General</h1>
 
 <select id="jornadaSelect"></select>
+
+<div style="
+  max-width:700px;
+  margin:15px auto;
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:center;
+">
+
+  <input
+    id="buscarJugador"
+    placeholder="🔍 Buscar jugador"
+    style="
+      padding:10px;
+      border-radius:10px;
+      border:none;
+      min-width:220px;
+    "
+  >
+
+  <button onclick="verMiPosicion()">
+    🎯 Ver mi posición
+  </button>
+
+</div>
+
 <div id="partidosResumen"></div>
 
 <div id="tabla" class="tabla-scroll"></div>
