@@ -1284,6 +1284,16 @@ body h1{
   margin:8px 0;
 }
 
+
+.fila:first-of-type{
+    margin-top: 150px;
+}
+
+
+.header{
+    margin-bottom: 100px;
+}
+
 #tabla{
-  padding-top: 150px;
+    padding-top: 20px;
 }
