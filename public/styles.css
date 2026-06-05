@@ -1255,7 +1255,8 @@ body h1{
 
 
 .encabezado-partido{
-  min-height:120px;
+  min-height:180px;
+
   display:flex;
   flex-direction:column;
   justify-content:center;
@@ -1263,9 +1264,10 @@ body h1{
 }
 
 .logo-header{
-  width:28px;
-  height:28px;
+  width:32px;
+  height:32px;
   object-fit:contain;
+  margin:4px 0;
 }
 
 .equipo-header{
@@ -1285,7 +1287,7 @@ body h1{
 
 /* espacio pequeño entre encabezado y jugadores */
 .header{
-  margin-bottom:25px;
+  margin-bottom:50px;
 }
 
 .celda.header-partido{
