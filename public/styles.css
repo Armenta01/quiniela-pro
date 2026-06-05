@@ -1253,41 +1253,48 @@ body h1{
 }
 }
 
-
 .encabezado-partido{
-  min-height:180px;
+  min-width:140px;
+  min-height:170px;
 
   display:flex;
   flex-direction:column;
-  justify-content:center;
   align-items:center;
+  justify-content:space-between;
+
+  padding:10px 5px;
+  box-sizing:border-box;
 }
 
 .logo-header{
-  width:32px;
-  height:32px;
+  width:36px;
+  height:36px;
   object-fit:contain;
-  margin:4px 0;
+  display:block;
 }
 
 .equipo-header{
   display:flex;
   flex-direction:column;
   align-items:center;
-  font-size:11px;
+
+  font-size:12px;
   font-weight:700;
+  gap:6px;
 }
 
 .marcador-header{
-  font-size:18px;
+  font-size:20px;
   font-weight:bold;
   color:#ffd700;
-  margin:6px 0;
+
+  margin:10px 0;
 }
 
 /* espacio pequeño entre encabezado y jugadores */
 .header{
-  margin-bottom:50px;
+  align-items:flex-start !important;
+  margin-bottom:40px;
 }
 
 .celda.header-partido{
