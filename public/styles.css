@@ -131,6 +131,8 @@ button {
 .fila {
   display: flex;
   align-items: center;
+  gap: 12px;
+  margin-top:8px;
 }
 
 /* 🔥 celdas de la tabla */
@@ -1299,4 +1301,50 @@ body h1{
 
 .celda.header-partido{
   min-height:95px;
+}
+
+
+/* Encabezado partidos */
+
+.partido-header{
+
+  width:110px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+
+  gap:2px;
+
+  padding:4px 2px;
+
+  text-align:center;
+}
+
+.logo-equipo{
+
+  width:28px;
+  height:28px;
+
+  object-fit:contain;
+}
+
+.nombre-equipo{
+
+  font-size:11px;
+  font-weight:700;
+
+  line-height:1.1;
+}
+
+.resultado-header{
+
+  font-size:14px;
+  font-weight:bold;
+
+  color:#ffd700;
+}
+.fila.header{
+  margin-bottom:20px;
 }
