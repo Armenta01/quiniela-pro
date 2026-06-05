@@ -217,9 +217,9 @@ button {
 }
 
 .header .celda{
-  min-width: 140px;
-  padding: 12px 8px;
-  line-height: 1.4;
+  min-width: 110px;
+  padding: 6px;
+  line-height: 1.2;
 }
 
 
@@ -1253,8 +1253,9 @@ body h1{
 }
 }
 
+
 .encabezado-partido{
-  min-height: 160px;
+  min-height:120px;
   display:flex;
   flex-direction:column;
   justify-content:center;
@@ -1271,36 +1272,22 @@ body h1{
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:2px;
   font-size:11px;
   font-weight:700;
-}
-
-.equipo-header div{
-  gap: 2px;
 }
 
 .marcador-header{
   font-size:18px;
   font-weight:bold;
   color:#ffd700;
-  margin:4px 0;
+  margin:6px 0;
 }
 
-
-.fila:first-of-type{
-    margin-top: 150px;
-}
-
-
+/* espacio pequeño entre encabezado y jugadores */
 .header{
-    margin-bottom: 100px;
-}
-
-#tabla{
-    padding-top: 20px;
+  margin-bottom:25px;
 }
 
 .celda.header-partido{
-  min-height: 80px;
+  min-height:120px;
 }
