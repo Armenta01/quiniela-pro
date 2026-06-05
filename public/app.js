@@ -228,12 +228,24 @@ partidos.forEach(p => {
     : "⏳";
 
   header += `
-    <div class="celda">
-      <div style="font-size:11px">${p.local}</div>
-      <div style="font-weight:bold">${marcador}</div>
-      <div style="font-size:11px">${p.visitante}</div>
+  <div class="celda encabezado-partido">
+
+    <div class="equipo-header">
+      <img src="${p.logo_local}" class="logo-header">
+      <div>${p.local}</div>
     </div>
-  `;
+
+    <div class="marcador-header">
+      ${marcador}
+    </div>
+
+    <div class="equipo-header">
+      <img src="${p.logo_visitante}" class="logo-header">
+      <div>${p.visitante}</div>
+    </div>
+
+  </div>
+`;
 });
 
 header += `<div class="celda puntos">Pts</div></div>`;

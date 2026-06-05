@@ -216,6 +216,13 @@ button {
   font-weight: bold;
 }
 
+.header .celda{
+  min-width: 140px;
+  padding: 12px 8px;
+  line-height: 1.4;
+}
+
+
 .fila:hover {
   transform: scale(1.02);
 }
@@ -1246,3 +1253,30 @@ body h1{
 }
 }
 
+.encabezado-partido{
+  min-width:140px;
+  padding:10px;
+}
+
+.logo-header{
+  width:28px;
+  height:28px;
+  object-fit:contain;
+  margin-bottom:4px;
+}
+
+.equipo-header{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  font-size:11px;
+  font-weight:700;
+}
+
+.marcador-header{
+  font-size:18px;
+  font-weight:bold;
+  color:#ffd700;
+  margin:8px 0;
+}
