@@ -219,7 +219,7 @@ button {
 }
 
 .header .celda{
-  min-width: 110px;
+  min-width: 80px;
   padding: 6px;
   line-height: 1.2;
 }
@@ -1254,88 +1254,55 @@ body h1{
   color:white;
 }
 }
-.encabezado-partido{
-  min-width:110px;
-  min-height:90px;
 
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
+/* ========================= */
+/* ENCABEZADO DE PARTIDOS */
+/* ========================= */
 
-  gap:4px;
+.fila.header{
 
-  padding:4px;
-  box-sizing:border-box;
+  align-items:flex-start;
+
+  margin-bottom:40px !important;
+
+  background:transparent;
 }
-
-.logo-header{
-  width:24px;
-  height:24px;
-}
-
-.equipo-header{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:2px;
-
-  font-size:10px;
-  font-weight:700;
-  line-height:1;
-}
-
-.marcador-header{
-  font-size:14px;
-  font-weight:bold;
-  color:#ffd700;
-
-  margin:2px 0;
-}
-
-/* espacio pequeño entre encabezado y jugadores */
-.header{
-  align-items:flex-start !important;
-  margin-bottom:20px;
-}
-
-.celda.header-partido{
-  min-height:95px;
-}
-
-
-/* Encabezado partidos */
 
 .partido-header{
 
-  width:110px;
+  width:80px;
+  min-width:80px;
 
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
 
-  gap:2px;
+  gap:3px;
 
-  padding:4px 2px;
+  padding:0;
 
   text-align:center;
 }
 
 .logo-equipo{
 
-  width:28px;
-  height:28px;
+  width:26px;
+  height:26px;
 
   object-fit:contain;
+
+  margin:0;
 }
 
 .nombre-equipo{
 
-  font-size:11px;
+  font-size:10px;
   font-weight:700;
 
   line-height:1.1;
+
+  white-space:normal;
 }
 
 .resultado-header{
@@ -1344,16 +1311,41 @@ body h1{
   font-weight:bold;
 
   color:#ffd700;
+
+  margin:1px 0;
 }
-.fila.header{
-  margin-bottom:8px;
+
+/* separa encabezado de jugadores */
+
+#tabla .fila:not(.header){
+
+  margin-top:12px;
 }
+
+/* evita que los logos empujen la tabla */
 
 .header .celda{
-  vertical-align:top;
+
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+
+  overflow:hidden;
 }
 
-#tabla{
-  margin-top:0;
-  padding-top:0;
+/* columnas alineadas */
+
+.posicion{
+  width:70px;
+  min-width:70px;
+}
+
+.jugador{
+  width:120px;
+  min-width:120px;
+}
+
+.puntos{
+  width:70px;
+  min-width:70px;
 }
