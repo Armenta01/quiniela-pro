@@ -1309,12 +1309,17 @@ body h1{
 }
 
 .resultado-header{
+  display:flex;
+  justify-content:center;
+  align-items:center;
 
-  font-size:16px;
+  width:100%;
+
+  font-size:18px;
   font-weight:bold;
-
   color:#ffd700;
 
+  text-align:center;
 }
 
 /* separa encabezado de jugadores */
