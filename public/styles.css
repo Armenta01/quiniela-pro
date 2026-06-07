@@ -1353,3 +1353,59 @@ body h1{
   min-width:70px;
 }
 
+/* ========================= */
+/* NUEVO ENCABEZADO PARTIDOS */
+/* ========================= */
+
+.partido-header{
+
+  width:130px;
+  min-width:130px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+
+  gap:6px;
+
+  text-align:center;
+}
+
+.equipo-linea{
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  gap:6px;
+
+  font-size:12px;
+  font-weight:700;
+
+  line-height:1.1;
+}
+
+.logo-equipo{
+
+  width:24px;
+  height:24px;
+
+  object-fit:contain;
+}
+
+.nombre-equipo{
+
+  font-size:12px;
+  font-weight:bold;
+
+  color:white;
+}
+
+.resultado-header{
+
+  font-size:18px;
+  font-weight:bold;
+
+  color:#ffd700;
+}
