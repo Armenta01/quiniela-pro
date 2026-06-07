@@ -82,7 +82,9 @@ initDB().catch(err => {
 async function jornadaBloqueada(jornada) {
 
   const result = await pool.query(
-    `SELECT MIN(fecha) as fecha FROM partidos WHERE jornada = $1`,
+    `SELECT MIN(fecha) as fecha 
+    FROM partidos 
+    WHERE jornada = $1`,
     [jornada]
   );
 
@@ -93,7 +95,12 @@ async function jornadaBloqueada(jornada) {
     "America/Mexico_City"
   );
 
-  const limite = fechaPartido.clone().subtract(1, 'day');
+ const limite = fechaPartido
+  .clone()
+  .subtract(1, 'day')
+  .hour(22)
+  .minute(0)
+  .second(0);
 
   const ahora = moment.tz("America/Mexico_City");
 
