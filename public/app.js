@@ -238,17 +238,17 @@ partidos.forEach(p => {
     ${p.local}
   </div>
 
-  <div class="resultado-header">
+    <div class="resultado-header">
     ${marcador}
-  </div>
+    </div>
+
+    <div class="nombre-equipo">
+    ${p.visitante}
+    </div>
 
   <img src="${p.logo_visitante}"
        class="logo-equipo"
        onerror="this.style.visibility='hidden'">
-
-  <div class="nombre-equipo">
-    ${p.visitante}
-  </div>
 
 </div>
 `;
