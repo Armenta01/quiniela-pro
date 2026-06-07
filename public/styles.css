@@ -1263,9 +1263,11 @@ body h1{
 
   align-items:flex-start;
 
-  margin-bottom:40px !important;
+  margin-bottom:60px !important;
 
   background:transparent;
+  align-items:flex-start;
+
 }
 
 .partido-header{
@@ -1273,14 +1275,14 @@ body h1{
   width:80px;
   min-width:80px;
 
+  min-height:140px;
+
   display:flex;
   flex-direction:column;
   align-items:center;
-  justify-content:center;
+  justify-content:flex-start;
 
-  gap:3px;
-
-  padding:0;
+  gap:4px;
 
   text-align:center;
 }
@@ -1297,22 +1299,22 @@ body h1{
 
 .nombre-equipo{
 
-  font-size:10px;
+  font-size:12px;
   font-weight:700;
 
-  line-height:1.1;
+  line-height:1.15;
 
   white-space:normal;
+  
 }
 
 .resultado-header{
 
-  font-size:14px;
+  font-size:16px;
   font-weight:bold;
 
   color:#ffd700;
 
-  margin:1px 0;
 }
 
 /* separa encabezado de jugadores */
@@ -1330,7 +1332,8 @@ body h1{
   justify-content:center;
   align-items:flex-start;
 
-  overflow:hidden;
+  overflow: visible !important;
+  height:auto !important;
 }
 
 /* columnas alineadas */
@@ -1349,3 +1352,4 @@ body h1{
   width:70px;
   min-width:70px;
 }
+
