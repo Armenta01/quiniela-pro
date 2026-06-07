@@ -1358,3 +1358,12 @@ body h1{
   min-width:70px;
 }
 
+.header .posicion,
+.header .jugador,
+.header .puntos{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding-top:70px; /* ajusta entre 60 y 90px */
+}
