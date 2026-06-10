@@ -128,7 +128,7 @@ if (sessionStorage.getItem("admin") !== "true") {
 <div class="lista" id="lista"></div>
 
 <script>
-
+let editandoId = null;
  function logout() {
   sessionStorage.removeItem("admin");
   window.location.href = "login.html";
@@ -268,8 +268,8 @@ async function cargarParticipantes() {
 
 async function cargarPartidos() {
 
-cargarEstadoJornada();
-cargarParticipantes();
+  cargarEstadoJornada();
+  cargarParticipantes();
 
   const lista = document.getElementById('lista');
 
@@ -284,8 +284,10 @@ cargarParticipantes();
 }
 
     lista.innerHTML = '<h2>📋 Partidos</h2>';
-
-   data.forEach(p => {
+  
+    window.partidosAdmin = data;
+  
+    data.forEach(p => {
   lista.innerHTML += `
     <div class="partido">
 
@@ -297,6 +299,12 @@ cargarParticipantes();
 
       <button onclick="guardarResultado(${p.id})">
         Guardar Resultado
+      </button>
+
+      <button
+        class="btn-editar"
+        onclick="editarPartido(${p.id})">
+        ✏️ Editar
       </button>
 
       <button class="btn-eliminar"onclick="eliminarPartido(${p.id})">
@@ -386,6 +394,44 @@ async function eliminarPartido(id) {
     alert("❌ Error servidor");
 
   }
+}
+
+function editarPartido(id) {
+
+  const partido = window.partidosAdmin.find(
+    p => p.id == id
+  );
+
+  if (!partido) return;
+
+  editandoId = id;
+
+  document.getElementById("local").value =
+    partido.local || "";
+
+  document.getElementById("visitante").value =
+    partido.visitante || "";
+
+  document.getElementById("fecha").value =
+    partido.fecha.substring(0,16);
+
+  document.getElementById("logo_local").value =
+    partido.logo_local || "";
+
+  document.getElementById("logo_visitante").value =
+    partido.logo_visitante || "";
+
+  document.getElementById("jornada").value =
+    partido.jornada;
+
+  document.getElementById("msg").innerHTML =
+    "✏️ Editando partido #" + id;
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
 }
 
 </script>
