@@ -1367,3 +1367,93 @@ body h1{
 
     padding-top:100px; /* ajusta entre 60 y 90px */
 }
+
+/* ========================= */
+/* HISTORIAL DE CAMPEONES PRO */
+/* ========================= */
+
+#historial{
+  width:95%;
+  max-width:1000px;
+  margin:20px auto;
+}
+
+.tabla-historial{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0 8px;
+}
+
+.tabla-historial th{
+  background:#ffd700;
+  color:#000;
+  padding:14px;
+  font-size:22px;
+  font-weight:800;
+}
+
+.tabla-historial th:first-child{
+  border-radius:12px 0 0 12px;
+}
+
+.tabla-historial th:last-child{
+  border-radius:0 12px 12px 0;
+}
+
+.tabla-historial td{
+  padding:16px 12px;
+  text-align:center;
+  border:none;
+}
+
+.campeon-row{
+  background:#17356f;
+  transition:.25s;
+}
+
+.campeon-row:hover{
+  background:#21468f;
+  transform:translateY(-2px);
+}
+
+.campeon-row td:first-child{
+  border-radius:12px 0 0 12px;
+  font-size:30px;
+}
+
+.campeon-row td:last-child{
+  border-radius:0 12px 12px 0;
+}
+
+.campeon-row strong{
+  font-size:20px;
+  color:white;
+}
+
+.tabla-historial td:last-child{
+  font-weight:800;
+  color:#ffd700;
+  font-size:18px;
+}
+
+/* móvil */
+@media(max-width:768px){
+
+  .tabla-historial th{
+    font-size:16px;
+    padding:10px;
+  }
+
+  .tabla-historial td{
+    padding:12px 6px;
+    font-size:14px;
+  }
+
+  .campeon-row td:first-child{
+    font-size:22px;
+  }
+
+  .campeon-row strong{
+    font-size:16px;
+  }
+}
