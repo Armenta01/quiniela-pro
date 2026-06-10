@@ -1,64 +1,188 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Login Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login</title>
 
 <style>
-body {
-  background:#0f172a;
-  color:white;
-  font-family:Arial;
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  min-height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
-  height:100vh;
-}
 
-.box {
-  background:#1e293b;
-  padding:30px;
-  border-radius:15px;
-  width:300px;
-}
+  font-family:Arial, Helvetica, sans-serif;
 
-input {
-  width:100%;
-  padding:10px;
-  margin:10px 0;
-  border:none;
-  border-radius:8px;
-}
+  background:
+  linear-gradient(
+    135deg,
+    #020617,
+    #08122e,
+    #0f172a
+  );
 
-button {
-  width:100%;
-  padding:10px;
-  background:#22c55e;
-  border:none;
-  border-radius:8px;
   color:white;
 }
+
+.box{
+
+  width:420px;
+  padding:40px;
+
+  background:rgba(255,255,255,.06);
+
+  border:1px solid rgba(255,255,255,.08);
+
+  backdrop-filter:blur(12px);
+
+  border-radius:25px;
+
+  box-shadow:
+    0 0 30px rgba(0,0,0,.35),
+    0 0 50px rgba(255,215,0,.08);
+
+  animation:fade .4s ease;
+}
+
+.logo{
+  display:block;
+  width:120px;
+  margin:auto;
+  margin-bottom:15px;
+}
+
+h1{
+  text-align:center;
+  margin-bottom:25px;
+  font-size:40px;
+}
+
+.subtitle{
+  text-align:center;
+  color:#cbd5e1;
+  margin-bottom:25px;
+}
+
+input{
+
+  width:100%;
+
+  padding:16px;
+
+  margin-bottom:15px;
+
+  border:none;
+  border-radius:12px;
+
+  font-size:18px;
+
+  background:white;
+}
+
+input:focus{
+  outline:none;
+  box-shadow:0 0 15px rgba(34,197,94,.4);
+}
+
+button{
+
+  width:100%;
+
+  padding:16px;
+
+  border:none;
+
+  border-radius:12px;
+
+  background:#22c55e;
+
+  color:white;
+
+  font-size:22px;
+
+  font-weight:bold;
+
+  cursor:pointer;
+
+  transition:.3s;
+}
+
+button:hover{
+
+  transform:translateY(-2px);
+
+  box-shadow:
+  0 0 20px rgba(34,197,94,.7);
+
+}
+
+.footer{
+
+  text-align:center;
+
+  margin-top:20px;
+
+  color:#94a3b8;
+
+  font-size:15px;
+}
+
+@keyframes fade{
+  from{
+    opacity:0;
+    transform:translateY(20px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
 </style>
 </head>
 
 <body>
 
 <div class="box">
-  <h2>🔐 Admin Login</h2>
 
-  <input id="user" placeholder="Usuario">
-  <input id="pass" type="password" placeholder="Contraseña">
+  <img src="banner.jpg" class="logo">
 
-  <button onclick="login()">Entrar</button>
-</div>
+  <h1>🔐 Admin</h1>
 
-  <div class="footer">
-     Quinielas El Inge © 2026
+  <div class="subtitle">
+    Panel de administración
   </div>
 
-  
+  <input id="user" placeholder="👤 Usuario">
+
+  <input
+    id="pass"
+    type="password"
+    placeholder="🔒 Contraseña"
+  >
+
+  <button onclick="login()">
+    Entrar
+  </button>
+
+  <div class="footer">
+    Quinielas El Inge © 2026
+  </div>
+
+</div>
 
 <script>
+
 async function login() {
 
   try {
@@ -66,48 +190,44 @@ async function login() {
     const user = document.getElementById("user").value.trim();
     const password = document.getElementById("pass").value.trim();
 
-    console.log("LOGIN CLICK");
-
     const res = await fetch('/admin/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json'
       },
-      body: JSON.stringify({ user, password })
+      body:JSON.stringify({user,password})
     });
-
-    console.log("STATUS:", res.status);
 
     const data = await res.json();
 
-    console.log(data);
+    if(data.ok){
 
-    if (data.ok) {
+      const expiracion =
+      Date.now() + (60 * 60 * 1000);
 
-      const expiracion = Date.now() + (60 * 60 * 1000);
+      sessionStorage.setItem("admin","true");
+      localStorage.setItem("expira",expiracion);
 
-      sessionStorage.setItem("admin", "true");
-      localStorage.setItem("expira", expiracion);
+      window.location.href="admin.html";
 
-      window.location.href = "admin.html";
-
-    } else {
+    }else{
 
       alert(data.error || "Error login");
 
     }
 
-  } catch (err) {
+  } catch(err){
 
     console.error(err);
+
     alert("Error conexión servidor");
 
   }
-}
 
- 
+}
 
 </script>
 
 </body>
 </html>
+```
