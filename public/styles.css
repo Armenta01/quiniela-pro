@@ -1457,3 +1457,33 @@ body h1{
     font-size:16px;
   }
 }
+
+.estado-jornada{
+  width:100%;
+  padding:12px;
+  margin-bottom:10px;
+  border-radius:12px;
+  text-align:center;
+  font-weight:bold;
+  font-size:18px;
+  color:white;
+}
+
+.abierta{
+  background:#16a34a;
+}
+
+.cerrada{
+  background:#dc2626;
+}
+
+.participantes-box{
+  background:#1e293b;
+  border:2px solid #facc15;
+  color:#fff;
+  padding:12px;
+  border-radius:12px;
+  text-align:center;
+  font-weight:bold;
+  margin-bottom:15px;
+}

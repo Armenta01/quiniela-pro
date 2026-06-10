@@ -18,6 +18,14 @@ if (sessionStorage.getItem("admin") !== "true") {
 
 <h1>⚙️ Control de Jornadas</h1>
 
+<div id="estado-jornada" class="estado-jornada">
+⏳ Cargando...
+</div>
+
+<div id="participantes" class="participantes-box">
+👥 Participantes: 0
+</div>
+
 <div class="card">
 
   <div class="form-row">
@@ -226,7 +234,43 @@ async function resetearTodo() {
   location.reload();
 }
 
+async function cargarEstadoJornada() {
+
+  const jornada = document.getElementById("jornada").value;
+
+  const res = await fetch(`/limite?jornada=${jornada}`);
+  const data = await res.json();
+
+  const box = document.getElementById("estado-jornada");
+
+  if (data.bloqueada) {
+
+    box.innerHTML = `🔒 Semana ${jornada} cerrada`;
+    box.className = "estado-jornada cerrada";
+
+  } else {
+
+    box.innerHTML = `🔓 Semana ${jornada} abierta`;
+    box.className = "estado-jornada abierta";
+  }
+}
+
+async function cargarParticipantes() {
+
+  const jornada = document.getElementById("jornada").value;
+
+  const res = await fetch(`/bolsa?jornada=${jornada}`);
+  const data = await res.json();
+
+  document.getElementById("participantes").innerHTML =
+    `👥 Participantes: ${data.participantes}`;
+}
+
 async function cargarPartidos() {
+
+cargarEstadoJornada();
+cargarParticipantes();
+
   const lista = document.getElementById('lista');
 
   try {
