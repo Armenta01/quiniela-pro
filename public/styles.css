@@ -1489,24 +1489,17 @@ body h1{
 }
 
 .btn-eliminar{
-
-  background:#dc2626;
-
-  color:white;
-
-  border:none;
-
-  padding:8px 12px;
-
-  border-radius:8px;
-
+  width:100% !important;
+  padding:14px !important;
+  margin-top:10px;
+  background:#dc2626 !important;
+  color:white !important;
+  border:none !important;
+  border-radius:12px;
   cursor:pointer;
-
-  margin-top:8px;
+  font-weight:bold;
 }
 
 .btn-eliminar:hover{
-
-  background:#b91c1c;
-
+  background:#b91c1c !important;
 }
