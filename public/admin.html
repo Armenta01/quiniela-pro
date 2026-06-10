@@ -299,6 +299,12 @@ cargarParticipantes();
         Guardar Resultado
       </button>
 
+      <button     
+        class="btn-eliminar"
+        onclick="eliminarPartido(${p.id})">
+        🗑 Eliminar
+      </button>
+
     </div>
   `;
 });
@@ -341,6 +347,46 @@ async function guardarResultado(id) {
   } catch (err) {
     console.error(err);
     alert("❌ Error servidor");
+  }
+}
+
+async function eliminarPartido(id) {
+
+  const confirmar = confirm(
+    "⚠️ ¿Eliminar este partido?"
+  );
+
+  if (!confirmar) return;
+
+  try {
+
+    const res = await fetch(
+      `/admin/partido/${id}`,
+      {
+        method: 'DELETE'
+      }
+    );
+
+    const data = await res.json();
+
+    if (data.ok) {
+
+      alert("✅ Partido eliminado");
+
+      cargarPartidos();
+
+    } else {
+
+      alert("❌ Error");
+
+    }
+
+  } catch (err) {
+
+    console.error(err);
+
+    alert("❌ Error servidor");
+
   }
 }
 

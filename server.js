@@ -338,6 +338,32 @@ app.post('/admin/resultado', async (req, res) => {
   }
 });
 
+app.delete('/admin/partido/:id', async (req, res) => {
+
+  try {
+
+    const id = req.params.id;
+
+    await pool.query(
+      `DELETE FROM partidos WHERE id = $1`,
+      [id]
+    );
+
+    res.json({ ok: true });
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      error: 'Error eliminando partido'
+    });
+
+  }
+
+});
+
+
 
 // 🔥 TABLA
 function calcularPuntos(p, pr) {
