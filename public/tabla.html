@@ -52,7 +52,6 @@
 
 </div>
 
-<div id="partidosResumen"></div>
 
 <div id="tabla" class="tabla-scroll"></div>
 
@@ -62,7 +61,8 @@
 <script src="app.js"></script>
 
 <script>
-window.onload = async () => {
+
+  window.onload = async () => {
 
   const params = new URLSearchParams(window.location.search);
   const jornadaURL = params.get("jornada");
@@ -75,15 +75,13 @@ window.onload = async () => {
 
   const jornada = document.getElementById("jornadaSelect").value;
 
-  // 🔥 usar tu función PRO
   verTablaCompleta(jornada);
-  cargarResumenPartidos(jornada);
-  
+
   document.getElementById("jornadaSelect").onchange = function() {
-  const j = this.value;
-  verTablaCompleta(j);
-  cargarResumenPartidos(j);
-};
+    const j = this.value;
+    verTablaCompleta(j);
+  };
+
 };
 
 async function cargarResumenPartidos(jornada) {
