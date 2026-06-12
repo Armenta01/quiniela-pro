@@ -1601,3 +1601,36 @@ body h1{
   }
 
 }
+
+.dashboard-admin{
+  background:#1e293b;
+  border-radius:15px;
+  padding:20px;
+  margin-bottom:20px;
+
+  border:2px solid #334155;
+
+  text-align:center;
+
+  box-shadow:0 0 15px rgba(0,0,0,.3);
+}
+
+.dashboard-top{
+  font-size:22px;
+  font-weight:bold;
+  margin-bottom:15px;
+}
+
+.dashboard-stats{
+  display:flex;
+  justify-content:center;
+  gap:25px;
+  flex-wrap:wrap;
+}
+
+.dashboard-item{
+  background:#0f172a;
+  padding:10px 15px;
+  border-radius:10px;
+  min-width:120px;
+}

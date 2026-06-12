@@ -21,8 +21,8 @@ if (sessionStorage.getItem("admin") !== "true") {
 
 <div id="infoBolsaAdmin" class="card"></div>
 
-<div id="estado-jornada" class="estado-jornada">
-⏳ Cargando...
+<div id="dashboardAdmin" class="dashboard-admin">
+  ⏳ Cargando...
 </div>
 
 <div id="participantes" class="participantes-box">
@@ -271,9 +271,7 @@ async function cargarParticipantes() {
 
 async function cargarPartidos() {
 
-  cargarEstadoJornada();
-  cargarParticipantes();
-  cargarBolsaAdmin();
+  cargarDashboard();
 
   const lista = document.getElementById('lista');
 
@@ -476,6 +474,61 @@ async function cargarBolsaAdmin() {
       <b>$${Math.round(bolsa.segundoLugar)} MXN</b>
     </p>
 
+  `;
+}
+
+async function cargarDashboard() {
+
+  const jornada =
+    document.getElementById("jornada").value;
+
+  const bolsaRes =
+    await fetch(`/bolsa?jornada=${jornada}`);
+
+  const bolsa =
+    await bolsaRes.json();
+
+  const limiteRes =
+    await fetch(`/limite?jornada=${jornada}`);
+
+  const limite =
+    await limiteRes.json();
+
+  document.getElementById(
+    "dashboardAdmin"
+  ).innerHTML = `
+
+    <div class="dashboard-top">
+      ${
+        limite.bloqueada
+        ? `🔒 Semana ${jornada} Cerrada`
+        : `🔓 Semana ${jornada} Abierta`
+      }
+    </div>
+
+    <div class="dashboard-stats">
+
+      <div class="dashboard-item">
+        👥<br>
+        <b>${bolsa.participantes}</b>
+      </div>
+
+      <div class="dashboard-item">
+        💰<br>
+        <b>$${bolsa.recaudado}</b>
+      </div>
+
+      <div class="dashboard-item">
+        🥇<br>
+        <b>$${Math.round(bolsa.primerLugar)}</b>
+      </div>
+
+      <div class="dashboard-item">
+        🥈<br>
+        <b>$${Math.round(bolsa.segundoLugar)}</b>
+      </div>
+
+    </div>
   `;
 }
 
