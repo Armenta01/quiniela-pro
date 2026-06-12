@@ -14,6 +14,10 @@ body {
   align-items: center;
 
   padding-left: 12px;
+
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .top-bar {
@@ -1535,5 +1539,62 @@ body h1{
 .btn-editar:hover{
 
   background:#eab308 !important;
+
+}
+
+/* 📱 RESPONSIVE TABLA */
+
+.tabla-scroll{
+  width:100%;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+@media (max-width:768px){
+
+  .fila{
+    min-width:max-content;
+  }
+
+  .celda{
+    min-width:45px;
+    padding:6px 4px;
+    font-size:12px;
+  }
+
+  .posicion{
+    min-width:50px;
+    font-size:16px;
+  }
+
+  .jugador{
+    min-width:110px;
+    font-size:13px;
+  }
+
+  .puntos{
+    min-width:50px;
+    font-size:14px;
+  }
+
+  .partido-header{
+    min-width:60px;
+    width:60px;
+  }
+
+  .logo-equipo{
+    width:20px;
+    height:20px;
+  }
+
+  .nombre-equipo{
+    font-size:10px;
+    line-height:1.1;
+  }
+
+  .resultado-header{
+    font-size:11px;
+    font-weight:bold;
+  }
 
 }
