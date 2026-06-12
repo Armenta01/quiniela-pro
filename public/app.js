@@ -654,43 +654,67 @@ async function actualizarContador() {
 
   if (!info) return;
 
-  info.style.display = "block";
+  try {
 
-  const r = await fetch(`/limite?jornada=${jornadaActual}`);
-  const d = await r.json();
+    info.style.display = "block";
 
-  // Si ya cerró, ocultar la barra
-  if (d.bloqueada) {
-    info.style.display = "none";
-    return;
+    const r = await fetch(`/limite?jornada=${jornadaActual}`);
+
+    if (!r.ok) {
+      throw new Error("Error obteniendo límite");
+    }
+
+    const d = await r.json();
+
+    // Si ya cerró, ocultar la barra
+    if (d.bloqueada) {
+      info.style.display = "none";
+      return;
+    }
+
+    const limite = new Date(d.limite);
+    const ahora = new Date();
+
+    const diff = limite - ahora;
+
+    const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+    const horas = Math.floor(
+      (diff % (1000 * 60 * 60 * 24))
+      / (1000 * 60 * 60)
+    );
+
+    const minutos = Math.floor(
+      (diff % (1000 * 60 * 60))
+      / (1000 * 60)
+    );
+
+    info.innerHTML = `
+      <div class="costo">
+        💰 Costo: $50 MXN
+      </div>
+
+      <div class="contador">
+        ⏰ Cierra en: ${dias}d ${horas}h ${minutos}m
+      </div>
+    `;
+
+  } catch (err) {
+
+    console.error("Error contador:", err);
+
+    info.innerHTML = `
+      <div class="costo">
+        💰 Costo: $50 MXN
+      </div>
+
+      <div class="contador">
+        ⏰ Actualizando...
+      </div>
+    `;
+
   }
 
-  const limite = new Date(d.limite);
-  const ahora = new Date();
-
-  const diff = limite - ahora;
-
-  const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
-
-  const horas = Math.floor(
-    (diff % (1000 * 60 * 60 * 24))
-    / (1000 * 60 * 60)
-  );
-
-  const minutos = Math.floor(
-    (diff % (1000 * 60 * 60))
-    / (1000 * 60)
-  );
-
-  info.innerHTML = `
-  <div class="costo">
-    💰 Costo: $50 MXN
-  </div>
-
-  <div class="contador">
-    ⏰ Cierra en: ${dias}d ${horas}h ${minutos}m
-  </div>
-`;
 }
 
 async function mostrarRankingPopup() {
