@@ -262,28 +262,42 @@ let contador = {};
 
 let ranking = [];
 
-let ultimoPuntaje = null;
-let lugarVisual = 0;
-let lugarReal = 0;
+let puntosPrimero = data[0]?.puntos;
+let puntosSegundo = null;
+let posicionActual = 3;
 
-data.forEach((u) => {
+data.forEach((u, index) => {
 
-  lugarReal++;
+  let lugar;
 
-  if (u.puntos !== ultimoPuntaje) {
+  // Empates del primer lugar
+  if (u.puntos === puntosPrimero) {
 
-    if (lugarReal <= 2) {
-      lugarVisual = lugarReal;
-    } else {
-      lugarVisual++;
+    lugar = 1;
+
+  } else {
+
+    // Detectar puntaje del segundo lugar
+    if (puntosSegundo === null) {
+      puntosSegundo = u.puntos;
     }
 
-    ultimoPuntaje = u.puntos;
+    // Empates del segundo lugar
+    if (u.puntos === puntosSegundo) {
+
+      lugar = 2;
+
+    } else {
+
+      // Del tercero para abajo consecutivos
+      lugar = posicionActual;
+      posicionActual++;
+    }
   }
 
   ranking.push({
     ...u,
-    lugar: lugarVisual
+    lugar
   });
 
 });
