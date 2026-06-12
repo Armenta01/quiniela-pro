@@ -261,28 +261,38 @@ header += `<div class="celda puntos">Pts</div></div>`;
 let contador = {};
 
 let ranking = [];
+
 let ultimoPuntaje = null;
-let lugar = 0;
+let lugarVisual = 0;
+let lugarReal = 0;
 
 data.forEach((u) => {
 
+  lugarReal++;
+
   if (u.puntos !== ultimoPuntaje) {
-    lugar++;
+
+    if (lugarReal <= 2) {
+      lugarVisual = lugarReal;
+    } else {
+      lugarVisual++;
+    }
+
     ultimoPuntaje = u.puntos;
   }
 
   ranking.push({
     ...u,
-    lugar
+    lugar: lugarVisual
   });
+
 });
 
 ranking.forEach((u) => {
 
   let claseTop =
   u.lugar === 1 ? "top1" :
-  u.lugar === 2 ? "top2" :
-  u.lugar === 3 ? "top3" : "";
+  u.lugar === 2 ? "top2" : "";
 
   if (!contador[u.nombre]) contador[u.nombre] = 1;
   else contador[u.nombre]++;
@@ -296,10 +306,9 @@ ranking.forEach((u) => {
   fila += `
 <div class="celda posicion">
   ${
-    u.lugar === 1 ? "🥇" :
-    u.lugar === 2 ? "🥈" :
-    u.lugar === 3 ? "🥉" :
-    "#" + u.lugar
+   u.lugar === 1 ? "🥇" :
+   u.lugar === 2 ? "🥈" :
+   `${u.lugar}º`
   }
 </div>
 
