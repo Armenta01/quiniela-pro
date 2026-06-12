@@ -1298,6 +1298,10 @@ body h1{
   margin:0 auto;
 }
 
+.partido-header{
+  text-align:center;
+}
+
 .nombre-equipo{
 
   font-size:12px;
