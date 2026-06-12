@@ -442,18 +442,21 @@ if (usuario.length < 3) {
       mensaje += `⚽ ${partido.local} ${p.local}-${p.visitante} ${partido.visitante}\n`;
     });
 
-    const phone = "524531336012";
-    const texto = encodeURIComponent(mensaje);
-    const url = `https://wa.me/${phone}?text=${texto}`;
+   const phone = "524531336012";
+const texto = encodeURIComponent(mensaje);
+const url = `https://wa.me/${phone}?text=${texto}`;
 
-    if (/Android|iPhone/i.test(navigator.userAgent)) {
-  window.location.href = url;   // 📱 móvil
-} else {
-  window.open(url, "_blank");   // 💻 computadora
-}
+confetti();
 
-    confetti();
-    alert("🔥 Quiniela enviada");
+setTimeout(() => {
+
+  if (/Android|iPhone/i.test(navigator.userAgent)) {
+    window.location.href = url;   // 📱 móvil
+  } else {
+    window.open(url, "_blank");   // 💻 computadora
+  }
+
+}, 1000);
 
   } catch (err) {
     console.error(err);
