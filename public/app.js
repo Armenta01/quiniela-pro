@@ -787,16 +787,12 @@ async function cargarBolsa(jornada) {
   <div class="bolsa-box">
 
     <div class="bolsa-titulo">
-      🏆 BOLSA ACUMULADA
-    </div>
-
-    <div class="bolsa-total">
-      $${bolsa.recaudado} MXN
+      🏆 PREMIOS SEMANA ${jornada}
     </div>
 
     <div class="premios">
       🥇 1er Lugar: $${Math.round(bolsa.primerLugar)} MXN
-      <br>
+      <br><br>
       🥈 2do Lugar: $${Math.round(bolsa.segundoLugar)} MXN
     </div>
 
