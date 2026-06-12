@@ -164,6 +164,9 @@ button {
 .header {
   background: #1e3a5f;
   color: white;
+   position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 
