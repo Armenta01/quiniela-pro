@@ -1294,7 +1294,8 @@ body h1{
 
   object-fit:contain;
 
-  margin:0;
+  display:block;
+  margin:0 auto;
 }
 
 .nombre-equipo{
