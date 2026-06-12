@@ -1602,35 +1602,66 @@ body h1{
 
 }
 
+
+/* ===== DASHBOARD ADMIN ===== */
+
 .dashboard-admin{
   background:#1e293b;
-  border-radius:15px;
-  padding:20px;
-  margin-bottom:20px;
-
   border:2px solid #334155;
-
+  border-radius:20px;
+  padding:25px;
+  margin:20px 0;
   text-align:center;
-
-  box-shadow:0 0 15px rgba(0,0,0,.3);
+  box-shadow:0 0 20px rgba(0,0,0,.3);
 }
 
 .dashboard-top{
-  font-size:22px;
-  font-weight:bold;
-  margin-bottom:15px;
+  font-size:40px;
+  font-weight:700;
+  margin-bottom:25px;
+  color:white;
 }
 
 .dashboard-stats{
   display:flex;
   justify-content:center;
-  gap:25px;
+  align-items:center;
+  gap:20px;
   flex-wrap:wrap;
 }
 
 .dashboard-item{
   background:#0f172a;
-  padding:10px 15px;
-  border-radius:10px;
-  min-width:120px;
+  border-radius:15px;
+  min-width:180px;
+  padding:20px;
+  font-size:18px;
+  font-weight:600;
+  color:white;
+  transition:.2s;
+}
+
+.dashboard-item b{
+  display:block;
+  margin-top:8px;
+  font-size:22px;
+}
+
+/* Responsive celular */
+
+@media (max-width:768px){
+
+  .dashboard-top{
+    font-size:28px;
+  }
+
+  .dashboard-stats{
+    flex-direction:column;
+  }
+
+  .dashboard-item{
+    width:100%;
+    max-width:300px;
+  }
+
 }
