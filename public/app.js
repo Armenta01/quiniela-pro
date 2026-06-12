@@ -28,7 +28,6 @@ window.onload = async () => {
   actualizarContador();
 
   setInterval(actualizarContador, 60000);
-
   setTimeout(mostrarRankingPopup, 1000);
 
 };
@@ -582,17 +581,23 @@ async function checkBloqueo() {
 
 const social = document.getElementById("socialFloat");
 
-window.addEventListener("scroll", function() {
+if (social) {
 
-  const posicion = window.pageYOffset || document.documentElement.scrollTop;
+  window.addEventListener("scroll", function() {
 
-  if (posicion > 150) {
-    social.style.display = "none";
-  } else {
-    social.style.display = "flex";
-  }
+    const posicion =
+      window.pageYOffset ||
+      document.documentElement.scrollTop;
 
-});
+    if (posicion > 150) {
+      social.style.display = "none";
+    } else {
+      social.style.display = "flex";
+    }
+
+  });
+
+}
 
 function limpiarPronosticos() {
 
