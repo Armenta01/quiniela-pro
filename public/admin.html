@@ -19,14 +19,9 @@ if (sessionStorage.getItem("admin") !== "true") {
 
 <h1>⚙️ Control de Jornadas</h1>
 
-<div id="infoBolsaAdmin" class="card"></div>
 
 <div id="dashboardAdmin" class="dashboard-admin">
   ⏳ Cargando...
-</div>
-
-<div id="participantes" class="participantes-box">
-👥 Participantes: 0
 </div>
 
 <div class="card">
@@ -258,17 +253,6 @@ async function cargarEstadoJornada() {
   }
 }
 
-async function cargarParticipantes() {
-
-  const jornada = document.getElementById("jornada").value;
-
-  const res = await fetch(`/bolsa?jornada=${jornada}`);
-  const data = await res.json();
-
-  document.getElementById("participantes").innerHTML =
-    `👥 Participantes: ${data.participantes}`;
-}
-
 async function cargarPartidos() {
 
   cargarDashboard();
@@ -435,46 +419,6 @@ function editarPartido(id) {
     behavior:"smooth"
   });
 
-}
-
-async function cargarBolsaAdmin() {
-
-  const jornada =
-    document.getElementById("jornada").value;
-
-  const res =
-    await fetch(`/bolsa?jornada=${jornada}`);
-
-  const bolsa =
-    await res.json();
-
-  document.getElementById(
-    "infoBolsaAdmin"
-  ).innerHTML = `
-
-    <h3>💰 Bolsa Semana ${jornada}</h3>
-
-    <p>
-      👥 Participantes:
-      <b>${bolsa.participantes}</b>
-    </p>
-
-    <p>
-      💵 Recaudado:
-      <b>$${bolsa.recaudado} MXN</b>
-    </p>
-
-    <p>
-      🥇 Primer Lugar:
-      <b>$${Math.round(bolsa.primerLugar)} MXN</b>
-    </p>
-
-    <p>
-      🥈 Segundo Lugar:
-      <b>$${Math.round(bolsa.segundoLugar)} MXN</b>
-    </p>
-
-  `;
 }
 
 async function cargarDashboard() {
