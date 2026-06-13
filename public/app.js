@@ -816,13 +816,19 @@ async function cargarBolsa(jornada) {
     <div class="bolsa-titulo">
       🏆 PREMIOS SEMANA ${jornada}
     </div>
-
     <div class="premios">
-    <br><br>
-      🥇 1er Lugar: $${Math.round(bolsa.primerLugar)} MXN
-      <br>
-      🥈 2do Lugar: $${Math.round(bolsa.segundoLugar)} MXN
-    </div>
+
+  <br><br>
+
+  🥇 1er Lugar: $${Math.round(bolsa.primerLugar)} MXN
+
+  ${
+    bolsa.segundoLugar > 0
+    ? `<br>🥈 2do Lugar: $${Math.round(bolsa.segundoLugar)} MXN`
+    : `<br>👥 Menos de 31 participantes: premio único`
+  }
+
+</div>
 
   </div>
 `;
