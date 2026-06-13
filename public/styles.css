@@ -43,7 +43,7 @@ input, select, button {
 .card{
   background:#1e293b;
   margin:8px;
-  padding:16px;
+  padding:12px;
   border-radius:15px;
 }
 
@@ -587,7 +587,7 @@ button {
 }
 
 .card {
-  padding: 15px;
+  padding: 12px;
 }
 
 .form-row {
