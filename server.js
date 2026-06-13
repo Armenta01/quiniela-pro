@@ -539,17 +539,32 @@ app.get('/bolsa', async (req, res) => {
     `, [jornada]);
 
     const participantes =
-      parseInt(result.rows[0].participantes || 0);
+  parseInt(result.rows[0].participantes || 0);
 
-    const recaudado = participantes * 50;
+const recaudado = participantes * 50;
 
-    const administracion = recaudado * 0.20;
+const administracion = recaudado * 0.20;
 
-    const bolsaPremios = recaudado * 0.80;
+const bolsaPremios = recaudado * 0.80;
 
-    const primerLugar = bolsaPremios * 0.75;
+let primerLugar = 0;
+let segundoLugar = 0;
 
-    const segundoLugar = bolsaPremios * 0.25;
+// 👥 Hasta 30 participantes
+if (participantes <= 30) {
+
+  primerLugar = bolsaPremios;
+  segundoLugar = 0;
+
+}
+
+// 👥 31 o más participantes
+else {
+
+  primerLugar = bolsaPremios * 0.65;
+  segundoLugar = bolsaPremios * 0.35;
+
+}
 
     res.json({
       participantes,
