@@ -1667,14 +1667,16 @@ body h1{
 }
 
 .usuario-box{
-  max-width: 400px;
-  margin: 25px auto 15px;
-  padding: 0 15px;
+  display:flex;
+  justify-content:center;
+  margin:20px auto;
+  width:100%;
 }
 
 .usuario-box input{
-  width: 100%;
+  width: 300px;
   padding: 14px;
+  max-width: 90%;
   border-radius: 12px;
   border: 2px solid #2d3b55;
   background: #101827;
