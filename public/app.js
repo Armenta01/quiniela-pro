@@ -701,8 +701,6 @@ async function actualizarContador() {
 
   } catch (err) {
 
-    console.error("Error contador:", err);
-
     info.innerHTML = `
       <div class="costo">
         💰 Costo: $50 MXN
