@@ -439,41 +439,54 @@ async function cargarDashboard() {
     await limiteRes.json();
 
   document.getElementById(
-    "dashboardAdmin"
-  ).innerHTML = `
+  "dashboardAdmin"
+).innerHTML = `
 
-    <div class="dashboard-top">
-      ${
-        limite.bloqueada
-        ? `🔒 Semana ${jornada} Cerrada`
-        : `🔓 Semana ${jornada} Abierta`
-      }
+  <div class="dashboard-top">
+    ${
+      limite.bloqueada
+      ? `🔒 Semana ${jornada} Cerrada`
+      : `🔓 Semana ${jornada} Abierta`
+    }
+  </div>
+
+  <div class="dashboard-stats">
+
+    <div class="dashboard-item">
+      👥 Participantes
+      <b>${bolsa.participantes}</b>
     </div>
 
-    <div class="dashboard-stats">
+    <div class="dashboard-item">
+      💰 Recaudado
+      <b>$${bolsa.recaudado}</b>
+    </div>
 
+    <div class="dashboard-item">
+      🥇 Primer Lugar
+      <b>$${Math.round(bolsa.primerLugar)}</b>
+    </div>
+
+    ${
+      bolsa.segundoLugar > 0
+      ? `
       <div class="dashboard-item">
-  👥 Participantes
-  <b>${bolsa.participantes}</b>
-</div>
+        🥈 Segundo Lugar
+        <b>$${Math.round(bolsa.segundoLugar)}</b>
+      </div>
+      `
+      : `
+      <div class="dashboard-item">
+        👥 Premio único
+        <b>Hasta 30 participantes</b>
+      </div>
+      `
+    }
 
-<div class="dashboard-item">
-  💰 Recaudado
-  <b>$${bolsa.recaudado}</b>
-</div>
+  </div>
 
-<div class="dashboard-item">
-  🥇 Primer Lugar
-  <b>$${Math.round(bolsa.primerLugar)}</b>
-</div>
+`;
 
-<div class="dashboard-item">
-  🥈 Segundo Lugar
-  <b>$${Math.round(bolsa.segundoLugar)}</b>
-</div>
-
-    </div>
-  `;
 }
 
 </script>
