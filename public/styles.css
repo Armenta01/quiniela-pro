@@ -82,9 +82,8 @@ input, select, button {
 }
 
 .team{
-  display:flex;
-  align-items:center;
-  gap:10px;
+  width:auto;
+  max-width:120px;
 }
 
 .team.left{
@@ -101,30 +100,27 @@ input, select, button {
   text-align:center;
 }
 
-@media (max-width: 768px){
+@media(max-width:768px){
+
+  .match{
+    grid-template-columns: 1fr 100px 1fr;
+  }
 
   .team{
-    width:120px;
+    max-width:95px;
+    overflow:hidden;
   }
 
   .team span{
-    font-size:14px;
+    font-size:12px;
     line-height:1.1;
+    word-break:break-word;
   }
 
   .score{
-    margin:0 8px;
+    min-width:100px;
   }
 
-}
-
-.score{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-
-  min-width:110px;
 }
 
 .score input {
