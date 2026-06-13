@@ -117,11 +117,6 @@
 <div class="top-bar">
   <button onclick="irTabla()">📊 Ver Tabla</button>
 
-  <input id="usuario"
-         maxlength="15"
-         placeholder="Tu nombre"
-         onblur="validarUsuario()">
-
   <select id="jornadaSelect" onchange="cambiarJornada()"></select>
 </div>
 
@@ -142,6 +137,13 @@
 <div id="bolsaInfo"></div>
 
 <div id="partidos"></div>
+
+<div class="usuario-box">
+  <input id="usuario"
+         maxlength="15"
+         placeholder="👤 Escribe tu nombre"
+         onblur="validarUsuario()">
+</div>
 
 <button id="btnGuardar"
         class="btn-main"

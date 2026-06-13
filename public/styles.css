@@ -1665,3 +1665,25 @@ body h1{
   }
 
 }
+
+.usuario-box{
+  max-width: 400px;
+  margin: 25px auto 15px;
+  padding: 0 15px;
+}
+
+.usuario-box input{
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: 2px solid #2d3b55;
+  background: #101827;
+  color: #fff;
+  font-size: 16px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.usuario-box input::placeholder{
+  color: #bbb;
+}
