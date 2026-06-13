@@ -139,23 +139,30 @@ const horaFormateada = horaParte;
         <div class="match">
 
           <div class="team left">
-            <img src="${p.logo_local || ''}">
-            <span>${p.local}</span>
-          </div>
 
-          <div class="score">
+  <img src="${p.logo_local || ''}">
+
+  <div class="nombre-abajo">
+    ${p.local}
+  </div>
+
+</div>
+
+<div class="score">
   <input type="number" min="0" max="20" id="l${p.id}">
   <span>-</span>
   <input type="number" min="0" max="20" id="v${p.id}">
 </div>
 
-          <div class="team right">
-            <span>${p.visitante}</span>
-            <img src="${p.logo_visitante || ''}">
-          </div>
+<div class="team right">
 
-        </div>
+  <img src="${p.logo_visitante || ''}">
 
+  <div class="nombre-abajo">
+    ${p.visitante}
+  </div>
+
+</div>
         <div class="meta">
           <div class="hora">
             ⏰ ${fechaFormateada} · ${horaFormateada}

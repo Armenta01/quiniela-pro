@@ -40,11 +40,11 @@ input, select, button {
   background: #22c55e;
 }
 
-.card {
-  background: #1e293b;
-  margin: 10px;
-  padding: 30px;
-  border-radius: 15px;
+.card{
+  background:#1e293b;
+  margin:8px;
+  padding:16px;
+  border-radius:15px;
 }
 
 .match{
@@ -358,11 +358,12 @@ button {
   box-shadow: 0 0 15px #ffd700, 0 0 30px #facc15;
 }
 
-.meta {
-  margin-top: 10px;
-  font-size: 13px;
-  text-align: center;
-  opacity: 0.9;
+.meta{
+  margin-top:8px;
+  padding:8px;
+  font-size:12px;
+  text-align:center;
+  opacity:.9;
 }
 
 .hora {
@@ -1730,8 +1731,8 @@ body h1{
   }
 
   .team img{
-    width:36px;
-    height:36px;
+    width:44px;
+    height:44px;
   }
 
 }
@@ -1758,4 +1759,25 @@ body h1{
 
 .usuario-box input::placeholder{
   color: #bbb;
+}
+
+.team{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+
+.nombre-abajo{
+  text-align:center;
+  font-size:13px;
+  line-height:1.1;
+  font-weight:600;
+}
+
+.team img{
+  width:42px;
+  height:42px;
+  object-fit:contain;
 }
