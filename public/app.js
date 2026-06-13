@@ -160,8 +160,11 @@ const horaFormateada = horaParte;
 
   <div class="nombre-abajo">
     ${p.visitante}
+  </div>
 
 </div>
+</div>
+
         <div class="meta">
           <div class="hora">
             ⏰ ${fechaFormateada} · ${horaFormateada}
