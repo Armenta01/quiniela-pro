@@ -53,21 +53,34 @@ input, select, button {
   justify-content: space-between;
 }
 
-.team {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 12px;
+.team{
+  display:flex;
+  align-items:center;
+  gap:8px;
+
+  width:120px;
+  min-width:120px;
 }
 
 .team img {
-  width: 35px;
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
 }
 
-.score {
-  display: flex;
-  align-items: center;
-  gap: 5px;
+.team span{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.score{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+
+  min-width:110px;
 }
 
 .score input {
@@ -519,7 +532,7 @@ button {
 }
 
 .card {
-  padding: 35px;
+  padding: 20px;
 }
 
 .form-row input,
