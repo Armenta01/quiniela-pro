@@ -63,15 +63,15 @@ input, select, button {
 }
 
 .team img {
-  width: 42px;
-  height: 42px;
+  width: 30px;
+  height: 30px;
   object-fit: contain;
 }
 
 .team span{
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  font-size:12px;
+  line-height:1.1;
+  text-align:center;
 }
 
 .score{
