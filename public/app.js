@@ -388,28 +388,33 @@ if (usuario.length < 3) {
 
     const lista = [];
 
-    partidos.forEach(p => {
+    for (const p of partidos) {
+
   const gl = document.getElementById("l" + p.id).value;
   const gv = document.getElementById("v" + p.id).value;
 
-  // si no llenó ambos → lo ignora
-  if (gl === "" || gv === "") return;
+  if (gl === "" || gv === "") {
+    alert(
+      `⚠️ Falta capturar el marcador de:\n\n${p.local} vs ${p.visitante}`
+    );
+    return;
+  }
 
   const local = parseInt(gl);
   const visitante = parseInt(gv);
 
-  // 🚫 no números
-  if (isNaN(local) || isNaN(visitante)) return;
-
-  // 🚫 negativos
-  if (local < 0 || visitante < 0) {
-    alert("No se permiten goles negativos");
+  if (isNaN(local) || isNaN(visitante)) {
+    alert("⚠️ Marcador inválido");
     return;
   }
 
-  // 🚫 marcadores irreales
+  if (local < 0 || visitante < 0) {
+    alert("⚠️ No se permiten goles negativos");
+    return;
+  }
+
   if (local > 20 || visitante > 20) {
-    alert("Marcador fuera de rango (máx 20)");
+    alert("⚠️ Marcador fuera de rango (máx 20)");
     return;
   }
 
@@ -418,7 +423,7 @@ if (usuario.length < 3) {
     local,
     visitante
   });
-});
+}
 
     if (lista.length === 0) {
       alert("No capturaste resultados");
