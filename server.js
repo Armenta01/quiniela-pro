@@ -585,7 +585,7 @@ app.get('/bolsa', async (req, res) => {
     const { jornada } = req.query;
 
     const result = await pool.query(`
-      SELECT COUNT(DISTINCT user_id) AS participantes
+      SELECT COUNT(DISTINCT envio_id) AS participantes
       FROM predicciones
       WHERE jornada = $1
     `, [jornada]);
