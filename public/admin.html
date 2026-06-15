@@ -109,6 +109,10 @@ if (sessionStorage.getItem("admin") !== "true") {
 📥 Descargar Excel
 </button>
 
+<button class="btn-verde" onclick="verParticipantes()">
+👥 Participantes
+</button>
+
 <button class="btn-rojo" onclick="logout()">
 🚪 Cerrar sesión
 </button>
@@ -124,6 +128,7 @@ if (sessionStorage.getItem("admin") !== "true") {
 </div>
 
 <div class="lista" id="lista"></div>
+<div class="lista" id="listaParticipantes"></div>
 
 <script>
 let editandoId = null;
@@ -486,6 +491,47 @@ async function cargarDashboard() {
   </div>
 
 `;
+
+}
+
+async function verParticipantes() {
+
+  const jornada =
+    document.getElementById("jornada").value;
+
+  const res =
+    await fetch(`/admin/participantes?jornada=${jornada}`);
+
+  const data =
+    await res.json();
+
+  const div =
+    document.getElementById("listaParticipantes");
+
+  div.innerHTML =
+    `<h2>👥 PARTICIPANTES SEMANA ${jornada}</h2>`;
+
+  data.forEach((p, i) => {
+
+    div.innerHTML += `
+      <div class="partido">
+
+        <b>${i + 1}. ${p.nombre}</b><br>
+
+        📱 ${p.telefono || "Sin teléfono"}<br>
+
+        📅 ${p.fecha}<br><br>
+
+        <a
+          href="https://wa.me/52${p.telefono}"
+          target="_blank"
+        >
+          💬 Abrir WhatsApp
+        </a>
+
+      </div>
+    `;
+  });
 
 }
 

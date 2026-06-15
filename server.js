@@ -237,25 +237,23 @@ nombre = nombre.trim();
     }
 
     let user = await pool.query(
-      `SELECT id FROM users WHERE nombre = $1`,
-      [nombre]
-    );
+  `SELECT id FROM users WHERE nombre = $1`,
+  [nombre]
+);
 
-    let userId;
+let userId;
 
-    if (user.rows.length === 0) {
-      const newUser = await pool.query(
-      `INSERT INTO users(nombre, telefono)
-        VALUES($1, $2)
-        RETURNING id`,
-        [nombre, telefono]
-    );
-      userId = newUser.rows[0].id;
-    } else {
-      userId = user.rows[0].id;
-    }
-
-
+if (user.rows.length === 0) {
+  const newUser = await pool.query(
+    `INSERT INTO users(nombre, telefono)
+      VALUES($1, $2)
+      RETURNING id`,
+      [nombre, telefono]
+  );
+  userId = newUser.rows[0].id;
+} else {
+  userId = user.rows[0].id;
+}
 
 // 🔥 validar si ya mandó EXACTfAMENTE lo mismo
 const existentes = await pool.query(
@@ -482,6 +480,44 @@ app.get('/tabla', async (req, res) => {
   const { jornada } = req.query;
   const tabla = await fetchTabla(jornada);
   res.json(tabla);
+});
+
+app.get('/admin/participantes', async (req, res) => {
+
+  try {
+
+    const { jornada } = req.query;
+
+    const result = await pool.query(`
+      SELECT
+        u.nombre,
+        pr.telefono,
+        pr.fecha_envio,
+        pr.envio_id
+      FROM predicciones pr
+      JOIN users u
+        ON pr.user_id = u.id
+      WHERE pr.jornada = $1
+      GROUP BY
+        u.nombre,
+        pr.telefono,
+        pr.fecha_envio,
+        pr.envio_id
+      ORDER BY pr.fecha_envio DESC
+    `, [jornada]);
+
+    res.json(result.rows);
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      error: "Error participantes"
+    });
+
+  }
+
 });
 
 
