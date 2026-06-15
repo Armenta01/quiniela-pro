@@ -77,7 +77,9 @@ h1{
 
 async function cargarParticipantes() {
 
-  const jornada = 10;
+  const params = new URLSearchParams(window.location.search);
+
+  const jornada = params.get("jornada") || 10;
 
   const res = await fetch(
     `/admin/participantes?jornada=${jornada}`
