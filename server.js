@@ -222,7 +222,7 @@ app.get('/check-user', async (req, res) => {
 
 // 🔥 GUARDAR PRONÓSTICOS (FIX PRINCIPAL)
 app.post('/guardar', async (req, res) => {
-  let { nombre, jornada, pronosticos } = req.body;
+ let { nombre, telefono, jornada, pronosticos } = req.body;
 
 nombre = nombre.trim();
   const envioId = Date.now().toString() + "_" + Math.random().toString(36).substring(2,8);
@@ -245,13 +245,24 @@ nombre = nombre.trim();
 
     if (user.rows.length === 0) {
       const newUser = await pool.query(
-        `INSERT INTO users(nombre) VALUES($1) RETURNING id`,
-        [nombre]
-      );
+      `INSERT INTO users(nombre, telefono)
+        VALUES($1, $2)
+        RETURNING id`,
+        [nombre, telefono]
+    );
       userId = newUser.rows[0].id;
     } else {
       userId = user.rows[0].id;
     }
+    
+    await pool.query(
+  `UPDATE users
+   SET telefono = $1
+   WHERE id = $2`,
+  [telefono, userId]
+);
+
+
 // 🔥 validar si ya mandó EXACTfAMENTE lo mismo
 const existentes = await pool.query(
   `SELECT envio_id

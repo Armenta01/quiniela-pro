@@ -367,6 +367,13 @@ async function guardarTodo() {
   if (quinielaCerrada) return alert("🔒 Cerrado");
 
   let usuario = document.getElementById("usuario").value.trim();
+  let telefono = document.getElementById("telefono").value.trim();
+
+if (!/^\d{10}$/.test(telefono)) {
+  alert("Ingresa un WhatsApp válido de 10 dígitos");
+  return;
+}
+
 
 // limpiar caracteres raros
 usuario = usuario.replace(/[^a-zA-Z0-9\s]/g, "");
@@ -434,9 +441,10 @@ if (usuario.length < 3) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        nombre: usuario,
-        jornada: jornadaActual,
-        pronosticos: lista
+      nombre: usuario,
+      telefono,
+      jornada: jornadaActual,
+      pronosticos: lista
       })
     });
 
