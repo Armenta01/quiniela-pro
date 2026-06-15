@@ -75,6 +75,64 @@ h1{
 
 <script>
 
+async function cargarParticipantes() {
+
+  const jornada = 10;
+
+  const res = await fetch(
+    `/admin/participantes?jornada=${jornada}`
+  );
+
+  const data = await res.json();
+
+  const lista = document.getElementById(
+    "listaParticipantes"
+  );
+
+  lista.innerHTML = "";
+
+  data.forEach((p, i) => {
+
+    lista.innerHTML += `
+
+    <div class="participante">
+
+      <div class="info">
+
+        <div class="nombre">
+          ${i + 1}. ${p.nombre}
+        </div>
+
+        <div class="telefono">
+          📱 ${p.telefono || "Sin teléfono"}
+        </div>
+
+        <div class="fecha">
+          📅 ${new Date(
+            p.fecha_envio
+          ).toLocaleString()}
+        </div>
+
+      </div>
+
+      <a
+        class="btn-wa"
+        href="https://wa.me/52${p.telefono}"
+        target="_blank"
+      >
+        💬 WhatsApp
+      </a>
+
+    </div>
+
+    `;
+
+  });
+
+}
+
+cargarParticipantes();
+
 </script>
 
 </body>
