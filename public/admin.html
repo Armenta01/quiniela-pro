@@ -513,6 +513,9 @@ async function verParticipantes() {
 
   data.forEach((p, i) => {
 
+    const fecha =
+      new Date(p.fecha_envio).toLocaleString("es-MX");
+
     div.innerHTML += `
       <div class="partido">
 
@@ -520,11 +523,12 @@ async function verParticipantes() {
 
         📱 ${p.telefono || "Sin teléfono"}<br>
 
-        📅 ${p.fecha}<br><br>
+        📅 ${fecha}<br><br>
 
         <a
           href="https://wa.me/52${p.telefono}"
           target="_blank"
+          class="btn-verde"
         >
           💬 Abrir WhatsApp
         </a>
