@@ -254,13 +254,7 @@ nombre = nombre.trim();
     } else {
       userId = user.rows[0].id;
     }
-    
-    await pool.query(
-  `UPDATE users
-   SET telefono = $1
-   WHERE id = $2`,
-  [telefono, userId]
-);
+
 
 
 // 🔥 validar si ya mandó EXACTfAMENTE lo mismo
@@ -315,11 +309,27 @@ if (nuevo === viejo) {
   const goles_local = p.local === "" ? null : parseInt(p.local);
   const goles_visitante = p.visitante === "" ? null : parseInt(p.visitante);
 
-  await pool.query(`
+ await pool.query(`
     INSERT INTO predicciones
-    (user_id, partido_id, goles_local, goles_visitante, jornada, envio_id)
-    VALUES($1,$2,$3,$4,$5,$6)
-  `, [userId, p.partido_id, goles_local, goles_visitante, jornada, envioId]);
+    (
+      user_id,
+      partido_id,
+      goles_local,
+      goles_visitante,
+      jornada,
+      envio_id,
+      telefono
+    )
+    VALUES($1,$2,$3,$4,$5,$6,$7)
+`, [
+    userId,
+    p.partido_id,
+    goles_local,
+    goles_visitante,
+    jornada,
+    envioId,
+    telefono
+]);
 }
 
     res.json({ ok: true });
