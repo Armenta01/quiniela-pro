@@ -489,21 +489,16 @@ app.get('/admin/participantes', async (req, res) => {
     const { jornada } = req.query;
 
     const result = await pool.query(`
-      SELECT
-        u.nombre,
-        pr.telefono,
-        pr.fecha_envio,
-        pr.envio_id
-      FROM predicciones pr
-      JOIN users u
-        ON pr.user_id = u.id
-      WHERE pr.jornada = $1
-      GROUP BY
-        u.nombre,
-        pr.telefono,
-        pr.fecha_envio,
-        pr.envio_id
-      ORDER BY pr.fecha_envio DESC
+  SELECT DISTINCT ON (pr.envio_id)
+     u.nombre,
+     pr.telefono,
+     pr.fecha_envio,
+     pr.envio_id
+  FROM predicciones pr
+  JOIN users u
+    ON pr.user_id = u.id
+  WHERE pr.jornada = $1
+  ORDER BY pr.envio_id, pr.fecha_envio DESC
     `, [jornada]);
 
     res.json(result.rows);
