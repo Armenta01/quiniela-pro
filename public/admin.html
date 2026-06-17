@@ -168,10 +168,6 @@ async function crearPartido() {
   }
 
   try {
-    const liga = document.getElementById('liga').value;
-const logo_local = document.getElementById('logo_local').value;
-const logo_visitante = document.getElementById('logo_visitante').value;
-
 if (editandoId) {
 
   const res = await fetch(
@@ -247,9 +243,12 @@ const res = await fetch('/admin/partidos', {
 
   } 
   catch (err) {
-  console.error("ERROR REAL:", err.message);
-  res.status(500).json({ error: err.message });
-  console.log("FECHA:", fecha);
+
+  console.error(err);
+
+  msg.innerText = "❌ Error al guardar partido";
+  msg.style.color = "red";
+
 }
 }
 
@@ -458,7 +457,10 @@ function editarPartido(id) {
   document.getElementById("logo_visitante").value =
     partido.logo_visitante || "";
 
-  document.getElementById("jornada").value =
+  document.getElementById("liga").value =
+    partido.liga || "";
+
+    document.getElementById("jornada").value =
     partido.jornada;
 
   document.getElementById("msg").innerHTML =
