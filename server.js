@@ -382,6 +382,61 @@ app.delete('/admin/partido/:id', async (req, res) => {
 
 });
 
+app.put('/admin/partido/:id', async (req, res) => {
+
+  try {
+
+    const { id } = req.params;
+
+    const {
+      local,
+      visitante,
+      fecha,
+      jornada,
+      liga,
+      logo_local,
+      logo_visitante
+    } = req.body;
+
+    const fechaMexico =
+      fecha.replace('T', ' ') + ':00';
+
+    await pool.query(`
+      UPDATE partidos
+      SET
+        local = $1,
+        visitante = $2,
+        fecha = $3,
+        jornada = $4,
+        liga = $5,
+        logo_local = $6,
+        logo_visitante = $7
+      WHERE id = $8
+    `, [
+      local,
+      visitante,
+      fechaMexico,
+      jornada,
+      liga,
+      logo_local,
+      logo_visitante,
+      id
+    ]);
+
+    res.json({ ok: true });
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      error: 'Error actualizando partido'
+    });
+
+  }
+
+});
+
 
 
 // 🔥 TABLA

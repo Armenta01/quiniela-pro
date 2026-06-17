@@ -172,6 +172,49 @@ async function crearPartido() {
 const logo_local = document.getElementById('logo_local').value;
 const logo_visitante = document.getElementById('logo_visitante').value;
 
+if (editandoId) {
+
+  const res = await fetch(
+    `/admin/partido/${editandoId}`,
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        local,
+        visitante,
+        fecha,
+        jornada,
+        liga,
+        logo_local,
+        logo_visitante
+      })
+    }
+  );
+
+  const data = await res.json();
+
+  if (data.ok) {
+
+    document.getElementById("msg").innerHTML =
+      "✅ Partido actualizado";
+
+    editandoId = null;
+
+    document.getElementById('local').value = '';
+    document.getElementById('visitante').value = '';
+    document.getElementById('fecha').value = '';
+    document.getElementById('liga').value = '';
+    document.getElementById('logo_local').value = '';
+    document.getElementById('logo_visitante').value = '';
+
+    cargarPartidos();
+
+    return;
+  }
+}
+
 const res = await fetch('/admin/partidos', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
