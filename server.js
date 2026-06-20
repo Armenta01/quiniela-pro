@@ -657,15 +657,15 @@ const bolsaPremios = recaudado * 0.80;
 let primerLugar = 0;
 let segundoLugar = 0;
 
-// 👥 Hasta 30 participantes
-if (participantes <= 30) {
+// 👥 Hasta 50 participantes
+if (participantes <= 50) {
 
   primerLugar = bolsaPremios;
   segundoLugar = 0;
 
 }
 
-// 👥 31 o más participantes
+// 👥 51 o más participantes
 else {
 
   primerLugar = bolsaPremios * 0.65;
