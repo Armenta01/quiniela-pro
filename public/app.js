@@ -847,7 +847,7 @@ async function cargarBolsa(jornada) {
     ? `<br>🥈 2do Lugar: $${Math.round(bolsa.segundoLugar)} MXN`
     : `<br>👥 Menos de 51 participantes: premio único`
   }
-
+  
 </div>
 
   </div>
