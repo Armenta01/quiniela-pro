@@ -52,7 +52,7 @@
 
 </div>
 
-<div id="partidosResumen"></div>
+
 
 <div id="tabla" class="tabla-scroll"></div>
 
@@ -76,15 +76,12 @@
 
   const jornada = document.getElementById("jornadaSelect").value;
   
-  await cargarResumenPartidos(jornada);
   
   verTablaCompleta(jornada);
 
   document.getElementById("jornadaSelect").onchange = function() {
 
   const j = this.value;
-
-  cargarResumenPartidos(j);
 
   verTablaCompleta(j);
 };
