@@ -1781,3 +1781,18 @@ body h1{
   height:44px;
   object-fit:contain;
 }
+
+#partidosResumen{
+
+  position: sticky;
+
+  top: 70px;
+
+  z-index: 999;
+
+  background: #0f172a;
+
+  padding: 10px 0;
+
+  border-bottom: 2px solid #facc15;
+}
