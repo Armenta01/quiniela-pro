@@ -1322,15 +1322,13 @@ body h1{
 
 .fila.header{
 
-  position: sticky;
+  align-items:flex-start;
 
-  top: 70px;
+  margin-bottom:130px !important;
 
-  z-index: 9999;
+  background:transparent;
+  align-items:flex-start;
 
-  background: #07152f;
-
-  box-shadow: 0 4px 15px rgba(0,0,0,.4);
 }
 
 .partido-header{
