@@ -1325,7 +1325,7 @@ body h1{
   position: sticky;
 
   align-items:flex-start;
-  z-index: 999;
+  z-index: 9999;
   margin-bottom:130px !important;
 
   background:transparent;
