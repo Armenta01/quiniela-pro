@@ -1322,6 +1322,8 @@ body h1{
 
 .fila.header{
 
+  position: sticky;
+
   align-items:flex-start;
 
   margin-bottom:130px !important;
