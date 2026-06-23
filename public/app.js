@@ -478,6 +478,18 @@ setTimeout(() => {
     window.open(url, "_blank");   // 💻 computadora
   }
 
+  // Limpiar formulario
+  document.getElementById("usuario").value = "";
+  document.getElementById("telefono").value = "";
+
+  document.querySelectorAll('input[id^="l"]').forEach(i => {
+  i.value = "";
+  });
+
+  document.querySelectorAll('input[id^="v"]').forEach(i => {
+  i.value = "";
+  });
+
 }, 1000);
 
   } catch (err) {
