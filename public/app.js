@@ -149,9 +149,23 @@ const horaFormateada = horaParte;
 </div>
 
 <div class="score">
-  <input type="number" min="0" max="20" id="l${p.id}">
+
+  <input
+    type="text"
+    inputmode="numeric"
+    pattern="[0-9]*"
+    maxlength="2"
+    id="l${p.id}">
+
   <span>-</span>
-  <input type="number" min="0" max="20" id="v${p.id}">
+
+  <input
+    type="text"
+    inputmode="numeric"
+    pattern="[0-9]*"
+    maxlength="2"
+    id="v${p.id}">
+
 </div>
 
 <div class="team right">
