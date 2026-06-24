@@ -124,8 +124,14 @@ input, select, button {
 }
 
 .score input {
+
   width: 40px;
+  height: 40px;
+
   text-align: center;
+
+  font-size: 18px;
+
 }
 
 .meta {
