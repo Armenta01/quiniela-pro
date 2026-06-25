@@ -856,28 +856,67 @@ async function cargarBolsa(jornada) {
   const res = await fetch(`/bolsa?jornada=${jornada}`);
   const bolsa = await res.json();
 
+  if (bolsa.jornadaTerminada && bolsa.campeones.length > 0) {
+
+  const nombres = bolsa.campeones
+    .map(c => c.nombre)
+    .join("<br>");
+
   document.getElementById("bolsaInfo").innerHTML = `
-  <div class="bolsa-box">
+    <div class="bolsa-box">
 
-    <div class="bolsa-titulo">
-      🏆 PREMIOS SEMANA ${jornada}
+      <div class="bolsa-titulo">
+        🏆 CAMPEÓN SEMANA ${jornada}
+      </div>
+
+      <div class="premios">
+
+        <br>
+
+        🥇 <strong>${nombres}</strong>
+
+        <br><br>
+
+        🏅 ${bolsa.campeones[0].puntos} puntos
+
+        <br><br>
+
+        💰 Premio:
+        $${Math.round(bolsa.primerLugar)} MXN
+
+      </div>
+
     </div>
-    <div class="premios">
+  `;
 
-  <br><br>
+} else {
 
-  🥇 1er Lugar: $${Math.round(bolsa.primerLugar)} MXN
+  document.getElementById("bolsaInfo").innerHTML = `
+    <div class="bolsa-box">
 
-  ${
-    bolsa.segundoLugar > 0
-    ? `<br>🥈 2do Lugar: $${Math.round(bolsa.segundoLugar)} MXN`
-    : `<br>👥 Menos de 51 participantes: premio único`
-  }
-  
-</div>
+      <div class="bolsa-titulo">
+        🏆 PREMIOS SEMANA ${jornada}
+      </div>
 
-  </div>
-`;
+      <div class="premios">
+
+        <br><br>
+
+        🥇 1er Lugar:
+        $${Math.round(bolsa.primerLugar)} MXN
+
+        ${
+          bolsa.segundoLugar > 0
+          ? `<br>🥈 2do Lugar: $${Math.round(bolsa.segundoLugar)} MXN`
+          : `<br>👥 Menos de 51 participantes: premio único`
+        }
+
+      </div>
+
+    </div>
+  `;
+
+}
 }
 
 function toggleMenu() {

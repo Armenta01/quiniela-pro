@@ -673,14 +673,36 @@ else {
 
 }
 
+// Revisar si todos los partidos ya tienen resultado
+const pendientes = await pool.query(`
+  SELECT COUNT(*) AS pendientes
+  FROM partidos
+  WHERE jornada = $1
+    AND (
+      goles_local IS NULL
+      OR goles_visitante IS NULL
+    )
+`, [jornada]);
+
+let campeones = [];
+
+if (parseInt(pendientes.rows[0].pendientes) === 0) {
+  campeones = await obtenerCampeon(jornada);
+}
+
     res.json({
-      participantes,
-      recaudado,
-      administracion,
-      bolsaPremios,
-      primerLugar,
-      segundoLugar
-    });
+  participantes,
+  recaudado,
+  administracion,
+  bolsaPremios,
+  primerLugar,
+  segundoLugar,
+
+  jornadaTerminada:
+    parseInt(pendientes.rows[0].pendientes) === 0,
+
+  campeones
+});
 
   } catch (err) {
 
