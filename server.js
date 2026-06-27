@@ -910,10 +910,10 @@ app.get('/exportar-excel', async (req, res) => {
     const sheet = workbook.addWorksheet(`Semana ${jornada}`);
 
     // 🔥 obtener datos directo DB
-    const partidosResult = await pool.query(
-      `SELECT * FROM partidos WHERE jornada = $1 ORDER BY fecha`,
-      [jornada]
-    );
+   const partidosResult = await pool.query(
+  `SELECT * FROM partidos WHERE jornada = $1 ORDER BY orden`,
+  [jornada]
+  );
 
     const partidos = partidosResult.rows;
 
