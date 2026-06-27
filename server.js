@@ -199,7 +199,7 @@ app.get('/partidos', async (req, res) => {
       liga
     FROM partidos
     WHERE jornada = $1
-    ORDER BY fecha
+    ORDER BY orden
   `, [jornada]);
 
   res.json(result.rows);
