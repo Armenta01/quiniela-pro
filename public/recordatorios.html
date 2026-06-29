@@ -86,6 +86,60 @@ button:hover{
 
 }
 
+.reiniciar-btn{
+
+    background:#f59e0b;
+
+    color:white;
+
+    border:none;
+
+    padding:14px 24px;
+
+    border-radius:12px;
+
+    font-size:18px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    margin:20px auto;
+
+    display:block;
+
+}
+
+.reiniciar-btn:hover{
+
+    background:#d97706;
+
+}
+
+.fecha-recordatorio{
+
+    margin-top:10px;
+
+    color:#94a3b8;
+
+    font-size:14px;
+
+    font-weight:bold;
+
+}
+
+.estado-pendiente{
+
+    margin-top:10px;
+
+    color:#22c55e;
+
+    font-size:15px;
+
+    font-weight:bold;
+
+}
+
 </style>
 
 </head>
@@ -93,6 +147,10 @@ button:hover{
 <body>
 
 <h1>📲 Recordatorios</h1>
+
+<button class="reiniciar-btn" onclick="reiniciarRecordatorios()">
+🔄 Reiniciar Recordatorios
+</button>
 
 <div id="cantidad"></div>
 

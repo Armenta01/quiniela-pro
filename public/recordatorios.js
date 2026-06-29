@@ -17,31 +17,62 @@ async function cargarRecordatorios(){
 
     usuarios.forEach(u=>{
 
-        lista.innerHTML += `
+    const textoBoton =
+        u.recordatorio_enviado
+        ? "✅ Enviado"
+        : "📲 WhatsApp";
 
-        <div class="card">
+    const fechaEnvio =
+        u.fecha_recordatorio
+        ? new Date(u.fecha_recordatorio).toLocaleString('es-MX')
+        : "";
 
-            <div class="nombre">
-                👤 ${u.nombre}
-            </div>
+    const deshabilitado =
+        u.recordatorio_enviado
+        ? "disabled"
+        : "";
 
-            <div class="telefono">
-                📱 ${u.telefono}
-            </div>
+    const color =
+        u.recordatorio_enviado
+        ? "#64748b"
+        : "#22c55e";
 
-            <button
-                id="btn-${u.id}"
-                onclick="enviarWhatsApp(${u.id},'${u.nombre}','${u.telefono}')">
+    lista.innerHTML += `
 
-                 📲 WhatsApp
+<div class="card">
 
-            </button>
+    <div class="nombre">
+        👤 ${u.nombre}
+    </div>
 
-        </div>
+    <div class="telefono">
+        📱 ${u.telefono}
+    </div>
 
-        `;
+    <button
+        id="btn-${u.id}"
+        style="background:${color}"
+        ${deshabilitado}
+        onclick="enviarWhatsApp(${u.id},'${u.nombre}','${u.telefono}')">
 
-    });
+        ${textoBoton}
+
+    </button>
+
+    ${
+        u.recordatorio_enviado
+        ? `<div class="fecha-recordatorio">
+             🕒 ${fechaEnvio}
+           </div>`
+        : `<div class="estado-pendiente">
+             🟢 Pendiente
+           </div>`
+    }
+
+</div>
+
+`;
+});
 
 }
 
@@ -58,6 +89,20 @@ function enviarWhatsApp(id, nombre, telefono){
 
     const url =
 `https://wa.me/52${telefono}?text=${encodeURIComponent(mensaje)}`;
+
+fetch('/recordatorio/enviado', {
+
+    method: 'POST',
+
+    headers:{
+        'Content-Type':'application/json'
+    },
+
+    body: JSON.stringify({
+        id:id
+    })
+
+});
 
     window.open(url,'_blank');
 
@@ -101,5 +146,46 @@ function filtrarParticipantes(){
         }
 
     });
+
+}
+
+
+async function reiniciarRecordatorios(){
+
+    const confirmar = confirm(
+        "¿Deseas reiniciar todos los recordatorios para una nueva jornada?"
+    );
+
+    if(!confirmar) return;
+
+    try{
+
+        const r = await fetch('/recordatorios/reiniciar',{
+
+            method:'POST'
+
+        });
+
+        const data = await r.json();
+
+        if(data.ok){
+
+            alert("✅ Recordatorios reiniciados correctamente.");
+
+            cargarRecordatorios();
+
+        }else{
+
+            alert("❌ No fue posible reiniciar los recordatorios.");
+
+        }
+
+    }catch(err){
+
+        console.error(err);
+
+        alert("❌ Error de conexión con el servidor.");
+
+    }
 
 }

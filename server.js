@@ -357,6 +357,38 @@ app.post('/admin/resultado', async (req, res) => {
   }
 });
 
+app.post('/recordatorio/enviado', async (req, res) => {
+
+  const { id } = req.body;
+
+  try {
+
+    await pool.query(
+      `
+      UPDATE users
+      SET
+        recordatorio_enviado = TRUE,
+        fecha_recordatorio = NOW()
+      WHERE id = $1
+      `,
+      [id]
+    );
+
+    res.json({ ok: true });
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      error: 'No se pudo actualizar'
+    });
+
+  }
+
+});
+
+
 app.delete('/admin/partido/:id', async (req, res) => {
 
   try {
@@ -1148,7 +1180,9 @@ app.get('/recordatorios', async (req, res) => {
       SELECT
         u.id,
         u.nombre,
-        u.telefono
+        u.telefono,
+        u.recordatorio_enviado,
+        u.fecha_recordatorio
       FROM users u
       WHERE u.telefono IS NOT NULL
         AND TRIM(u.telefono) <> ''
@@ -1172,6 +1206,32 @@ app.get('/recordatorios', async (req, res) => {
 
     res.status(500).json({
       error: err.message
+    });
+
+  }
+
+});
+
+app.post('/recordatorios/reiniciar', async (req, res) => {
+
+  try {
+
+    await pool.query(`
+     UPDATE users
+    SET recordatorio_enviado = FALSE,
+    fecha_recordatorio = NULL
+    `);
+
+    res.json({
+      ok: true
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      error: 'No se pudieron reiniciar'
     });
 
   }
