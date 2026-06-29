@@ -89,7 +89,9 @@ function enviarWhatsApp(id, nombre, telefono){
 
 📲 *Registra tus pronósticos aquí:*
 
-https://quinielasinge.com`;
+https://quinielasinge.com 
+
+🍀 *¡Mucho éxito!*`;
 
     const url =
 `https://wa.me/52${telefono}?text=${encodeURIComponent(mensaje)}`;
