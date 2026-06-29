@@ -30,9 +30,10 @@ async function cargarRecordatorios(){
             </div>
 
             <button
-                onclick="enviarWhatsApp('${u.nombre}','${u.telefono}')">
+                id="btn-${u.id}"
+                onclick="enviarWhatsApp(${u.id},'${u.nombre}','${u.telefono}')">
 
-                📲 WhatsApp
+                 📲 WhatsApp
 
             </button>
 
@@ -44,7 +45,7 @@ async function cargarRecordatorios(){
 
 }
 
-function enviarWhatsApp(nombre, telefono){
+function enviarWhatsApp(id, nombre, telefono){
 
     const mensaje =
 `Hola ${nombre} 👋
@@ -60,6 +61,45 @@ function enviarWhatsApp(nombre, telefono){
 
     window.open(url,'_blank');
 
+    const boton = document.getElementById(`btn-${id}`);
+
+    boton.innerHTML = "✅ Enviado";
+
+    boton.style.background = "#64748b";
+
+    boton.disabled = true;
+
 }
 
 cargarRecordatorios();
+
+function filtrarParticipantes(){
+
+    const texto =
+        document.getElementById("buscar")
+        .value
+        .toLowerCase();
+
+    const tarjetas =
+        document.querySelectorAll(".card");
+
+    tarjetas.forEach(card=>{
+
+        const nombre =
+            card.querySelector(".nombre")
+            .innerText
+            .toLowerCase();
+
+        if(nombre.includes(texto)){
+
+            card.style.display="block";
+
+        }else{
+
+            card.style.display="none";
+
+        }
+
+    });
+
+}
