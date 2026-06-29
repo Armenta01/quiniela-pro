@@ -1137,6 +1137,47 @@ const mejorRacha = await pool.query(`
   }
 });
 
+// 📲 Usuarios que aún no han enviado su quiniela
+app.get('/recordatorios', async (req, res) => {
+
+  try {
+
+    const { jornada } = req.query;
+
+    const result = await pool.query(`
+      SELECT
+        u.id,
+        u.nombre,
+        u.telefono
+      FROM users u
+      WHERE u.telefono IS NOT NULL
+        AND TRIM(u.telefono) <> ''
+        AND NOT EXISTS (
+
+          SELECT 1
+          FROM predicciones p
+          WHERE p.user_id = u.id
+            AND p.jornada = $1
+
+        )
+
+      ORDER BY u.nombre
+    `, [jornada]);
+
+    res.json(result.rows);
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      error: err.message
+    });
+
+  }
+
+});
+
 // 🚀 SERVER
 const PORT = process.env.PORT || 10000;
 
