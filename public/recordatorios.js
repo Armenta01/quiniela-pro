@@ -79,7 +79,7 @@ async function cargarRecordatorios(){
 function enviarWhatsApp(id, nombre, telefono){
 
     const mensaje =
-`👋 Hola ${nombre}.
+`👋 Hola *${nombre}*.
 
 🏆 Ya está disponible una nueva jornada de *Quinielas El Inge*.
 
