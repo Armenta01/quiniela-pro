@@ -942,11 +942,26 @@ app.get('/exportar-excel', async (req, res) => {
     const sheet = workbook.addWorksheet(`Semana ${jornada}`);
 
     // 🔥 obtener datos directo DB
-   const partidosResult = await pool.query(
-  `SELECT * FROM partidos WHERE jornada = $1 ORDER BY id`,
-  [jornada]
-  );
+   const partidosResult = await pool.query(`
+    SELECT *
+    FROM partidos
+    WHERE jornada = $1
+    ORDER BY
+      COALESCE(orden, 999),
+      id
+`, [jornada]);
 
+
+    const sinOrden = partidosResult.rows.filter(p => p.orden == null);
+
+if (sinOrden.length > 0) {
+
+    return res.status(400).json({
+        error: true,
+        mensaje:
+            `La jornada ${jornada} tiene ${sinOrden.length} partidos sin orden asignado.`
+    });
+}
     const partidos = partidosResult.rows;
 
     const tabla = await fetchTabla(jornada);
