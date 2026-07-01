@@ -887,19 +887,41 @@ app.post('/admin/partidos', async (req, res) => {
 
   try {
 
+    // Obtener el siguiente orden de la jornada
+const ordenResult = await pool.query(
+  `
+  SELECT COALESCE(MAX(orden), 0) + 1 AS siguiente
+  FROM partidos
+  WHERE jornada = $1
+  `,
+  [jornada]
+);
+
+const orden = parseInt(ordenResult.rows[0].siguiente);
+
     await pool.query(`
-      INSERT INTO partidos
-      (local, visitante, fecha, jornada, liga, logo_local, logo_visitante)
-      VALUES ($1,$2,$3,$4,$5,$6,$7)
-    `, [
-      local,
-      visitante,
-      fechaMexico,
-      jornada,
-      liga || null,
-      logo_local || null,
-      logo_visitante || null
-    ]);
+  INSERT INTO partidos
+  (
+    local,
+    visitante,
+    fecha,
+    jornada,
+    orden,
+    liga,
+    logo_local,
+    logo_visitante
+  )
+  VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+`, [
+  local,
+  visitante,
+  fechaMexico,
+  jornada,
+  orden,
+  liga || null,
+  logo_local || null,
+  logo_visitante || null
+]);
 
     res.json({ ok: true });
 
