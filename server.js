@@ -511,8 +511,8 @@ async function fetchTabla(jornada) {
     JOIN partidos p ON pr.partido_id = p.id
     JOIN users u ON pr.user_id = u.id
     WHERE pr.jornada = $1
-    ORDER BY pr.envio_id
-  `, [jornada]);
+    ORDER BY pr.envio_id, pr.partido_id`, 
+    [jornada]);
 
   const tabla = {};
 
@@ -943,7 +943,7 @@ app.get('/exportar-excel', async (req, res) => {
 
     // 🔥 obtener datos directo DB
    const partidosResult = await pool.query(
-  `SELECT * FROM partidos WHERE jornada = $1 ORDER BY orden`,
+  `SELECT * FROM partidos WHERE jornada = $1 ORDER BY id`,
   [jornada]
   );
 
