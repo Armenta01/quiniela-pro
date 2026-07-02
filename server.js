@@ -1167,67 +1167,104 @@ for (let i = 2; i < headers.length; i++) {
 
 sheet.getColumn(headers.length).width = 10;
 
-// Estilos
-headerRow.height = 55;
+// =========================================
+// ESTILO CABECERA
+// =========================================
 
-headerRow.eachCell((cell, colNumber) => {
+[rowLocal, rowResultado, rowVisitante].forEach(row => {
 
-    cell.font = {
-        bold: true,
-        color: { argb: "FFFFFFFF" },
-        size: 11,
-        name: "Arial"
-    };
+    row.height = 24;
 
-    cell.alignment = {
-        horizontal: "center",
-        vertical: "middle",
-        wrapText: true
-    };
+    row.eachCell((cell) => {
+
+        cell.font = {
+            bold: true,
+            color: { argb: "FFFFFFFF" },
+            name: "Arial",
+            size: 10
+        };
+
+        cell.alignment = {
+            horizontal: "center",
+            vertical: "middle",
+            wrapText: true
+        };
+
+        cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: {
+                argb: "FF1A1A1A"
+            }
+        };
+
+        cell.border = {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" }
+        };
+
+    });
+
+});
+
+// Resultado oficial en amarillo
+rowResultado.eachCell((cell, colNumber) => {
+
+    if (colNumber === 1 || colNumber === filaResultado.length)
+        return;
 
     cell.fill = {
         type: "pattern",
         pattern: "solid",
         fgColor: {
-            argb: "FF1A1A1A"
+            argb: "FFFFEB3B"
         }
     };
 
-    cell.border = {
-        top: { style: "medium" },
-        bottom: { style: "medium" },
-        left: { style: "thin" },
-        right: { style: "thin" }
+    cell.font = {
+        bold: true,
+        color: {
+            argb: "FF000000"
+        },
+        size: 11
     };
-
-    // Columna Jugador
-    if (colNumber === 1) {
-
-        cell.fill = {
-            type: "pattern",
-            pattern: "solid",
-            fgColor: {
-                argb: "FF2F5597"
-            }
-        };
-
-    }
-
-    // Columna Puntos
-    if (colNumber === headers.length) {
-
-        cell.fill = {
-            type: "pattern",
-            pattern: "solid",
-            fgColor: {
-                argb: "FF70AD47"
-            }
-        };
-
-    }
 
 });
 
+
+// Jugador (azul)
+for (let i = 9; i <= 11; i++) {
+
+    const c = sheet.getCell(`A${i}`);
+
+    c.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: {
+            argb: "FF2F5597"
+        }
+    };
+
+}
+
+// Puntos (verde)
+const ultimaColumna = sheet.columnCount;
+
+for (let i = 9; i <= 11; i++) {
+
+    const c = sheet.getRow(i).getCell(ultimaColumna);
+
+    c.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: {
+            argb: "FF70AD47"
+        }
+    };
+
+}
 
     // 🔥 FILAS
     tabla.forEach(u => {
