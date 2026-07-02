@@ -1325,6 +1325,17 @@ for (let i = 9; i <= 11; i++) {
 
       const fila = [u.nombre, ...u.picks, u.puntos];
       const row = sheet.addRow(fila);
+
+      row.eachCell(cell => {
+
+    cell.border = {
+        top: { style: "thin", color: { argb: "FF000000" } },
+        bottom: { style: "thin", color: { argb: "FF000000" } },
+        left: { style: "thin", color: { argb: "FF000000" } },
+        right: { style: "thin", color: { argb: "FF000000" } }
+    };
+
+});
       
       const maxPuntos = tabla[0].puntos;
 
@@ -1390,7 +1401,40 @@ row.getCell(1).font = {
 
     });
 
-    
+    // =========================================
+// BORDE EXTERIOR DE LA TABLA
+// =========================================
+
+const primeraFilaTabla = 9;
+const ultimaFilaTabla = sheet.rowCount;
+
+for (let fila = primeraFilaTabla; fila <= ultimaFilaTabla; fila++) {
+
+    sheet.getRow(fila).getCell(1).border.left = {
+        style: "medium",
+        color: { argb: "FF000000" }
+    };
+
+    sheet.getRow(fila).getCell(sheet.columnCount).border.right = {
+        style: "medium",
+        color: { argb: "FF000000" }
+    };
+
+}
+
+for (let columna = 1; columna <= sheet.columnCount; columna++) {
+
+    sheet.getRow(primeraFilaTabla).getCell(columna).border.top = {
+        style: "medium",
+        color: { argb: "FF000000" }
+    };
+
+    sheet.getRow(ultimaFilaTabla).getCell(columna).border.bottom = {
+        style: "medium",
+        color: { argb: "FF000000" }
+    };
+
+}
 
     // 🔥 HEADERS HTTP (ANTES de enviar)
     res.setHeader(
