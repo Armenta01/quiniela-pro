@@ -33,17 +33,19 @@ async function initDB() {
   `);
 
   await pool.query(`
-    CREATE TABLE IF NOT EXISTS partidos (
-      id SERIAL PRIMARY KEY,
-      local TEXT,
-      visitante TEXT,
-      fecha TIMESTAMP,
-      logo_local TEXT,
-      logo_visitante TEXT,
-      goles_local INTEGER,
-      goles_visitante INTEGER,
-      jornada INTEGER
-    );
+    CREATE TABLE partidos (
+    id SERIAL PRIMARY KEY,
+    local TEXT,
+    visitante TEXT,
+    fecha TIMESTAMP,
+    logo_local TEXT,
+    logo_visitante TEXT,
+    goles_local INTEGER,
+    goles_visitante INTEGER,
+    jornada INTEGER,
+    orden INTEGER NOT NULL,
+    liga TEXT
+);
   `);
 
   await pool.query(`
@@ -965,7 +967,14 @@ app.get('/exportar-excel', async (req, res) => {
   try {
 
     const workbook = new ExcelJS.Workbook();
+
+    workbook.creator = "Quinielas El Inge";
+    workbook.company = "Quinielas El Inge";
+    workbook.subject = `Semana ${jornada}`;
+    workbook.title = `Resultados Semana ${jornada}`;
+
     const sheet = workbook.addWorksheet(`Semana ${jornada}`);
+    sheet.properties.defaultRowHeight = 22;
 
     // =========================================
 // CONFIGURACIÓN DE LA HOJA
@@ -994,73 +1003,9 @@ sheet.pageSetup = {
   }
 };
 
-// Espacio superior
-sheet.addRow([]);
-sheet.addRow([]);
 
-// Título
-sheet.mergeCells("A3:K3");
 
-const titulo = sheet.getCell("A3");
 
-titulo.value = `🏆 PREMIOS SEMANA ${jornada}`;
-
-titulo.font = {
-  bold: true,
-  size: 18,
-  name: "Arial"
-};
-
-titulo.alignment = {
-  horizontal: "center",
-  vertical: "middle"
-};
-
-titulo.border = {
-  top: { style: "medium" },
-  bottom: { style: "medium" },
-  left: { style: "medium" },
-  right: { style: "medium" }
-};
-
-// Recuadro azul
-sheet.mergeCells("C6:I7");
-
-const premio = sheet.getCell("C6");
-
-premio.value =
-`🥇 1er Lugar: $0 MXN
-
-👥 Menos de 51 participantes: Premio único`;
-
-premio.font = {
-  bold: true,
-  color: { argb: "FFFFFFFF" },
-  size: 13
-};
-
-premio.alignment = {
-  horizontal: "center",
-  vertical: "middle",
-  wrapText: true
-};
-
-premio.fill = {
-  type: "pattern",
-  pattern: "solid",
-  fgColor: { argb: "FF4F81BD" }
-};
-
-premio.border = {
-  top: { style: "thin" },
-  bottom: { style: "thin" },
-  left: { style: "thin" },
-  right: { style: "thin" }
-};
-
-// Dos filas vacías
-sheet.addRow([]);
-sheet.addRow([]);
 
     // 🔥 obtener datos directo DB
    const partidosResult = await pool.query(`
@@ -1091,31 +1036,222 @@ if (sinOrden.length > 0) {
       return res.status(400).send("No hay datos para exportar");
     }
 
-    // 🔥 HEADER
-    const headers = ["Jugador"];
+    // =========================================
+// ENCABEZADO
+// =========================================
 
-    partidos.forEach(p => {
-      let marcador = (p.goles_local != null && p.goles_visitante != null)
-        ? `${p.goles_local}-${p.goles_visitante}`
-        : "⏳";
+// Espacio superior
+sheet.addRow([]);
+sheet.addRow([]);
 
-      headers.push(`${p.local} ${marcador} ${p.visitante}`);
-    });
+// Título
+sheet.mergeCells("A3:K3");
 
-    headers.push("Puntos");
+const titulo = sheet.getCell("A3");
 
-    sheet.addRow(headers);
+titulo.value = `🏆 PREMIOS SEMANA ${jornada}`;
 
-    // 🔥 estilos
-    sheet.getRow(1).font = { bold: true };
+titulo.font = {
+  bold: true,
+  size: 18,
+  color: { argb: "FFFFFFFF" }
+};
 
-    sheet.columns = headers.map(() => ({ width: 18 }));
+titulo.alignment = {
+  horizontal: "center",
+  vertical: "middle"
+};
+
+titulo.fill = {
+  type: "pattern",
+  pattern: "solid",
+  fgColor: { argb: "FF1F4E78" }
+};
+
+titulo.border = {
+  top: { style: "medium" },
+  bottom: { style: "medium" },
+  left: { style: "medium" },
+  right: { style: "medium" }
+};
+
+// Premio
+sheet.mergeCells("C5:I6");
+
+const premio = sheet.getCell("C5");
+
+premio.value =
+`🥇 Primer Lugar
+
+$${premioPrimerLugar.toLocaleString()} MXN
+
+👥 ${participantes} participantes
+
+Premio único`;
+
+premio.font = {
+  bold: true,
+  size: 13,
+  color: { argb: "FFFFFFFF" }
+};
+
+premio.alignment = {
+  horizontal: "center",
+  vertical: "middle",
+  wrapText: true
+};
+
+premio.fill = {
+  type: "pattern",
+  pattern: "solid",
+  fgColor: {
+    argb: "FF4F81BD"
+  }
+};
+
+premio.border = {
+  top: { style: "medium" },
+  bottom: { style: "medium" },
+  left: { style: "medium" },
+  right: { style: "medium" }
+};
+
+// Separación antes de la tabla
+sheet.addRow([]);
+sheet.addRow([]);
+
+
+
+
+    // =========================================
+// ENCABEZADOS
+// =========================================
+
+// =========================================
+// CABECERA DE 3 FILAS (COMO TU PLANTILLA)
+// =========================================
+
+const filaLocal = ["Jugador"];
+const filaResultado = [""];
+const filaVisitante = [""];
+
+partidos.forEach(p => {
+
+    filaLocal.push(p.local);
+
+    filaResultado.push(
+        (p.goles_local != null && p.goles_visitante != null)
+            ? `${p.goles_local}-${p.goles_visitante}`
+            : "⏳"
+    );
+
+    filaVisitante.push(p.visitante);
+
+});
+
+filaLocal.push("Puntos");
+filaResultado.push("");
+filaVisitante.push("");
+
+const rowLocal = sheet.insertRow(9, filaLocal);
+const rowResultado = sheet.insertRow(10, filaResultado);
+const rowVisitante = sheet.insertRow(11, filaVisitante);
+headerRow.height = 42;
+
+// Ancho columnas
+sheet.getColumn(1).width = 22;
+
+for (let i = 2; i < headers.length; i++) {
+    sheet.getColumn(i).width = 16;
+}
+
+sheet.getColumn(headers.length).width = 10;
+
+// Estilos
+headerRow.height = 55;
+
+headerRow.eachCell((cell, colNumber) => {
+
+    cell.font = {
+        bold: true,
+        color: { argb: "FFFFFFFF" },
+        size: 11,
+        name: "Arial"
+    };
+
+    cell.alignment = {
+        horizontal: "center",
+        vertical: "middle",
+        wrapText: true
+    };
+
+    cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: {
+            argb: "FF1A1A1A"
+        }
+    };
+
+    cell.border = {
+        top: { style: "medium" },
+        bottom: { style: "medium" },
+        left: { style: "thin" },
+        right: { style: "thin" }
+    };
+
+    // Columna Jugador
+    if (colNumber === 1) {
+
+        cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: {
+                argb: "FF2F5597"
+            }
+        };
+
+    }
+
+    // Columna Puntos
+    if (colNumber === headers.length) {
+
+        cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: {
+                argb: "FF70AD47"
+            }
+        };
+
+    }
+
+});
+
 
     // 🔥 FILAS
     tabla.forEach(u => {
 
       const fila = [u.nombre, ...u.picks, u.puntos];
       const row = sheet.addRow(fila);
+
+      row.height = 24;
+
+row.eachCell(cell => {
+
+    cell.alignment = {
+        horizontal: "center",
+        vertical: "middle"
+    };
+
+    cell.border = {
+        top: { style: "thin" },
+        bottom: { style: "thin" },
+        left: { style: "thin" },
+        right: { style: "thin" }
+    };
+
+});
 
       u.detalles.forEach((d, i) => {
 
