@@ -1325,7 +1325,7 @@ for (let i = 9; i <= 11; i++) {
 
       const fila = [u.nombre, ...u.picks, u.puntos];
       const row = sheet.addRow(fila);
-
+      
       const maxPuntos = tabla[0].puntos;
 
 if (u.puntos === maxPuntos) {
