@@ -1365,7 +1365,7 @@ if (u.puntos === maxPuntos) {
 
 row.getCell(1).font = {
     bold: false,
-    size: 10
+    size: 16
 };
 
       row.height = 24;
