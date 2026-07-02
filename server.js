@@ -1390,25 +1390,7 @@ row.getCell(1).font = {
 
     });
 
-    if (u.puntos === tabla[0].puntos) {
-
-    const puntosCell = row.getCell(row.cellCount);
-
-    puntosCell.fill = {
-        type: "pattern",
-        pattern: "solid",
-        fgColor: {
-            argb: "FFFFD700"
-        }
-    };
-
-    puntosCell.font = {
-        bold: true,
-        color: {
-            argb: "FF000000"
-        }
-    };
-}
+    
 
     // 🔥 HEADERS HTTP (ANTES de enviar)
     res.setHeader(
@@ -1427,7 +1409,7 @@ row.getCell(1).font = {
     res.send(buffer);
 
   } catch (err) {
-    console.error(err.stack);
+    console.error(err);
     res.status(500).send("Error al generar Excel");
   }
 });
