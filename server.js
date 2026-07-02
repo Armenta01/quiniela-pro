@@ -1102,7 +1102,7 @@ titulo.border = {
 };
 
 // Premio
-sheet.mergeCells("C5:I6");
+sheet.mergeCells("C5:I7");
 
 const premio = sheet.getCell("C5");
 
@@ -1118,7 +1118,7 @@ premio.value = [
 
 premio.font = {
   bold: true,
-  size: 13,
+  size: 15,
   color: { argb: "FFFFFFFF" }
 };
 
@@ -1145,8 +1145,9 @@ premio.border = {
   left: { style: "medium" },
   right: { style: "medium" }
 };
-sheet.getRow(5).height = 24;
-sheet.getRow(6).height = 24;
+sheet.getRow(5).height = 26;
+sheet.getRow(6).height = 26;
+sheet.getRow(7).height = 26;
 
 // Separación antes de la tabla
 sheet.addRow([]);
