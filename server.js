@@ -897,7 +897,11 @@ const ordenResult = await pool.query(
   [jornada]
 );
 
-const orden = parseInt(ordenResult.rows[0].siguiente);
+const orden = Number(ordenResult.rows[0].siguiente);
+
+if (!Number.isInteger(orden) || orden <= 0) {
+  throw new Error("No se pudo calcular el orden del partido.");
+}
 
     await pool.query(`
   INSERT INTO partidos
@@ -973,6 +977,7 @@ app.get('/exportar-excel', async (req, res) => {
       id
 `, [jornada]);
 
+    const partidos = partidosResult.rows;
 
     const sinOrden = partidosResult.rows.filter(p => p.orden == null);
 
@@ -984,7 +989,6 @@ if (sinOrden.length > 0) {
             `La jornada ${jornada} tiene ${sinOrden.length} partidos sin orden asignado.`
     });
 }
-    const partidos = partidosResult.rows;
 
     const tabla = await fetchTabla(jornada);
 
