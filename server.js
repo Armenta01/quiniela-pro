@@ -33,7 +33,7 @@ async function initDB() {
   `);
 
   await pool.query(`
-    CREATE TABLE partidos (
+    CREATE TABLE IF NOT EXISTS partidos (
     id SERIAL PRIMARY KEY,
     local TEXT,
     visitante TEXT,
