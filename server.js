@@ -1037,6 +1037,32 @@ if (sinOrden.length > 0) {
     }
 
     // =========================================
+// DATOS DE PREMIOS
+// =========================================
+
+const bolsaResult = await pool.query(`
+SELECT COUNT(DISTINCT envio_id) AS participantes
+FROM predicciones
+WHERE jornada = $1
+`, [jornada]);
+
+const participantes = parseInt(
+  bolsaResult.rows[0].participantes || 0
+);
+
+const recaudado = participantes * 50;
+
+const bolsaPremios = recaudado * 0.80;
+
+let premioPrimerLugar = 0;
+
+if (participantes <= 50) {
+  premioPrimerLugar = bolsaPremios;
+} else {
+  premioPrimerLugar = bolsaPremios * 0.65;
+}
+
+    // =========================================
 // ENCABEZADO
 // =========================================
 
