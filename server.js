@@ -1359,11 +1359,15 @@ row.getCell(1).font = {
 
       row.height = 24;
 
-      cell.alignment = {
-    horizontal: "center",
-    vertical: "middle",
-    wrapText: true
-};
+      row.eachCell(cell => {
+
+    cell.alignment = {
+        horizontal: "center",
+        vertical: "middle",
+        wrapText: true
+    };
+
+});
 
 
       u.detalles.forEach((d, i) => {
@@ -1385,6 +1389,26 @@ row.getCell(1).font = {
       });
 
     });
+
+    if (u.puntos === tabla[0].puntos) {
+
+    const puntosCell = row.getCell(row.cellCount);
+
+    puntosCell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: {
+            argb: "FFFFD700"
+        }
+    };
+
+    puntosCell.font = {
+        bold: true,
+        color: {
+            argb: "FF000000"
+        }
+    };
+}
 
     // 🔥 HEADERS HTTP (ANTES de enviar)
     res.setHeader(
