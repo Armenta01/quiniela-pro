@@ -1106,15 +1106,14 @@ sheet.mergeCells("C5:I7");
 
 const premio = sheet.getCell("C5");
 
-
 premio.value = [
   "🥇 Primer Lugar",
   `$${premioPrimerLugar.toLocaleString()} MXN`,
-  `${participantes} participantes`,
   participantes <= 50
     ? "Premio único"
     : "1° Lugar"
 ].join("\n");
+
 
 premio.font = {
   bold: true,
