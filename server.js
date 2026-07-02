@@ -1405,33 +1405,42 @@ row.getCell(1).font = {
 // BORDE EXTERIOR DE LA TABLA
 // =========================================
 
-const primeraFilaTabla = 9;
+
+    const primeraFilaTabla = 9;
 const ultimaFilaTabla = sheet.rowCount;
 
 for (let fila = primeraFilaTabla; fila <= ultimaFilaTabla; fila++) {
 
-    sheet.getRow(fila).getCell(1).border.left = {
-        style: "medium",
-        color: { argb: "FF000000" }
+    const izquierda = sheet.getRow(fila).getCell(1);
+
+    izquierda.border = {
+        ...izquierda.border,
+        left: { style: "medium", color: { argb: "FF000000" } }
     };
 
-    sheet.getRow(fila).getCell(sheet.columnCount).border.right = {
-        style: "medium",
-        color: { argb: "FF000000" }
+    const derecha = sheet.getRow(fila).getCell(sheet.columnCount);
+
+    derecha.border = {
+        ...derecha.border,
+        right: { style: "medium", color: { argb: "FF000000" } }
     };
 
 }
 
-for (let columna = 1; columna <= sheet.columnCount; columna++) {
+for (let col = 1; col <= sheet.columnCount; col++) {
 
-    sheet.getRow(primeraFilaTabla).getCell(columna).border.top = {
-        style: "medium",
-        color: { argb: "FF000000" }
+    const arriba = sheet.getRow(primeraFilaTabla).getCell(col);
+
+    arriba.border = {
+        ...arriba.border,
+        top: { style: "medium", color: { argb: "FF000000" } }
     };
 
-    sheet.getRow(ultimaFilaTabla).getCell(columna).border.bottom = {
-        style: "medium",
-        color: { argb: "FF000000" }
+    const abajo = sheet.getRow(ultimaFilaTabla).getCell(col);
+
+    abajo.border = {
+        ...abajo.border,
+        bottom: { style: "medium", color: { argb: "FF000000" } }
     };
 
 }
