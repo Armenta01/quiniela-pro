@@ -1259,7 +1259,7 @@ rowResultado.eachCell((cell, colNumber) => {
         color: {
             argb: "FF000000"
         },
-        size: 11
+        size: 16
     };
 
 });
@@ -1397,6 +1397,13 @@ row.getCell(1).font = {
           pattern: 'solid',
           fgColor: { argb: color }
         };
+
+        cell.font = {
+    name: "Arial",
+    bold: true,
+    size: 14,
+    color: { argb: "FF000000" }
+};
       });
 
     });
