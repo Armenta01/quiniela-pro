@@ -1368,6 +1368,18 @@ row.getCell(1).font = {
     size: 16
 };
 
+// Tamaño de la columna Puntos
+const puntosCell = row.getCell(row.cellCount);
+
+puntosCell.font = {
+    name: "Arial",
+    bold: true,
+    size: 14,
+    color: { argb: "FF000000" }
+};
+
+
+
       row.height = 24;
 
       row.eachCell(cell => {
