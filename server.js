@@ -967,6 +967,101 @@ app.get('/exportar-excel', async (req, res) => {
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet(`Semana ${jornada}`);
 
+    // =========================================
+// CONFIGURACIÓN DE LA HOJA
+// =========================================
+
+sheet.views = [
+  {
+    state: "frozen",
+    xSplit: 1,
+    ySplit: 10
+  }
+];
+
+sheet.pageSetup = {
+  orientation: "landscape",
+  fitToPage: true,
+  fitToWidth: 1,
+  fitToHeight: 0,
+  margins: {
+    left: 0.25,
+    right: 0.25,
+    top: 0.35,
+    bottom: 0.35,
+    header: 0.2,
+    footer: 0.2
+  }
+};
+
+// Espacio superior
+sheet.addRow([]);
+sheet.addRow([]);
+
+// Título
+sheet.mergeCells("A3:K3");
+
+const titulo = sheet.getCell("A3");
+
+titulo.value = `🏆 PREMIOS SEMANA ${jornada}`;
+
+titulo.font = {
+  bold: true,
+  size: 18,
+  name: "Arial"
+};
+
+titulo.alignment = {
+  horizontal: "center",
+  vertical: "middle"
+};
+
+titulo.border = {
+  top: { style: "medium" },
+  bottom: { style: "medium" },
+  left: { style: "medium" },
+  right: { style: "medium" }
+};
+
+// Recuadro azul
+sheet.mergeCells("C6:I7");
+
+const premio = sheet.getCell("C6");
+
+premio.value =
+`🥇 1er Lugar: $0 MXN
+
+👥 Menos de 51 participantes: Premio único`;
+
+premio.font = {
+  bold: true,
+  color: { argb: "FFFFFFFF" },
+  size: 13
+};
+
+premio.alignment = {
+  horizontal: "center",
+  vertical: "middle",
+  wrapText: true
+};
+
+premio.fill = {
+  type: "pattern",
+  pattern: "solid",
+  fgColor: { argb: "FF4F81BD" }
+};
+
+premio.border = {
+  top: { style: "thin" },
+  bottom: { style: "thin" },
+  left: { style: "thin" },
+  right: { style: "thin" }
+};
+
+// Dos filas vacías
+sheet.addRow([]);
+sheet.addRow([]);
+
     // 🔥 obtener datos directo DB
    const partidosResult = await pool.query(`
     SELECT *
