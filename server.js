@@ -1106,14 +1106,15 @@ sheet.mergeCells("C5:I6");
 
 const premio = sheet.getCell("C5");
 
-premio.value =
-`🥇 Primer Lugar
 
-$${premioPrimerLugar.toLocaleString()} MXN
-
-👥 ${participantes} participantes
-
-Premio único`;
+premio.value = [
+  "🥇 Primer Lugar",
+  `$${premioPrimerLugar.toLocaleString()} MXN`,
+  `${participantes} participantes`,
+  participantes <= 50
+    ? "Premio único"
+    : "1° Lugar"
+].join("\n");
 
 premio.font = {
   bold: true,
@@ -1126,6 +1127,9 @@ premio.alignment = {
   vertical: "middle",
   wrapText: true
 };
+
+sheet.getRow(5).height = 28;
+sheet.getRow(6).height = 28;
 
 premio.fill = {
   type: "pattern",
@@ -1141,6 +1145,8 @@ premio.border = {
   left: { style: "medium" },
   right: { style: "medium" }
 };
+sheet.getRow(5).height = 24;
+sheet.getRow(6).height = 24;
 
 // Separación antes de la tabla
 sheet.addRow([]);
@@ -1197,7 +1203,7 @@ sheet.getColumn(filaLocal.length).width = 10;
 
 [rowLocal, rowResultado, rowVisitante].forEach(row => {
 
-    row.height = 24;
+    row.height = 22;
 
     row.eachCell((cell) => {
 
@@ -1295,6 +1301,16 @@ for (let i = 9; i <= 11; i++) {
 
       const fila = [u.nombre, ...u.picks, u.puntos];
       const row = sheet.addRow(fila);
+
+      row.getCell(1).alignment = {
+    horizontal: "left",
+    vertical: "middle"
+};
+
+row.getCell(1).font = {
+    bold: false,
+    size: 10
+};
 
       row.height = 24;
 
