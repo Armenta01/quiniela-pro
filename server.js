@@ -1266,6 +1266,7 @@ rowResultado.eachCell((cell, colNumber) => {
 
 
 // Jugador (azul)
+// Jugador (azul)
 for (let i = 9; i <= 11; i++) {
 
     const c = sheet.getCell(`A${i}`);
@@ -1278,8 +1279,20 @@ for (let i = 9; i <= 11; i++) {
         }
     };
 
+    c.font = {
+        bold: true,
+        color: { argb: "FFFFFFFF" },
+        size: 11
+    };
+
+    c.alignment = {
+        horizontal: "center",
+        vertical: "middle"
+    };
+
 }
 
+// Puntos (verde)
 // Puntos (verde)
 const ultimaColumna = sheet.columnCount;
 
@@ -1295,13 +1308,44 @@ for (let i = 9; i <= 11; i++) {
         }
     };
 
-}
+    c.font = {
+        bold: true,
+        color: { argb: "FFFFFFFF" },
+        size: 11
+    };
 
+    c.alignment = {
+        horizontal: "center",
+        vertical: "middle"
+    };
+
+}
     // 🔥 FILAS
     tabla.forEach(u => {
 
       const fila = [u.nombre, ...u.picks, u.puntos];
       const row = sheet.addRow(fila);
+
+      const maxPuntos = tabla[0].puntos;
+
+if (u.puntos === maxPuntos) {
+
+    row.getCell(row.cellCount).fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: {
+            argb: "FFFFD700"
+        }
+    };
+
+    row.getCell(row.cellCount).font = {
+        bold: true,
+        color: {
+            argb: "FF000000"
+        }
+    };
+
+}
 
       row.getCell(1).alignment = {
     horizontal: "left",
@@ -1315,21 +1359,12 @@ row.getCell(1).font = {
 
       row.height = 24;
 
-row.eachCell(cell => {
+      cell.alignment = {
+    horizontal: "center",
+    vertical: "middle",
+    wrapText: true
+};
 
-    cell.alignment = {
-        horizontal: "center",
-        vertical: "middle"
-    };
-
-    cell.border = {
-        top: { style: "thin" },
-        bottom: { style: "thin" },
-        left: { style: "thin" },
-        right: { style: "thin" }
-    };
-
-});
 
       u.detalles.forEach((d, i) => {
 
