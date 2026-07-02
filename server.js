@@ -1156,17 +1156,15 @@ filaVisitante.push("");
 const rowLocal = sheet.insertRow(9, filaLocal);
 const rowResultado = sheet.insertRow(10, filaResultado);
 const rowVisitante = sheet.insertRow(11, filaVisitante);
-headerRow.height = 42;
 
 // Ancho columnas
 sheet.getColumn(1).width = 22;
 
-for (let i = 2; i < headers.length; i++) {
+for (let i = 2; i < filaLocal.length; i++) {
     sheet.getColumn(i).width = 16;
 }
 
-sheet.getColumn(headers.length).width = 10;
-
+sheet.getColumn(filaLocal.length).width = 10;
 // =========================================
 // ESTILO CABECERA
 // =========================================
@@ -1327,7 +1325,7 @@ row.eachCell(cell => {
     res.send(buffer);
 
   } catch (err) {
-    console.error("🔥 ERROR REAL EXCEL:", err);
+    console.error(err.stack);
     res.status(500).send("Error al generar Excel");
   }
 });
