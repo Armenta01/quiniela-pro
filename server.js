@@ -692,7 +692,7 @@ let primerLugar = 0;
 let segundoLugar = 0;
 
 // 👥 Hasta 200 participantes: un solo premio
-if (participantes <= 200) {
+if (participantes <= 750) {
 
   primerLugar = bolsaPremios;
   segundoLugar = 0;
@@ -1056,7 +1056,7 @@ const bolsaPremios = recaudado * 0.80;
 
 let premioPrimerLugar = 0;
 
-if (participantes <= 200) {
+if (participantes <= 750) {
   premioPrimerLugar = bolsaPremios;
 } else {
   premioPrimerLugar = bolsaPremios * 0.65;
@@ -1109,7 +1109,7 @@ const premio = sheet.getCell("C5");
 premio.value = [
   "🥇 Primer Lugar",
   `$${premioPrimerLugar.toLocaleString()} MXN`,
-  participantes <= 200
+  participantes <= 750
     ? "Premio único"
     : "1° Lugar"
 ].join("\n");
