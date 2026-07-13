@@ -148,19 +148,39 @@ if (sessionStorage.getItem("admin") !== "true") {
 
     <h2>📝 Editar Quiniela</h2>
 
-    <select id="jugadorEditar">
-        <option value="">Selecciona un jugador</option>
-    </select>
+    <div class="form-row">
 
-    <div id="listaPronosticos" style="margin-top:20px;"></div>
+        <select id="jornadaEditar">
+        </select>
+
+        <input
+            type="text"
+            id="buscarJugador"
+            placeholder="🔍 Buscar participante..."
+            autocomplete="off">
+
+    </div>
+
+    <div id="listaJugadores" class="lista"></div>
 
     <br>
 
-    <button class="btn-verde" onclick="guardarCambiosPronosticos()">
+    <div id="listaPronosticos"></div>
+
+    <br>
+
+    <button
+        id="btnGuardarPronosticos"
+        class="btn-verde"
+        style="display:none;"
+        onclick="guardarCambiosPronosticos()">
+
         💾 Guardar cambios
+
     </button>
 
 </div>
+
 
 <script>
 let editandoId = null;
