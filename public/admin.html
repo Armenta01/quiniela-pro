@@ -109,6 +109,10 @@ if (sessionStorage.getItem("admin") !== "true") {
 📥 Descargar Excel
 </button>
 
+<button onclick="abrirEditorPronosticos()">
+    📝 Editar Quiniela
+</button>
+
 <button
   class="btn-verde"
   onclick="window.location.href='participantes.html?jornada=' + document.getElementById('jornada').value">
@@ -137,6 +141,26 @@ if (sessionStorage.getItem("admin") !== "true") {
 
 <div class="lista" id="lista"></div>
 <div class="lista" id="listaParticipantes"></div>
+
+<hr>
+
+<div id="editorPronosticos" style="display:none; margin-top:25px;">
+
+    <h2>📝 Editar Quiniela</h2>
+
+    <select id="jugadorEditar">
+        <option value="">Selecciona un jugador</option>
+    </select>
+
+    <div id="listaPronosticos" style="margin-top:20px;"></div>
+
+    <br>
+
+    <button class="btn-verde" onclick="guardarCambiosPronosticos()">
+        💾 Guardar cambios
+    </button>
+
+</div>
 
 <script>
 let editandoId = null;

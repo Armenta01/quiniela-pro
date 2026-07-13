@@ -604,6 +604,129 @@ app.get('/admin/participantes', async (req, res) => {
 
 });
 
+// 📝 Jugadores con quiniela de una jornada
+app.get('/admin/jugadores', async (req, res) => {
+
+  try {
+
+    const { jornada } = req.query;
+
+    const result = await pool.query(`
+      SELECT DISTINCT
+        u.id,
+        u.nombre
+      FROM users u
+      INNER JOIN predicciones p
+        ON p.user_id = u.id
+      WHERE p.jornada = $1
+      ORDER BY u.nombre
+    `, [jornada]);
+
+    res.json(result.rows);
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      error: err.message
+    });
+
+  }
+
+});
+
+// 📝 Obtener pronósticos de un jugador
+app.get('/admin/pronosticos', async (req, res) => {
+
+  try {
+
+    const { jornada, user_id } = req.query;
+
+    const result = await pool.query(`
+      SELECT
+        p.id AS partido_id,
+        p.local,
+        p.visitante,
+        pr.goles_local,
+        pr.goles_visitante
+      FROM predicciones pr
+      INNER JOIN partidos p
+        ON pr.partido_id = p.id
+      WHERE
+        pr.user_id = $1
+        AND pr.jornada = $2
+      ORDER BY p.orden
+    `, [user_id, jornada]);
+
+    res.json(result.rows);
+
+  } catch (err) {
+
+    console.error(err);
+
+    res.status(500).json({
+      error: err.message
+    });
+
+  }
+
+});
+
+// 📝 Guardar cambios de pronósticos
+app.post('/admin/editar-pronosticos', async (req, res) => {
+
+  const { pronosticos } = req.body;
+
+  const client = await pool.connect();
+
+  try {
+
+    await client.query('BEGIN');
+
+    for (const p of pronosticos) {
+
+      await client.query(`
+        UPDATE predicciones
+        SET
+          goles_local = $1,
+          goles_visitante = $2
+        WHERE
+          user_id = $3
+          AND partido_id = $4
+      `, [
+        p.goles_local,
+        p.goles_visitante,
+        p.user_id,
+        p.partido_id
+      ]);
+
+    }
+
+    await client.query('COMMIT');
+
+    res.json({
+      ok: true
+    });
+
+  } catch (err) {
+
+    await client.query('ROLLBACK');
+
+    console.error(err);
+
+    res.status(500).json({
+      error: err.message
+    });
+
+  } finally {
+
+    client.release();
+
+  }
+
+});
+
 
 // 🏆 TOP 4
 app.get('/top4', async (req, res) => {
