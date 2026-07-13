@@ -792,6 +792,79 @@ async function cargarPronosticos(){
 
 }
 
+async function guardarCambiosPronosticos(){
+
+    if(!jugadorSeleccionado){
+        alert("Selecciona un jugador.");
+        return;
+    }
+
+    const pronosticos = [];
+
+    document
+        .querySelectorAll("#listaPronosticos .partido")
+        .forEach(div=>{
+
+            const gl = div.querySelector("input[id^='gl-']");
+            const gv = div.querySelector("input[id^='gv-']");
+
+            pronosticos.push({
+
+                user_id: jugadorSeleccionado,
+
+                partido_id: parseInt(
+                    gl.id.replace("gl-","")
+                ),
+
+                goles_local: parseInt(gl.value),
+
+                goles_visitante: parseInt(gv.value)
+
+            });
+
+        });
+
+    try{
+
+        const res = await fetch(
+            "/admin/editar-pronosticos",
+            {
+
+                method:"POST",
+
+                headers:{
+                    "Content-Type":"application/json"
+                },
+
+                body:JSON.stringify({
+                    pronosticos
+                })
+
+            }
+        );
+
+        const data = await res.json();
+
+        if(data.ok){
+
+            alert("✅ Pronósticos actualizados correctamente.");
+
+        }else{
+
+            alert(data.error || "Error");
+
+        }
+
+    }catch(err){
+
+        console.error(err);
+
+        alert("❌ Error del servidor.");
+
+    }
+
+}
+
 
 
 </script>
