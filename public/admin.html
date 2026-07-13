@@ -636,6 +636,164 @@ async function verParticipantes() {
 
 }
 
+// ======================================
+// EDITOR DE QUINIELAS
+// ======================================
+
+async function abrirEditorPronosticos() {
+
+    document.getElementById("editorPronosticos").style.display = "block";
+
+    const jornadaActual =
+        document.getElementById("jornada").value;
+
+    const select =
+        document.getElementById("jornadaEditar");
+
+    select.innerHTML = "";
+
+    for(let i=1;i<=60;i++){
+
+        select.innerHTML += `
+            <option value="${i}">
+                Semana ${i}
+            </option>
+        `;
+
+    }
+
+    select.value = jornadaActual;
+
+    cargarJugadores();
+
+}
+
+async function cargarJugadores(){
+
+    const jornada =
+        document.getElementById("jornadaEditar").value;
+
+    const res =
+        await fetch(`/admin/jugadores?jornada=${jornada}`);
+
+    const jugadores =
+        await res.json();
+
+    window.jugadoresEditor = jugadores;
+
+    mostrarJugadores(jugadores);
+
+}
+
+function mostrarJugadores(jugadores){
+
+    const lista =
+        document.getElementById("listaJugadores");
+
+    lista.innerHTML = "";
+
+    jugadores.forEach(j=>{
+
+        lista.innerHTML += `
+
+<div class="partido"
+onclick="seleccionarJugador(${j.id})">
+
+👤 ${j.nombre}
+
+</div>
+
+`;
+
+    });
+
+}
+
+document
+.getElementById("buscarJugador")
+.addEventListener("keyup",()=>{
+
+    const texto =
+        document
+        .getElementById("buscarJugador")
+        .value
+        .toLowerCase();
+
+    const filtrados =
+        window.jugadoresEditor.filter(j=>
+
+            j.nombre
+            .toLowerCase()
+            .includes(texto)
+
+        );
+
+    mostrarJugadores(filtrados);
+
+});
+
+let jugadorSeleccionado = null;
+
+async function seleccionarJugador(id){
+
+    jugadorSeleccionado = id;
+
+    await cargarPronosticos();
+
+}
+
+async function cargarPronosticos(){
+
+    const jornada =
+        document.getElementById("jornadaEditar").value;
+
+    const res = await fetch(
+        `/admin/pronosticos?jornada=${jornada}&user_id=${jugadorSeleccionado}`
+    );
+
+    const partidos = await res.json();
+
+    const lista =
+        document.getElementById("listaPronosticos");
+
+    lista.innerHTML = "";
+
+    partidos.forEach(p=>{
+
+        lista.innerHTML += `
+
+<div class="partido">
+
+    <b>${p.local}</b>
+
+    <input
+        type="number"
+        id="gl-${p.partido_id}"
+        value="${p.goles_local}">
+
+    -
+
+    <input
+        type="number"
+        id="gv-${p.partido_id}"
+        value="${p.goles_visitante}">
+
+    <b>${p.visitante}</b>
+
+</div>
+
+`;
+
+    });
+
+    document.getElementById(
+        "btnGuardarPronosticos"
+    ).style.display = "inline-block";
+
+}
+
+
+
 </script>
 </div>
 </body>
