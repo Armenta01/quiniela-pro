@@ -136,18 +136,3 @@ value="${p.goles_visitante}">
     });
 
 }
-
-document
-.getElementById("jornadaEditar")
-.addEventListener("change",cargarJugadores);
-
-
-async function iniciar(){
-
-    await cargarJornadas();
-
-    await cargarJugadores();
-
-}
-
-iniciar();
