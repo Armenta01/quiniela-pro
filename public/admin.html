@@ -668,7 +668,7 @@ async function abrirEditorPronosticos() {
 
     select.value = jornadaActual;
 
-    cargarJugadores();
+   await cargarJugadores();
 
 }
 
@@ -683,26 +683,13 @@ async function cargarJugadores(){
     const jugadores =
         await r.json();
 
-    const select =
-        document.getElementById("jugadorEditar");
+    // Guardamos los jugadores para el buscador
+    window.jugadoresEditor = jugadores;
 
-    select.innerHTML =
-        '<option value="">Selecciona un jugador</option>';
-
-    jugadores.forEach(j=>{
-
-        select.innerHTML += `
-            <option value="${j.id}">
-                ${j.nombre}
-            </option>
-        `;
-
-    });
-
-    select.onchange = cargarPronosticos;
+    // Mostramos la lista de jugadores
+    mostrarJugadores(jugadores);
 
 }
-
 
 function mostrarJugadores(jugadores){
 
