@@ -50,9 +50,6 @@ await fetch(`/admin/jugadores?jornada=${jornada}`);
 
 jugadores = await r.json();
 
-    jugadores =
-        await r.json();
-
     mostrarJugadores(jugadores);
 
 }
@@ -136,3 +133,88 @@ value="${p.goles_visitante}">
     });
 
 }
+
+async function guardarCambiosPronosticos(){
+
+    if(!jugadorSeleccionado){
+        alert("Selecciona un participante.");
+        return;
+    }
+
+    const gl =
+        document.querySelectorAll(".gl");
+
+    const gv =
+        document.querySelectorAll(".gv");
+
+    const pronosticos = [];
+
+    for(let i=0;i<gl.length;i++){
+
+        pronosticos.push({
+
+            partido_id:
+                Number(gl[i].dataset.id),
+
+            goles_local:
+                Number(gl[i].value),
+
+            goles_visitante:
+                Number(gv[i].value)
+
+        });
+
+    }
+
+    const jornada =
+        document.getElementById("jornadaEditar").value;
+
+    const r =
+        await fetch("/admin/editar-pronosticos",{
+
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+
+                user_id: jugadorSeleccionado,
+
+                jornada,
+
+                pronosticos
+
+            })
+
+        });
+
+    const data = await r.json();
+
+    if(data.ok){
+
+        alert("✅ Pronósticos actualizados correctamente.");
+
+    }else{
+
+        alert("❌ No fue posible guardar.");
+
+    }
+
+}
+
+
+document
+.getElementById("jornadaEditar")
+.addEventListener("change", cargarJugadores);
+
+async function iniciar(){
+
+    await cargarJornadas();
+
+    await cargarJugadores();
+
+}
+
+iniciar();
