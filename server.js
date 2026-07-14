@@ -675,58 +675,60 @@ app.get('/admin/pronosticos', async (req, res) => {
 
 // 📝 Guardar cambios de pronósticos
 app.post('/admin/editar-pronosticos', async (req, res) => {
+  console.log(req.body);
 
-  const { pronosticos } = req.body;
+    const { user_id, pronosticos } = req.body;
 
-  const client = await pool.connect();
+    const client = await pool.connect();
 
-  try {
+    try{
 
-    await client.query('BEGIN');
+        await client.query('BEGIN');
 
-    for (const p of pronosticos) {
+        for(const p of pronosticos){
+          console.log(p);
 
-      await client.query(`
-        UPDATE predicciones
-        SET
-          goles_local = $1,
-          goles_visitante = $2
-        WHERE
-          user_id = $3
-          AND partido_id = $4
-      `, [
-        p.goles_local,
-        p.goles_visitante,
-        p.user_id,
-        p.partido_id
-      ]);
+            await client.query(`
+                UPDATE predicciones
+                SET
+                    goles_local = $1,
+                    goles_visitante = $2
+                WHERE
+                    user_id = $3
+                    AND partido_id = $4
+            `,[
+                p.goles_local,
+                p.goles_visitante,
+                user_id,
+                p.partido_id
+            ]);
+
+        }
+
+        await client.query('COMMIT');
+
+        res.json({
+            ok:true
+        });
+
+    }catch(err){
+
+        await client.query('ROLLBACK');
+
+        console.error(err);
+
+        res.status(500).json({
+            ok:false,
+            error:err.message
+        });
+
+    }finally{
+
+        client.release();
 
     }
 
-    await client.query('COMMIT');
-
-    res.json({
-      ok: true
-    });
-
-  } catch (err) {
-
-    await client.query('ROLLBACK');
-
-    console.error(err);
-
-    res.status(500).json({
-      error: err.message
-    });
-
-  } finally {
-
-    client.release();
-
-  }
-
 });
-
 
 // 🏆 TOP 4
 app.get('/top4', async (req, res) => {
