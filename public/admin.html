@@ -645,6 +645,8 @@ async function abrirEditorPronosticos() {
   alert("Entré al editor");
 
     document.getElementById("editorPronosticos").style.display = "block";
+
+    alert("Voy a cargar jugadores");
     
     const jornadaActual =
         document.getElementById("jornada").value;
@@ -671,6 +673,8 @@ async function abrirEditorPronosticos() {
 }
 
 async function cargarJugadores(){
+
+  alert("Entré a cargar jugadores");
 
     const jornada =
         document.getElementById("jornadaEditar").value;
