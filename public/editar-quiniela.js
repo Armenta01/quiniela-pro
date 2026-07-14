@@ -35,4 +35,59 @@ async function cargarJornadas(){
 
 }
 
-cargarJornadas();
+
+let jugadores = [];
+
+async function cargarJugadores(){
+
+    const jornada =
+        document.getElementById("jornadaEditar").value;
+
+    const r =
+        await fetch(`/admin/jugadores?jornada=${jornada}`);
+
+    jugadores =
+        await r.json();
+
+    mostrarJugadores(jugadores);
+
+}
+
+function mostrarJugadores(lista){
+
+    const contenedor =
+        document.getElementById("listaJugadores");
+
+    contenedor.innerHTML = "";
+
+    lista.forEach(j=>{
+
+        contenedor.innerHTML += `
+
+<div class="jugador-card"
+onclick="seleccionarJugador(${j.id})">
+
+👤 ${j.nombre}
+
+</div>
+
+`;
+
+    });
+
+}
+
+document
+.getElementById("jornadaEditar")
+.addEventListener("change",cargarJugadores);
+
+
+async function iniciar(){
+
+    await cargarJornadas();
+
+    await cargarJugadores();
+
+}
+
+iniciar();
