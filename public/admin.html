@@ -674,22 +674,35 @@ async function abrirEditorPronosticos() {
 
 async function cargarJugadores(){
 
-    alert("Entré a cargar jugadores");
-
     const jornada =
         document.getElementById("jornadaEditar").value;
 
-    alert("Jornada: " + jornada);
+    const r =
+        await fetch(`/admin/jugadores?jornada=${jornada}`);
 
-    const r = await fetch(`/admin/jugadores?jornada=${jornada}`);
+    const jugadores =
+        await r.json();
 
-    alert("Status: " + r.status);
+    const select =
+        document.getElementById("jugadorEditar");
 
-    const jugadores = await r.json();
+    select.innerHTML =
+        '<option value="">Selecciona un jugador</option>';
 
-    alert("Jugadores: " + jugadores.length);
+    jugadores.forEach(j=>{
+
+        select.innerHTML += `
+            <option value="${j.id}">
+                ${j.nombre}
+            </option>
+        `;
+
+    });
+
+    select.onchange = cargarPronosticos;
 
 }
+
 
 function mostrarJugadores(jugadores){
 
