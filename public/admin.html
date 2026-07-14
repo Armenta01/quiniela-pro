@@ -674,23 +674,32 @@ async function abrirEditorPronosticos() {
 
 async function cargarJugadores(){
 
+    alert("1");
+
     const jornada =
         document.getElementById("jornadaEditar").value;
+
+    alert("Jornada: " + jornada);
 
     const r =
         await fetch(`/admin/jugadores?jornada=${jornada}`);
 
+    alert("Status: " + r.status);
+
     const jugadores =
         await r.json();
 
-    // Guardamos los jugadores para el buscador
+    alert("Jugadores: " + jugadores.length);
+
     window.jugadoresEditor = jugadores;
 
-    // Mostramos la lista de jugadores
+    alert("Voy a mostrar");
+
     mostrarJugadores(jugadores);
 
-}
+    alert("Terminé");
 
+}
 function mostrarJugadores(jugadores){
 
     const lista =
