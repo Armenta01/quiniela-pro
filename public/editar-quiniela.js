@@ -78,6 +78,24 @@ onclick="seleccionarJugador(${j.id},'${j.nombre}')">
 
 }
 
+document
+.getElementById("buscarJugador")
+.addEventListener("input", function(){
+
+    const texto = this.value.toLowerCase();
+
+    const filtrados = jugadores.filter(j=>{
+
+        return j.nombre
+            .toLowerCase()
+            .includes(texto);
+
+    });
+
+    mostrarJugadores(filtrados);
+
+});
+
 async function seleccionarJugador(id,nombre){
 
     jugadorSeleccionado=id;
