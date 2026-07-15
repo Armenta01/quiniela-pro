@@ -132,6 +132,7 @@ body{
 .campo input:focus{
 
     border-color:#2563eb;
+    color:#FFFFFF;
 
 }
 
