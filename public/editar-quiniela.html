@@ -1,37 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Editor de Quinielas | Quinielas El Inge</title>
+
+    <link rel="stylesheet" href="editar-quiniela.css">
+
+    <link rel="icon"
+          type="image/png"
+          href="logo.png">
+
+</head>
+
+<body>
 
 <div class="admin-container">
 
-    <h1>📝 Editor de Quinielas</h1>
+    <div class="titulo-editor">
 
-    <div class="card">
+        <h1>📝 Editor de Quinielas</h1>
 
-        <select id="jornadaEditar"></select>
-
-        <input
-            id="buscarJugador"
-            placeholder="🔍 Buscar participante">
+        <p>
+            Selecciona una jornada, busca un participante y modifica sus pronósticos.
+        </p>
 
     </div>
 
-    <div id="listaJugadores"></div>
+    <div class="barra-superior">
 
-    <hr>
+        <div class="campo">
 
-    <h2 id="tituloJugador"></h2>
+            <label for="jornadaEditar">
+                📅 Jornada
+            </label>
 
-    <div id="listaPronosticos"></div>
+            <select id="jornadaEditar"></select>
 
-    <br>
+        </div>
 
-    <button
-    id="btnGuardar"
-    onclick="guardarCambiosPronosticos()">
+        <div class="campo">
 
-    💾 Guardar cambios
+            <label for="buscarJugador">
+                🔍 Buscar participante
+            </label>
 
-</button>
+            <input
+                id="buscarJugador"
+                type="text"
+                autocomplete="off"
+                placeholder="Escribe el nombre...">
+
+        </div>
+
+    </div>
+
+    <div class="contenedor-principal">
+
+        <!-- Participantes -->
+
+        <div class="panel panel-jugadores">
+
+            <div class="panel-titulo">
+
+                👥 Participantes
+
+            </div>
+
+            <div id="listaJugadores"></div>
+
+        </div>
+
+        <!-- Pronósticos -->
+
+        <div class="panel panel-pronosticos">
+
+            <div class="panel-titulo">
+
+                <span id="tituloJugador">
+
+                    Selecciona un participante
+
+                </span>
+
+            </div>
+
+            <div id="listaPronosticos"></div>
+
+        </div>
+
+    </div>
+
+    <div class="barra-inferior">
+
+        <button
+            id="btnGuardar"
+            onclick="guardarCambiosPronosticos()">
+
+            💾 Guardar cambios
+
+        </button>
+
+    </div>
 
 </div>
+
 <script src="editar-quiniela.js"></script>
+
 </body>
 </html>
