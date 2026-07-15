@@ -11,10 +11,9 @@
 
 body{
 
-    background:linear-gradient(180deg,#0b2d6d 0%,#123b8d 40%,#1d4ed8 100%);
-    background-attachment:fixed;
+    background:#121A33;
 
-    color:#000000;
+    color:#fff;
 
     padding:30px;
 
@@ -34,31 +33,35 @@ body{
 
 .titulo-editor{
 
-    background:#fff;
+    background:#27324A;
 
-    border-radius:14px;
+    border:2px solid #3B4A68;
 
-    padding:25px;
+    border-radius:20px;
 
-    margin-bottom:20px;
+    padding:30px;
 
-    box-shadow:0 8px 25px rgba(0,0,0,.08);
+    margin-bottom:25px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.35);
 
 }
 
 .titulo-editor h1{
 
-    font-size:32px;
+    color:#FFD21E;
 
-    margin-bottom:8px;
+    font-size:38px;
+
+    text-align:center;
 
 }
 
 .titulo-editor p{
 
-    color:#64748b;
+    color:#d9d9d9;
 
-    font-size:15px;
+    text-align:center;
 
 }
 
@@ -78,15 +81,13 @@ body{
 
 .campo{
 
-    background:rgba(255,255,255,.97);
+    background:#27324A;
+
+    border:2px solid #3B4A68;
+
+    border-radius:18px;
 
     padding:18px;
-
-    border-radius:15px;
-
-    border:1px solid rgba(255,255,255,.20);
-
-    box-shadow:0 12px 35px rgba(0,0,0,.20);
 
 }
 
@@ -102,21 +103,14 @@ body{
 
 }
 
-.campo select,
+.campo input,
+.campo select{
 
-.campo input{
+    background:#121A33;
 
-    width:100%;
+    color:white;
 
-    padding:12px;
-
-    border:1px solid #cbd5e1;
-
-    border-radius:10px;
-
-    font-size:15px;
-
-    outline:none;
+    border:2px solid #3B4A68;
 
 }
 
@@ -144,27 +138,21 @@ body{
 
 .panel{
 
-    background:rgba(255,255,255,.98);
+    background:#27324A;
 
-    border-radius:18px;
+    border:2px solid #3B4A68;
 
-    overflow:hidden;
-
-    box-shadow:0 18px 45px rgba(0,0,0,.25);
+    border-radius:20px;
 
 }
 
 .panel-titulo{
 
-    background:#2563eb;
+    background:#1B243D;
 
-    color:white;
+    color:#FFD21E;
 
-    padding:16px;
-
-    font-size:18px;
-
-    font-weight:bold;
+    font-size:20px;
 
 }
 
@@ -180,31 +168,23 @@ body{
 
 .jugador-card{
 
-    padding:16px;
+    color:white;
 
-    border-bottom:1px solid #e2e8f0;
-
-    cursor:pointer;
-
-    transition:.20s;
-
-    font-size:16px;
+    border-bottom:1px solid #3B4A68;
 
 }
 
 .jugador-card:hover{
 
-    background:#eff6ff;
+    background:#33405D;
 
 }
 
 .jugador-card.activo{
 
-    background:linear-gradient(90deg,#2563eb,#3b82f6);
+    background:#2563EB;
 
     color:white;
-
-    font-weight:bold;
 
 }
 
@@ -222,9 +202,9 @@ body{
 
 .card{
 
-    background:white;
+    background: #1B243D;
 
-    border:2px solid #dbeafe;
+    border:2px solid #3B4A68;
 
     border-radius:18px;
 
@@ -246,7 +226,7 @@ body{
 
     margin-bottom:15px;
 
-    color:#0f172a;
+    color:#FFD21E;
 
     font-size:18px;
 
@@ -262,9 +242,9 @@ body{
 
     border-radius:12px;
 
-    border:2px solid #2563eb;
+    border:2px solid #3B4A68;
 
-    background:#eff6ff;
+    background:#121A33;
 
     color:#0b2d6d;
 
