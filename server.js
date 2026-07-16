@@ -615,11 +615,11 @@ app.get('/admin/jugadores', async (req, res) => {
 
             SELECT
 
-                MIN(u.id) AS id,
+                u.id,
 
                 u.nombre,
 
-                p.envio_id
+                p.envio_id,
 
                 MIN(p.fecha_envio) AS fecha_envio
 
@@ -631,6 +631,7 @@ app.get('/admin/jugadores', async (req, res) => {
             WHERE p.jornada = $1
 
             GROUP BY
+                u.id,
                 u.nombre,
                 p.envio_id
 
