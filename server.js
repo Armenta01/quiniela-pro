@@ -696,6 +696,7 @@ app.get('/admin/pronosticos', async (req, res) => {
 
 // 📝 Guardar cambios de pronósticos
 app.post('/admin/editar-pronosticos', async (req, res) => {
+  console.log("🚀 ENTRÓ A EDITAR PRONÓSTICOS");
   console.log(req.body);
 
     const { envio_id, jornada, pronosticos } = req.body;
