@@ -810,12 +810,10 @@ app.get('/admin/estado-edicion', async (req, res) => {
         const ahora =
             new Date();
 
-            console.log("===== ESTADO EDICION =====");
-console.log("BD:", result.rows[0].fecha);
-console.log("Primer:", primerPartido);
-console.log("Ahora:", ahora);
-console.log("Abierta:", ahora < primerPartido);
-console.log("==========================");
+           console.log("Tipo:", typeof result.rows[0].fecha);
+console.log("Instancia Date:", result.rows[0].fecha instanceof Date);
+console.log("Valor:", result.rows[0].fecha);
+console.log("ISO:", result.rows[0].fecha.toISOString()); 
 
         res.json({
 
@@ -1177,7 +1175,7 @@ app.get('/backup', async (req, res) => {
     const predicciones = await pool.query(`SELECT * FROM predicciones`);
 
     const backup = {
-      fecha: new Date(),
+      //fecha: new Date(),
       users: users.rows,
       partidos: partidos.rows,
       predicciones: predicciones.rows
