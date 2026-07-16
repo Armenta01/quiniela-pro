@@ -432,8 +432,9 @@ app.put('/admin/partido/:id', async (req, res) => {
       logo_visitante
     } = req.body;
 
-    const fechaMexico =
-      fecha.replace('T', ' ') + ':00';
+    const fechaMexico = moment
+  .tz(fecha, "YYYY-MM-DDTHH:mm", "America/Mexico_City")
+  .format("YYYY-MM-DD HH:mm:ss");
 
     await pool.query(`
       UPDATE partidos
