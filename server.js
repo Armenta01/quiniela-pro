@@ -716,10 +716,8 @@ try{
 
 if (primerPartido.rows.length > 0) {
 
- const inicio = moment.tz(
-    primerPartido.rows[0].fecha,
-    "America/Mexico_City"
-);
+  const inicio = moment(primerPartido.rows[0].fecha)
+    .tz("America/Mexico_City");
 
 const ahora = moment.tz("America/Mexico_City");
 
