@@ -715,24 +715,24 @@ try{
 
 if (primerPartido.rows.length > 0) {
 
-    const inicio = new Date(primerPartido.rows[0].fecha);
+ const inicio = moment.tz(
+    primerPartido.rows[0].fecha,
+    "America/Mexico_City"
+);
 
-    console.log("=== RENDER ===");
-    console.log("BD:", primerPartido.rows[0].fecha);
-    console.log("Ahora:", new Date());
-    console.log("Inicio:", inicio);
-    console.log("Comparación:", new Date() >= inicio);
+const ahora = moment.tz("America/Mexico_City");
 
+console.log("Inicio:", inicio.format());
+console.log("Ahora :", ahora.format());
 
-    if (new Date() >= inicio) {
+if (ahora.isSameOrAfter(inicio)) {
 
-        return res.status(403).json({
-            ok: false,
-            error: "La jornada ya inició. La edición está bloqueada."
-        });
+    return res.status(403).json({
+        ok:false,
+        error:"La jornada ya inició."
+    });
 
-    }
-
+}
 }
 
         await client.query('BEGIN');
@@ -804,24 +804,20 @@ app.get('/admin/estado-edicion', async (req, res) => {
 
         }
 
-        const primerPartido =
-            new Date(result.rows[0].fecha);
+        const primerPartido = moment.tz(
+    result.rows[0].fecha,
+    "America/Mexico_City"
+);
 
-        const ahora =
-            new Date();
+const ahora = moment.tz("America/Mexico_City");
 
-           console.log("Tipo:", typeof result.rows[0].fecha);
-console.log("Instancia Date:", result.rows[0].fecha instanceof Date);
-console.log("Valor:", result.rows[0].fecha);
-console.log("ISO:", result.rows[0].fecha.toISOString()); 
+res.json({
 
-        res.json({
+    abierta: ahora.isBefore(primerPartido),
 
-            abierta: ahora < primerPartido,
+    fechaPrimerPartido: primerPartido.format()
 
-            fechaPrimerPartido: primerPartido
-
-        });
+});
 
     }catch(err){
 
@@ -1115,8 +1111,9 @@ app.post('/admin/partidos', async (req, res) => {
   liga = liga ? liga.trim() : null;
 
   // FIX HORARIO MEXICO
-  const fechaMexico = fecha.replace('T', ' ') + ':00';
-
+  const fechaMexico = moment
+    .tz(fecha, "YYYY-MM-DDTHH:mm", "America/Mexico_City")
+    .format("YYYY-MM-DD HH:mm:ss");
   try {
 
     // Obtener el siguiente orden de la jornada
