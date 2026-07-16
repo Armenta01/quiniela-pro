@@ -810,6 +810,13 @@ app.get('/admin/estado-edicion', async (req, res) => {
         const ahora =
             new Date();
 
+            console.log("===== ESTADO EDICION =====");
+console.log("BD:", result.rows[0].fecha);
+console.log("Primer:", primerPartido);
+console.log("Ahora:", ahora);
+console.log("Abierta:", ahora < primerPartido);
+console.log("==========================");
+
         res.json({
 
             abierta: ahora < primerPartido,
