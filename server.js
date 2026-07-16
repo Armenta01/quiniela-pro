@@ -715,6 +715,10 @@ if (primerPartido.rows.length > 0) {
 
     const inicio = new Date(primerPartido.rows[0].fecha);
 
+    console.log("Hora servidor:", new Date());
+    console.log("Fecha partido:", inicio);
+    console.log("Valor BD:", primerPartido.rows[0].fecha);
+
     if (new Date() >= inicio) {
 
         return res.status(403).json({
