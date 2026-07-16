@@ -681,6 +681,8 @@ app.post('/admin/editar-pronosticos', async (req, res) => {
 
     const client = await pool.connect();
 
+try{
+
     const primerPartido = await pool.query(`
     SELECT fecha
     FROM partidos
@@ -703,8 +705,6 @@ if (primerPartido.rows.length > 0) {
     }
 
 }
-
-    try{
 
         await client.query('BEGIN');
 
