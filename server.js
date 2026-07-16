@@ -716,9 +716,13 @@ if (primerPartido.rows.length > 0) {
 
     const inicio = new Date(primerPartido.rows[0].fecha);
 
-    console.log("Hora servidor:", new Date());
-    console.log("Fecha partido:", inicio);
-    console.log("Valor BD:", primerPartido.rows[0].fecha);
+    console.log("======== FECHAS ========");
+    console.log("BD:", primerPartido.rows[0].fecha);
+    console.log("Inicio:", inicio);
+    console.log("Ahora:", new Date());
+    console.log("Comparación:", new Date() >= inicio);
+    console.log("========================");
+
 
     if (new Date() >= inicio) {
 
