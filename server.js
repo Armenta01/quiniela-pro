@@ -607,41 +607,61 @@ app.get('/admin/participantes', async (req, res) => {
 // 📝 Jugadores con quiniela de una jornada
 app.get('/admin/jugadores', async (req, res) => {
 
-  try {
+    try{
 
-    const { jornada } = req.query;
+        const { jornada } = req.query;
 
-    const result = await pool.query(`
-      SELECT DISTINCT
-        u.id,
-        u.nombre
-      FROM users u
-      INNER JOIN predicciones p
-        ON p.user_id = u.id
-      WHERE p.jornada = $1
-      ORDER BY u.nombre
-    `, [jornada]);
+        const result = await pool.query(`
 
-    res.json(result.rows);
+            SELECT
 
-  } catch (err) {
+                MIN(u.id) AS id,
 
-    console.error(err);
+                u.nombre,
 
-    res.status(500).json({
-      error: err.message
-    });
+                p.envio_id
 
-  }
+                MIN(p.fecha_envio) AS fecha_envio
+
+            FROM predicciones p
+
+            INNER JOIN users u
+                ON u.id = p.user_id
+
+            WHERE p.jornada = $1
+
+            GROUP BY
+                u.nombre,
+                p.envio_id
+
+            ORDER BY
+                u.nombre,
+                MIN(p.fecha_envio)
+
+        `,[jornada]);
+
+        res.json(result.rows);
+
+    }catch(err){
+
+        console.error(err);
+
+        res.status(500).json({
+            error:err.message
+        });
+
+    }
 
 });
+
+
 
 // 📝 Obtener pronósticos de un jugador
 app.get('/admin/pronosticos', async (req, res) => {
 
   try {
 
-    const { jornada, user_id } = req.query;
+    const { jornada, envio_id } = req.query;
 
     const result = await pool.query(`
       SELECT
@@ -654,10 +674,10 @@ app.get('/admin/pronosticos', async (req, res) => {
       INNER JOIN partidos p
         ON pr.partido_id = p.id
       WHERE
-        pr.user_id = $1
+        pr.envio_id = $1
         AND pr.jornada = $2
       ORDER BY p.orden
-    `, [user_id, jornada]);
+    `, [envio_id, jornada]);
 
     res.json(result.rows);
 
@@ -677,13 +697,13 @@ app.get('/admin/pronosticos', async (req, res) => {
 app.post('/admin/editar-pronosticos', async (req, res) => {
   console.log(req.body);
 
-    const { user_id, jornada, pronosticos } = req.body;
+    const { envio_id, jornada, pronosticos } = req.body;
 
     const client = await pool.connect();
 
 try{
 
-    const primerPartido = await pool.query(`
+    const primerPartido = await client.query(`
     SELECT fecha
     FROM partidos
     WHERE jornada = $1
@@ -714,15 +734,15 @@ if (primerPartido.rows.length > 0) {
             await client.query(`
                 UPDATE predicciones
                 SET
-                    goles_local = $1,
-                    goles_visitante = $2
+                  goles_local = $1,
+                  goles_visitante = $2
                 WHERE
-                    user_id = $3
-                    AND partido_id = $4
+                  envio_id = $3
+                  AND partido_id = $4
             `,[
                 p.goles_local,
                 p.goles_visitante,
-                user_id,
+                envio_id,
                 p.partido_id
             ]);
 

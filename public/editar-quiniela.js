@@ -61,14 +61,34 @@ function mostrarJugadores(lista){
 
     contenedor.innerHTML = "";
 
+    let ultimoNombre = "";
+    let numeroQuiniela = 0;
+
     lista.forEach(j=>{
+
+        if(j.nombre !== ultimoNombre){
+
+            ultimoNombre = j.nombre;
+            numeroQuiniela = 1;
+
+        }else{
+
+            numeroQuiniela++;
+
+        }
 
         contenedor.innerHTML += `
 
 <div class="jugador-card"
-onclick="seleccionarJugador(${j.id},'${j.nombre}')">
+onclick="seleccionarJugador(${j.id},'${j.nombre}','${j.envio_id}')">
 
-👤 ${j.nombre}
+    <div class="nombre-jugador">
+        👤 ${j.nombre}
+    </div>
+
+    <div class="numero-quiniela">
+        Quiniela ${numeroQuiniela}
+    </div>
 
 </div>
 
@@ -96,25 +116,33 @@ document
 
 });
 
-async function seleccionarJugador(id,nombre){
+async function seleccionarJugador(id,nombre,envio_id){
 
-    jugadorSeleccionado=id;
+    jugadorSeleccionado = {
 
-    document.getElementById("tituloJugador").innerHTML=
-        "👤 "+nombre;
+        id: id,
+
+        envio_id: envio_id
+
+    };
+
+    document.getElementById("tituloJugador").innerHTML =
+        "👤 " + nombre;
 
     await cargarPronosticos();
 
 }
+
+
 async function cargarPronosticos(){
 
-    if(!jugadorSeleccionado)return;
+    if(!jugadorSeleccionado?.envio_id)return;
 
     const jornada =
         document.getElementById("jornadaEditar").value;
 
     const r =
-await fetch(`/admin/pronosticos?user_id=${jugadorSeleccionado}&jornada=${jornada}`);
+    await fetch(`/admin/pronosticos?envio_id=${jugadorSeleccionado.envio_id}&jornada=${jornada}`);
 
     const partidos =
         await r.json();
@@ -198,13 +226,13 @@ async function guardarCambiosPronosticos(){
 
             body:JSON.stringify({
 
-                user_id: jugadorSeleccionado,
+            envio_id: jugadorSeleccionado.envio_id,
 
-                jornada,
+            jornada,
 
-                pronosticos
+            pronosticos
 
-            })
+        })
 
         });
 
