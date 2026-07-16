@@ -212,11 +212,39 @@ async function guardarCambiosPronosticos(){
 
     if(data.ok){
 
-        alert("✅ Pronósticos actualizados correctamente.");
+         alert("✅ Pronósticos actualizados correctamente.");
 
     }else{
 
-        alert("❌ No fue posible guardar.");
+        alert("❌ " + (data.error || "No fue posible guardar."));
+
+}
+
+}
+
+async function verificarEstadoEdicion(){
+
+    const jornada =
+        document.getElementById("jornadaEditar").value;
+
+    const r =
+        await fetch(`/admin/estado-edicion?jornada=${jornada}`);
+
+    const estado =
+        await r.json();
+
+    if(!estado.abierta){
+
+        document.getElementById("btnGuardar").disabled = true;
+
+        document.getElementById("btnGuardar").innerHTML =
+            "🔒 Edición cerrada";
+
+        document.getElementById("btnGuardar").style.opacity = ".6";
+
+        document.getElementById("btnGuardar").style.cursor = "not-allowed";
+
+        alert("La edición está cerrada porque el primer partido ya comenzó.");
 
     }
 
@@ -230,6 +258,8 @@ document
 async function iniciar(){
 
     await cargarJornadas();
+
+    await verificarEstadoEdicion();
 
     await cargarJugadores();
 

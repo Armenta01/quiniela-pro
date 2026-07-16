@@ -677,9 +677,32 @@ app.get('/admin/pronosticos', async (req, res) => {
 app.post('/admin/editar-pronosticos', async (req, res) => {
   console.log(req.body);
 
-    const { user_id, pronosticos } = req.body;
+    const { user_id, jornada, pronosticos } = req.body;
 
     const client = await pool.connect();
+
+    const primerPartido = await pool.query(`
+    SELECT fecha
+    FROM partidos
+    WHERE jornada = $1
+    ORDER BY fecha ASC
+    LIMIT 1
+`, [jornada]);
+
+if (primerPartido.rows.length > 0) {
+
+    const inicio = new Date(primerPartido.rows[0].fecha);
+
+    if (new Date() >= inicio) {
+
+        return res.status(403).json({
+            ok: false,
+            error: "La jornada ya inició. La edición está bloqueada."
+        });
+
+    }
+
+}
 
     try{
 
@@ -725,6 +748,54 @@ app.post('/admin/editar-pronosticos', async (req, res) => {
     }finally{
 
         client.release();
+
+    }
+
+});
+
+app.get('/admin/estado-edicion', async (req, res) => {
+
+    try{
+
+        const { jornada } = req.query;
+
+        const result = await pool.query(`
+            SELECT fecha
+            FROM partidos
+            WHERE jornada = $1
+            ORDER BY fecha ASC
+            LIMIT 1
+        `,[jornada]);
+
+        if(result.rows.length === 0){
+
+            return res.json({
+                abierta:true
+            });
+
+        }
+
+        const primerPartido =
+            new Date(result.rows[0].fecha);
+
+        const ahora =
+            new Date();
+
+        res.json({
+
+            abierta: ahora < primerPartido,
+
+            fechaPrimerPartido: primerPartido
+
+        });
+
+    }catch(err){
+
+        console.error(err);
+
+        res.status(500).json({
+            error:err.message
+        });
 
     }
 
