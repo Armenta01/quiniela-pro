@@ -788,7 +788,8 @@ app.get('/admin/estado-edicion', async (req, res) => {
         const { jornada } = req.query;
 
         const result = await pool.query(`
-            SELECT fecha
+            SELECT
+                TO_CHAR(fecha, 'YYYY-MM-DD HH24:MI:SS') AS fecha
             FROM partidos
             WHERE jornada = $1
             ORDER BY fecha ASC
@@ -803,31 +804,32 @@ app.get('/admin/estado-edicion', async (req, res) => {
 
         }
 
-        const fechaBD = moment.utc(result.rows[0].fecha);
+        const primerPartido = moment.tz(
+            result.rows[0].fecha,
+            "YYYY-MM-DD HH:mm:ss",
+            "America/Mexico_City"
+        );
 
-        const primerPartido = fechaBD.clone().subtract(6, "hours");
-        
-        const ahora = moment();
+        const ahora = moment.tz("America/Mexico_City");
 
         console.log("BD:", result.rows[0].fecha);
-console.log("Inicio:", primerPartido.format());
-console.log("Ahora:", ahora.format());
-console.log("Abierta:", ahora.isBefore(primerPartido));
+        console.log("Inicio:", primerPartido.format());
+        console.log("Ahora:", ahora.format());
+        console.log("Offset Inicio:", primerPartido.utcOffset());
+        console.log("Offset Ahora:", ahora.utcOffset());
+        console.log("Abierta:", ahora.isBefore(primerPartido));
 
-res.json({
-
-    abierta: ahora.isBefore(primerPartido),
-
-    fechaPrimerPartido: primerPartido.format()
-
-});
+        res.json({
+            abierta: ahora.isBefore(primerPartido),
+            fechaPrimerPartido: primerPartido.format()
+        });
 
     }catch(err){
 
         console.error(err);
 
         res.status(500).json({
-            error:err.message
+            error: err.message
         });
 
     }
