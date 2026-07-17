@@ -55,6 +55,23 @@ async function cargarQuinielas(jornada){
 
         tabla.innerHTML = "";
 
+        const total = data.quinielas.length;
+
+const pagados = data.quinielas.filter(q => q.estado_pago === "Pagado").length;
+
+const pendientes = total - pagados;
+
+const costoQuiniela = 50; // cambia este valor si el costo cambia
+
+document.getElementById("totalParticipantes").textContent = total;
+
+document.getElementById("totalPagados").textContent = pagados;
+
+document.getElementById("totalPendientes").textContent = pendientes;
+
+document.getElementById("totalRecaudado").textContent =
+"$" + (pagados * costoQuiniela).toLocaleString("es-MX");
+
         data.quinielas.forEach(q => {
 
             const fila = document.createElement("tr");
