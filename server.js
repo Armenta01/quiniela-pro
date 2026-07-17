@@ -1998,6 +1998,38 @@ app.post('/recordatorios/reiniciar', async (req, res) => {
 
 });
 
+// =========================================
+// OBTENER JORNADAS DISPONIBLES
+// =========================================
+
+app.get("/admin/jornadas", async (req, res) => {
+
+    try {
+
+        const resultado = await pool.query(`
+            SELECT DISTINCT jornada
+            FROM predicciones
+            ORDER BY jornada DESC
+        `);
+
+        res.json({
+            ok: true,
+            jornadas: resultado.rows.map(r => r.jornada)
+        });
+
+    } catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            ok: false,
+            error: "Error obteniendo jornadas"
+        });
+
+    }
+
+});
+
 // 🚀 SERVER
 const PORT = process.env.PORT || 10000;
 
