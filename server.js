@@ -68,6 +68,12 @@ async function initDB() {
     );
   `);
 
+  // 🔥 Agregar estado de pago si aún no existe
+await pool.query(`
+  ALTER TABLE predicciones
+  ADD COLUMN IF NOT EXISTS estado_pago TEXT DEFAULT 'Pendiente';
+`);
+
   // ⚡ performance
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_partidos_jornada ON partidos(jornada);`);
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_predicciones_jornada ON predicciones(jornada);`);
