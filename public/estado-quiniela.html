@@ -139,6 +139,59 @@ button{
 
 }
 
+.resumen{
+
+    display:flex;
+    gap:20px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-bottom:30px;
+
+}
+
+.card{
+
+    width:180px;
+    background:white;
+    border-radius:12px;
+    padding:20px;
+    text-align:center;
+    box-shadow:0 3px 8px rgba(0,0,0,.15);
+
+}
+
+.card h3{
+
+    margin:0;
+    font-size:34px;
+
+}
+
+.card span{
+
+    color:#555;
+    font-weight:bold;
+
+}
+
+.cardVerde{
+
+    border-top:6px solid #28a745;
+
+}
+
+.cardAmarilla{
+
+    border-top:6px solid #ffc107;
+
+}
+
+.cardAzul{
+
+    border-top:6px solid #007bff;
+
+}
+
 </style>
 
 </head>
@@ -156,6 +209,32 @@ button{
 </select>
 
 </div>
+
+<div class="resumen">
+
+    <div class="card">
+        <h3 id="totalParticipantes">0</h3>
+        <span>Participantes</span>
+    </div>
+
+    <div class="card cardVerde">
+        <h3 id="totalPagados">0</h3>
+        <span>Pagados</span>
+    </div>
+
+    <div class="card cardAmarilla">
+        <h3 id="totalPendientes">0</h3>
+        <span>Pendientes</span>
+    </div>
+
+    <div class="card cardAzul">
+        <h3 id="totalRecaudado">$0</h3>
+        <span>Recaudado</span>
+    </div>
+
+</div>
+
+<br>
 
 <table>
 
