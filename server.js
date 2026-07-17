@@ -803,8 +803,10 @@ app.get('/admin/estado-edicion', async (req, res) => {
 
         }
 
-        const primerPartido = moment(result.rows[0].fecha);
+        const fechaBD = moment.utc(result.rows[0].fecha);
 
+        const primerPartido = fechaBD.clone().subtract(6, "hours");
+        
         const ahora = moment();
 
         console.log("BD:", result.rows[0].fecha);
