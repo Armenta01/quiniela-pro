@@ -796,6 +796,57 @@ if (ahora.isSameOrAfter(inicio)) {
 
 });
 
+// =========================================
+// ESTADO DE QUINIELAS
+// =========================================
+
+app.get("/admin/estado-quinielas", async (req, res) => {
+    try {
+
+        const jornada = parseInt(req.query.jornada);
+
+        if (!jornada) {
+            return res.status(400).json({
+                ok: false,
+                error: "Jornada requerida"
+            });
+        }
+
+        const resultado = await pool.query(`
+            SELECT
+                pr.envio_id,
+                u.nombre,
+                pr.telefono,
+                MIN(pr.fecha_envio) AS fecha_envio,
+                MIN(pr.estado_pago) AS estado_pago
+            FROM predicciones pr
+            JOIN users u
+                ON u.id = pr.user_id
+            WHERE pr.jornada = $1
+            GROUP BY
+                pr.envio_id,
+                u.nombre,
+                pr.telefono
+            ORDER BY fecha_envio DESC
+        `, [jornada]);
+
+        res.json({
+            ok: true,
+            quinielas: resultado.rows
+        });
+
+    } catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            ok: false,
+            error: "Error al obtener quinielas"
+        });
+
+    }
+});
+
 app.get('/admin/estado-edicion', async (req, res) => {
 
     try{
