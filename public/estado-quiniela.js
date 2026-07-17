@@ -51,14 +51,31 @@ async function cargarQuinielas(jornada){
     try{
 
         const resp = await fetch(`/admin/estado-quinielas?jornada=${jornada}`);
-
         const data = await resp.json();
 
-        console.log(data);
+        tabla.innerHTML = "";
 
-        tabla.innerHTML="";
+        data.quinielas.forEach(q => {
 
-        // Aquí en el siguiente paso llenaremos la tabla
+            const fila = document.createElement("tr");
+
+            const fecha = new Date(q.fecha_envio);
+
+            fila.innerHTML = `
+                <td>${q.nombre}</td>
+                <td>${q.telefono}</td>
+                <td>${fecha.toLocaleString("es-MX")}</td>
+                <td>${q.estado_pago}</td>
+                <td>
+                    <button>
+                        Cambiar
+                    </button>
+                </td>
+            `;
+
+            tabla.appendChild(fila);
+
+        });
 
     }catch(error){
 
