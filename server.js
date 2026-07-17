@@ -2030,6 +2030,68 @@ app.get("/admin/jornadas", async (req, res) => {
 
 });
 
+// =========================================
+// CAMBIAR ESTADO DE PAGO
+// =========================================
+
+app.post("/admin/cambiar-estado", async (req, res) => {
+
+    try {
+
+        const { envio_id } = req.body;
+
+        if (!envio_id) {
+            return res.status(400).json({
+                ok: false,
+                error: "envio_id requerido"
+            });
+        }
+
+        // Obtener el estado actual
+        const actual = await pool.query(`
+            SELECT estado_pago
+            FROM predicciones
+            WHERE envio_id = $1
+            LIMIT 1
+        `, [envio_id]);
+
+        if (actual.rows.length === 0) {
+            return res.status(404).json({
+                ok: false,
+                error: "Quiniela no encontrada"
+            });
+        }
+
+        const nuevoEstado =
+            actual.rows[0].estado_pago === "Pagado"
+                ? "Pendiente"
+                : "Pagado";
+
+        await pool.query(`
+            UPDATE predicciones
+            SET estado_pago = $1
+            WHERE envio_id = $2
+        `, [nuevoEstado, envio_id]);
+
+        res.json({
+            ok: true,
+            estado: nuevoEstado
+        });
+
+    } catch (err) {
+
+        console.error(err);
+
+        res.status(500).json({
+            ok: false,
+            error: "Error al cambiar estado"
+        });
+
+    }
+
+});
+
+
 // 🚀 SERVER
 const PORT = process.env.PORT || 10000;
 
