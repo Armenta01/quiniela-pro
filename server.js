@@ -803,12 +803,14 @@ app.get('/admin/estado-edicion', async (req, res) => {
 
         }
 
-        const primerPartido = moment.tz(
-    result.rows[0].fecha,
-    "America/Mexico_City"
-);
+        const primerPartido = moment(result.rows[0].fecha);
 
-const ahora = moment.tz("America/Mexico_City");
+        const ahora = moment();
+
+        console.log("BD:", result.rows[0].fecha);
+console.log("Inicio:", primerPartido.format());
+console.log("Ahora:", ahora.format());
+console.log("Abierta:", ahora.isBefore(primerPartido));
 
 res.json({
 
