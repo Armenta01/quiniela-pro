@@ -65,11 +65,20 @@ async function cargarQuinielas(jornada){
                 <td>${q.nombre}</td>
                 <td>${q.telefono}</td>
                 <td>${fecha.toLocaleString("es-MX")}</td>
-                <td>${q.estado_pago}</td>
+                <td>
+                    <span class="estado ${q.estado_pago.toLowerCase()}">
+                        ${q.estado_pago}
+                    </span>
+                </td>
                 <td>
                     <button>
-                        Cambiar
+
+                    ${q.estado_pago === "Pendiente"
+                        ? "✔ Marcar pagado"
+                        : "↩ Marcar pendiente"}
+
                     </button>
+
                 </td>
             `;
 
