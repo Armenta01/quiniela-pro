@@ -61,6 +61,8 @@ async function cargarQuinielas(jornada){
 
             const fecha = new Date(q.fecha_envio);
 
+            const estado = q.estado_pago.trim().toLowerCase();
+
             fila.innerHTML = `
     <td>${q.nombre}</td>
 
@@ -69,19 +71,20 @@ async function cargarQuinielas(jornada){
     <td>${fecha.toLocaleString("es-MX")}</td>
 
     <td>
-        <span class="estado ${q.estado_pago.toLowerCase()}">
-            ${q.estado_pago}
+        <span class="estado ${estado}">
+           ${q.estado_pago}
         </span>
     </td>
 
     <td>
 
         <button
-                class="btnEstado ${q.estado_pago === "Pendiente" ? "btnPagado" : "btnPendiente"}"
+
+                class="btnEstado ${estado === "pendiente" ? "btnPagado" : "btnPendiente"}"
                 data-envio="${q.envio_id}"
         >
 
-            ${q.estado_pago === "Pendiente"
+            ${estado === "pendiente"
                 ? "✔ Marcar pagado"
                 : "↩ Marcar pendiente"}
 
