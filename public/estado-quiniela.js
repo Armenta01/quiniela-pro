@@ -1,14 +1,79 @@
 const jornadaSelect = document.getElementById("jornadaSelect");
+const tabla = document.getElementById("tablaQuinielas");
 
-for(let i=1;i<=60;i++){
+// ===============================
+// CARGAR JORNADAS
+// ===============================
 
-    const option=document.createElement("option");
+async function cargarJornadas() {
 
-    option.value=i;
-    option.textContent="Jornada "+i;
+    try {
 
-    jornadaSelect.appendChild(option);
+        const resp = await fetch("/admin/jornadas");
+        const data = await resp.json();
+
+        jornadaSelect.innerHTML = "";
+
+        data.jornadas.forEach(jornada => {
+
+            const option = document.createElement("option");
+
+            option.value = jornada;
+            option.textContent = "Jornada " + jornada;
+
+            jornadaSelect.appendChild(option);
+
+        });
+
+        // Seleccionar automáticamente la jornada más reciente
+        if (data.jornadas.length > 0) {
+
+            jornadaSelect.value = data.jornadas[0];
+
+            cargarQuinielas(data.jornadas[0]);
+
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
 
 }
 
-jornadaSelect.value=14;
+// ===============================
+// CARGAR QUINIELAS
+// ===============================
+
+async function cargarQuinielas(jornada){
+
+    try{
+
+        const resp = await fetch(`/admin/estado-quinielas?jornada=${jornada}`);
+
+        const data = await resp.json();
+
+        console.log(data);
+
+        tabla.innerHTML="";
+
+        // Aquí en el siguiente paso llenaremos la tabla
+
+    }catch(error){
+
+        console.error(error);
+
+    }
+
+}
+
+// ===============================
+
+jornadaSelect.addEventListener("change",()=>{
+
+    cargarQuinielas(jornadaSelect.value);
+
+});
+
+cargarJornadas();
