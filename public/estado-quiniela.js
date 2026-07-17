@@ -62,27 +62,79 @@ async function cargarQuinielas(jornada){
             const fecha = new Date(q.fecha_envio);
 
             fila.innerHTML = `
-                <td>${q.nombre}</td>
-                <td>${q.telefono}</td>
-                <td>${fecha.toLocaleString("es-MX")}</td>
-                <td>
-                    <span class="estado ${q.estado_pago.toLowerCase()}">
-                        ${q.estado_pago}
-                    </span>
-                </td>
-                <td>
-                    <button>
+    <td>${q.nombre}</td>
 
-                    ${q.estado_pago === "Pendiente"
-                        ? "✔ Marcar pagado"
-                        : "↩ Marcar pendiente"}
+    <td>${q.telefono}</td>
 
-                    </button>
+    <td>${fecha.toLocaleString("es-MX")}</td>
 
-                </td>
-            `;
+    <td>
+        <span class="estado ${q.estado_pago.toLowerCase()}">
+            ${q.estado_pago}
+        </span>
+    </td>
+
+    <td>
+
+        <button
+            class="btnEstado"
+            data-envio="${q.envio_id}"
+        >
+
+            ${q.estado_pago === "Pendiente"
+                ? "✔ Marcar pagado"
+                : "↩ Marcar pendiente"}
+
+        </button>
+
+    </td>
+`;
 
             tabla.appendChild(fila);
+
+            const boton = fila.querySelector(".btnEstado");
+
+boton.addEventListener("click", async () => {
+
+    try{
+
+        const resp = await fetch("/admin/cambiar-estado",{
+
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+
+                envio_id:q.envio_id
+
+            })
+
+        });
+
+        const resultado = await resp.json();
+
+        if(resultado.ok){
+
+            cargarQuinielas(jornada);
+
+        }else{
+
+            alert(resultado.error);
+
+        }
+
+    }catch(error){
+
+        console.error(error);
+
+        alert("Error al cambiar el estado.");
+
+    }
+
+});
 
         });
 
