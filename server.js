@@ -716,8 +716,11 @@ try{
 
 if (primerPartido.rows.length > 0) {
 
-  const inicio = moment(primerPartido.rows[0].fecha)
-    .tz("America/Mexico_City");
+  const fechaBD = moment.utc(primerPartido.rows[0].fecha);
+
+const inicio = fechaBD.clone().subtract(6, "hours");
+
+const ahora = moment();
 
 const ahora = moment.tz("America/Mexico_City");
 
