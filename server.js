@@ -722,8 +722,12 @@ const inicio = fechaBD.clone().subtract(6, "hours");
 
 const ahora = moment();
 
-const ahora = moment.tz("America/Mexico_City");
+console.log("BD:", primerPartido.rows[0].fecha);
+console.log("Inicio:", inicio.format());
+console.log("Ahora:", ahora.format());
+console.log("Cerrada:", ahora.isSameOrAfter(inicio));
 
+  
 console.log("Inicio:", inicio.format());
 console.log("Ahora :", ahora.format());
 
