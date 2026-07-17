@@ -77,8 +77,8 @@ async function cargarQuinielas(jornada){
     <td>
 
         <button
-            class="btnEstado"
-            data-envio="${q.envio_id}"
+                class="btnEstado ${q.estado_pago === "Pendiente" ? "btnPagado" : "btnPendiente"}"
+                data-envio="${q.envio_id}"
         >
 
             ${q.estado_pago === "Pendiente"
