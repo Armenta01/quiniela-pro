@@ -317,16 +317,17 @@ if (nuevo === viejo) {
 
  await pool.query(`
     INSERT INTO predicciones
-    (
-      user_id,
-      partido_id,
-      goles_local,
-      goles_visitante,
-      jornada,
-      envio_id,
-      telefono
-    )
-    VALUES($1,$2,$3,$4,$5,$6,$7)
+(
+  user_id,
+  partido_id,
+  goles_local,
+  goles_visitante,
+  jornada,
+  envio_id,
+  telefono,
+  estado_pago
+)
+VALUES($1,$2,$3,$4,$5,$6,$7,$8)
 `, [
     userId,
     p.partido_id,
@@ -334,7 +335,8 @@ if (nuevo === viejo) {
     goles_visitante,
     jornada,
     envioId,
-    telefono
+    telefono,
+    "Pendiente"
 ]);
 }
 
