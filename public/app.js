@@ -1,5 +1,6 @@
 let jornadaActual = 1;
 let quinielaCerrada = false;
+let enviandoQuiniela = false;
 
 async function obtenerJornadaActual() {
   const res = await fetch('/jornada-actual');
@@ -378,6 +379,8 @@ for (let i = u.picks.length; i < totalPartidos; i++) {
 
 // 🔥 GUARDAR
 async function guardarTodo() {
+
+
   if (quinielaCerrada) return alert("🔒 Cerrado");
 
   let usuario = document.getElementById("usuario").value.trim();
@@ -402,7 +405,6 @@ if (usuario.length < 3) {
   localStorage.setItem("miNombre", usuario);
 
   const btn = document.getElementById("btnGuardar");
-  if (btn) btn.disabled = true;
 
   try {
     const partidos = await (await fetch(`/partidos?jornada=${jornadaActual}`)).json();
@@ -451,6 +453,8 @@ if (usuario.length < 3) {
       return;
     }
 
+    if (btn) btn.disabled = true;
+
     const res = await fetch('/guardar', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -465,9 +469,10 @@ if (usuario.length < 3) {
     const data = await res.json();
 
     if (!res.ok) {
+      if (btn) btn.disabled = false;
       alert(data.error || "Error al guardar");
       return;
-    }
+}
 
     let mensaje = `📊 Quiniela Semana ${jornadaActual}\n`;
     mensaje += `👤 ${usuario}\n\n`;
@@ -504,14 +509,17 @@ setTimeout(() => {
   i.value = "";
   });
 
+  if (btn) btn.disabled = false;
+
 }, 1000);
 
   } catch (err) {
     console.error(err);
     alert("❌ Error de conexión");
-  } finally {
+
     if (btn) btn.disabled = false;
   }
+  
 }
 
 // 🔥 CAMPEÓN
