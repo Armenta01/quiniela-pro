@@ -2,6 +2,10 @@ const jornadaSelect = document.getElementById("jornadaSelect");
 const tabla = document.getElementById("tablaQuinielas");
 const buscador = document.getElementById("buscar");
 
+const modal = document.getElementById("modalEstado");
+const modalMensaje = document.getElementById("modalMensaje");
+const btnConfirmar = document.getElementById("btnConfirmar");
+const btnCancelar = document.getElementById("btnCancelar");
 // ===============================
 // CARGAR JORNADAS
 // ===============================
@@ -145,7 +149,7 @@ boton.addEventListener("click", async () => {
             })
 
         });
-        
+
         const resultado = await resp.json();
 
         if(resultado.ok){
