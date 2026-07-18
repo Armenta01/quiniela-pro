@@ -6,6 +6,7 @@ const modal = document.getElementById("modalEstado");
 const modalMensaje = document.getElementById("modalMensaje");
 const btnConfirmar = document.getElementById("btnConfirmar");
 const btnCancelar = document.getElementById("btnCancelar");
+let accionPendiente = null;
 // ===============================
 // CARGAR JORNADAS
 // ===============================
@@ -133,7 +134,7 @@ modalMensaje.textContent =
 
 modal.style.display = "flex";
 
-return;
+accionPendiente = async () => {
 
     try{
 
@@ -157,6 +158,8 @@ return;
 
         if(resultado.ok){
 
+            modal.style.display = "none";
+
             cargarQuinielas(jornada);
 
         }else{
@@ -172,6 +175,10 @@ return;
         alert("Error al cambiar el estado.");
 
     }
+
+};
+
+return;
 
 });
 
@@ -215,6 +222,18 @@ buscador.addEventListener("keyup",()=>{
 btnCancelar.addEventListener("click", () => {
 
     modal.style.display = "none";
+
+});
+
+btnConfirmar.addEventListener("click", async () => {
+
+    if (accionPendiente) {
+
+        await accionPendiente();
+
+        accionPendiente = null;
+
+    }
 
 });
 
