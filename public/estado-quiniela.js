@@ -1,5 +1,6 @@
 const jornadaSelect = document.getElementById("jornadaSelect");
 const tabla = document.getElementById("tablaQuinielas");
+const buscador = document.getElementById("buscar");
 
 // ===============================
 // CARGAR JORNADAS
@@ -57,7 +58,9 @@ async function cargarQuinielas(jornada){
 
         const total = data.quinielas.length;
 
-const pagados = data.quinielas.filter(q => q.estado_pago === "Pagado").length;
+const pagados = data.quinielas.filter(
+    q => q.estado_pago.trim().toLowerCase() === "pagado"
+).length;
 
 const pendientes = total - pagados;
 
@@ -116,6 +119,15 @@ document.getElementById("totalRecaudado").textContent =
 
 boton.addEventListener("click", async () => {
 
+    const accion =
+        estado === "pendiente"
+            ? "marcar como PAGADO"
+            : "marcar como PENDIENTE";
+
+    if (!confirm(`¿Deseas ${accion} la quiniela de ${q.nombre}?`)) {
+        return;
+    }
+
     try{
 
         const resp = await fetch("/admin/cambiar-estado",{
@@ -133,7 +145,7 @@ boton.addEventListener("click", async () => {
             })
 
         });
-
+        
         const resultado = await resp.json();
 
         if(resultado.ok){
@@ -171,6 +183,25 @@ boton.addEventListener("click", async () => {
 jornadaSelect.addEventListener("change",()=>{
 
     cargarQuinielas(jornadaSelect.value);
+
+});
+
+buscador.addEventListener("keyup",()=>{
+
+    const texto = buscador.value.toLowerCase();
+
+    const filas = tabla.querySelectorAll("tr");
+
+    filas.forEach(fila=>{
+
+        const contenido = fila.innerText.toLowerCase();
+
+        fila.style.display =
+            contenido.includes(texto)
+                ? ""
+                : "none";
+
+    });
 
 });
 
