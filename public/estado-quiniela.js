@@ -124,13 +124,16 @@ document.getElementById("totalRecaudado").textContent =
 boton.addEventListener("click", async () => {
 
     const accion =
-        estado === "pendiente"
-            ? "marcar como PAGADO"
-            : "marcar como PENDIENTE";
+    estado === "pendiente"
+        ? "marcar como PAGADO"
+        : "marcar como PENDIENTE";
 
-    if (!confirm(`¿Deseas ${accion} la quiniela de ${q.nombre}?`)) {
-        return;
-    }
+modalMensaje.textContent =
+`¿Deseas ${accion} la quiniela de ${q.nombre}?`;
+
+modal.style.display = "flex";
+
+return;
 
     try{
 
