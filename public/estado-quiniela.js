@@ -83,10 +83,21 @@ document.getElementById("totalRecaudado").textContent =
         data.quinielas.forEach(q => {
 
             const fila = document.createElement("tr");
+            
 
             const fecha = new Date(q.fecha_envio);
 
             const estado = q.estado_pago.trim().toLowerCase();
+
+            if (estado === "pagado") {
+
+    fila.classList.add("filaPagado");
+
+} else {
+
+    fila.classList.add("filaPendiente");
+
+}
 
             fila.innerHTML = `
     <td>${q.nombre}</td>
