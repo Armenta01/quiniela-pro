@@ -784,6 +784,8 @@ async function limpiarPronosticos() {
         i.value = "";
     });
 
+    mostrarToast("Pronósticos eliminados correctamente", "🗑️");
+
 }
 
 
