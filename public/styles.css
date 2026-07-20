@@ -2169,3 +2169,61 @@ body h1{
     border:1px solid #b91c1c !important;
 
 }
+
+/* ===========================
+   TOAST
+=========================== */
+
+.toast{
+
+    position:fixed;
+
+    top:20px;
+
+    right:20px;
+
+    background:#22c55e;
+
+    color:white;
+
+    padding:15px 20px;
+
+    border-radius:12px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    font-size:16px;
+
+    font-weight:bold;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.35);
+
+    z-index:999999;
+
+    opacity:0;
+
+    transform:translateX(120%);
+
+    transition:
+        opacity .35s ease,
+        transform .35s ease;
+
+}
+
+.toast.mostrar{
+
+    opacity:1;
+
+    transform:translateX(0);
+
+}
+
+#toastIcono{
+
+    font-size:22px;
+
+}

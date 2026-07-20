@@ -586,6 +586,8 @@ if (usuario.length < 3) {
 const texto = encodeURIComponent(mensaje);
 const url = `https://wa.me/${phone}?text=${texto}`;
 
+mostrarToast("¡Quiniela enviada correctamente!", "✅");
+
 confetti();
 
 setTimeout(() => {
@@ -1241,5 +1243,31 @@ if (icono === "❌" || icono === "🚫") {
         btnCancelar.style.display = "inline-block";
 
     };
+
+}
+
+// ==============================
+// TOAST
+// ==============================
+
+function mostrarToast(texto, icono = "✅") {
+
+    const toast = document.getElementById("toast");
+
+    const toastTexto = document.getElementById("toastTexto");
+
+    const toastIcono = document.getElementById("toastIcono");
+
+    toastTexto.innerHTML = texto;
+
+    toastIcono.innerHTML = icono;
+
+    toast.classList.add("mostrar");
+
+    setTimeout(() => {
+
+        toast.classList.remove("mostrar");
+
+    }, 3000);
 
 }
