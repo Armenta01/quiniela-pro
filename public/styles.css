@@ -1901,34 +1901,6 @@ body h1{
 
 }
 
-.splash-content::before{
-
-    content:"";
-
-    position:absolute;
-
-    width:220px;
-
-    height:220px;
-
-    left:50%;
-
-    top:5px;
-
-    transform:translateX(-50%);
-
-    background:radial-gradient(circle,
-        rgba(255,215,0,.30),
-        rgba(255,215,0,.08),
-        transparent);
-
-    border-radius:50%;
-
-    animation:pulsoGlow 2s ease-in-out infinite;
-
-    z-index:1;
-
-}
 /* Animaciones */
 
 @keyframes cargar{
