@@ -2130,8 +2130,10 @@ body h1{
 
 .btn-modal.cancelar{
 
-    background:#ef4444;
+    background:#dc2626;
 
-    color:white;
+    color:#fff;
+
+    border:1px solid #b91c1c;
 
 }
