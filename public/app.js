@@ -36,12 +36,19 @@ window.onload = async () => {
   setTimeout(() => {
 
     const splash = document.getElementById("splash");
+    const contenido = document.getElementById("contenido");
 
+    // Ocultar Splash
     if (splash) {
-      splash.classList.add("ocultar");
+        splash.classList.add("ocultar");
     }
 
-  }, 1800);
+    // Mostrar contenido con efecto
+    if (contenido) {
+        contenido.classList.add("visible");
+    }
+
+}, 1800);
 
 };
 

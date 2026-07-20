@@ -1973,3 +1973,27 @@ body h1{
     }
 
 }
+
+/* ===========================
+   APARICIÓN SUAVE DEL CONTENIDO
+=========================== */
+
+#contenido{
+
+    opacity:0;
+
+    transform:translateY(20px);
+
+    transition:
+        opacity .6s ease,
+        transform .6s ease;
+
+}
+
+#contenido.visible{
+
+    opacity:1;
+
+    transform:translateY(0);
+
+}
