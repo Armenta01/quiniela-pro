@@ -134,7 +134,7 @@ async function cargarPartidos() {
   const cont = document.getElementById("partidos");
   cont.innerHTML = "";
 
-  data.forEach(p => {
+  data.forEach((p, index) => {
 
     const estado = getEstadoPartido(p.fecha);
 
@@ -215,6 +215,18 @@ const horaFormateada = horaParte;
 
       </div>
     `;
+
+    setTimeout(() => {
+
+    const tarjetas = document.querySelectorAll(".card");
+
+    if (tarjetas[index]) {
+        tarjetas[index].classList.add("visible");
+    }
+
+}, index * 80);
+
+
   });
 }
 
