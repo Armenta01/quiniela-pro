@@ -1997,3 +1997,141 @@ body h1{
     transform:translateY(0);
 
 }
+
+/* ===========================
+   MODAL PERSONALIZADO
+=========================== */
+
+.modal-personalizado{
+
+    position:fixed;
+    inset:0;
+
+    background:rgba(0,0,0,.65);
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    opacity:0;
+    visibility:hidden;
+
+    transition:.25s;
+
+    z-index:99999;
+
+}
+
+.modal-personalizado.activo{
+
+    opacity:1;
+    visibility:visible;
+
+}
+
+.modal-box{
+
+    width:90%;
+    max-width:420px;
+
+    background:#132a4f;
+
+    border-radius:18px;
+
+    padding:30px;
+
+    text-align:center;
+
+    border:2px solid #facc15;
+
+    box-shadow:0 0 25px rgba(0,0,0,.45);
+
+    transform:scale(.85);
+
+    transition:.25s;
+
+}
+
+.modal-personalizado.activo .modal-box{
+
+    transform:scale(1);
+
+}
+
+.modal-icono{
+
+    font-size:60px;
+
+    margin-bottom:15px;
+
+}
+
+.modal-box h2{
+
+    color:#facc15;
+
+    margin-bottom:10px;
+
+}
+
+.modal-box p{
+
+    color:white;
+
+    font-size:17px;
+
+    line-height:1.5;
+
+    margin-bottom:25px;
+
+}
+
+.modal-botones{
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:15px;
+
+}
+
+.btn-modal{
+
+    border:none;
+
+    border-radius:10px;
+
+    padding:12px 22px;
+
+    font-size:16px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.btn-modal:hover{
+
+    transform:translateY(-2px);
+
+}
+
+.btn-modal.aceptar{
+
+    background:#22c55e;
+
+    color:white;
+
+}
+
+.btn-modal.cancelar{
+
+    background:#ef4444;
+
+    color:white;
+
+}

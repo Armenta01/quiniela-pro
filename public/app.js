@@ -681,21 +681,25 @@ if (social) {
 
 }
 
-function limpiarPronosticos() {
+async function limpiarPronosticos() {
 
-  if (!confirm("¿Deseas borrar todos tus pronósticos?")) {
-    return;
-  }
+    const ok = await mostrarConfirmacion(
+        "Borrar pronósticos",
+        "¿Deseas borrar todos tus pronósticos?"
+    );
 
-  document.querySelectorAll('input[id^="l"]').forEach(i => {
-    i.value = "";
-  });
+    if (!ok) return;
 
-  document.querySelectorAll('input[id^="v"]').forEach(i => {
-    i.value = "";
-  });
+    document.querySelectorAll('input[id^="l"]').forEach(i => {
+        i.value = "";
+    });
+
+    document.querySelectorAll('input[id^="v"]').forEach(i => {
+        i.value = "";
+    });
 
 }
+
 
 function generarAleatorio() {
 
@@ -1034,4 +1038,52 @@ function verMiPosicion(){
   setTimeout(()=>{
     encontrada.style.boxShadow="";
   },4000);
+}
+
+// ==============================
+// MODAL DE CONFIRMACIÓN
+// ==============================
+
+function mostrarConfirmacion(titulo, mensaje){
+
+    return new Promise((resolve)=>{
+
+        const modal = document.getElementById("modalPersonalizado");
+
+        const icono = document.getElementById("modalIcono");
+
+        const tituloModal = document.getElementById("modalTitulo");
+
+        const mensajeModal = document.getElementById("modalMensaje");
+
+        const btnAceptar = document.getElementById("btnAceptar");
+
+        const btnCancelar = document.getElementById("btnCancelar");
+
+        icono.innerHTML = "🗑️";
+
+        tituloModal.innerHTML = titulo;
+
+        mensajeModal.innerHTML = mensaje;
+
+        modal.classList.add("activo");
+
+        btnAceptar.onclick = () => {
+
+            modal.classList.remove("activo");
+
+            resolve(true);
+
+        };
+
+        btnCancelar.onclick = () => {
+
+            modal.classList.remove("activo");
+
+            resolve(false);
+
+        };
+
+    });
+
 }
