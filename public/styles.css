@@ -1835,9 +1835,20 @@ body h1{
 }
 
 .splash-logo{
+
     width:150px;
+
+    position:relative;
+
+    z-index:2;
+
     animation:logoZoom 1.2s ease;
-    filter:drop-shadow(0 0 20px rgba(255,215,0,.45));
+
+    filter:
+        drop-shadow(0 0 10px rgba(255,215,0,.55))
+        drop-shadow(0 0 30px rgba(255,215,0,.45))
+        drop-shadow(0 0 50px rgba(255,215,0,.25));
+
 }
 
 .splash-content h1{
@@ -1876,6 +1887,48 @@ body h1{
     animation:cargar 1.8s linear forwards;
 }
 
+.splash-content{
+
+    position:relative;
+
+    text-align:center;
+
+    animation:entradaSplash .9s ease;
+
+    width:90%;
+
+    max-width:420px;
+
+}
+
+.splash-content::before{
+
+    content:"";
+
+    position:absolute;
+
+    width:220px;
+
+    height:220px;
+
+    left:50%;
+
+    top:5px;
+
+    transform:translateX(-50%);
+
+    background:radial-gradient(circle,
+        rgba(255,215,0,.30),
+        rgba(255,215,0,.08),
+        transparent);
+
+    border-radius:50%;
+
+    animation:pulsoGlow 2s ease-in-out infinite;
+
+    z-index:1;
+
+}
 /* Animaciones */
 
 @keyframes cargar{
@@ -1926,6 +1979,25 @@ body h1{
     to{
         transform:translateY(0);
         opacity:1;
+    }
+
+}
+
+@keyframes pulsoGlow{
+
+    0%{
+        transform:translateX(-50%) scale(.9);
+        opacity:.6;
+    }
+
+    50%{
+        transform:translateX(-50%) scale(1.15);
+        opacity:1;
+    }
+
+    100%{
+        transform:translateX(-50%) scale(.9);
+        opacity:.6;
     }
 
 }
