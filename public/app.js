@@ -219,16 +219,6 @@ const horaFormateada = horaParte;
   });
 const tarjetas = document.querySelectorAll(".card");
 
-tarjetas.forEach((tarjeta, index) => {
-
-    setTimeout(() => {
-
-        tarjeta.classList.add("visible");
-
-    }, index * 80);
-
-});
-
 }
 
 async function verTablaCompleta(jornada) {
