@@ -29,9 +29,22 @@ window.onload = async () => {
   actualizarContador();
 
   setInterval(actualizarContador, 60000);
+
   setTimeout(mostrarRankingPopup, 1000);
 
+  // 🔥 Ocultar Splash
+  setTimeout(() => {
+
+    const splash = document.getElementById("splash");
+
+    if (splash) {
+      splash.classList.add("ocultar");
+    }
+
+  }, 1800);
+
 };
+
 
 function irTabla() {
   const jornada = document.getElementById("jornadaSelect").value;
