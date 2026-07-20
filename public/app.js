@@ -216,18 +216,19 @@ const horaFormateada = horaParte;
       </div>
     `;
 
+  });
+const tarjetas = document.querySelectorAll(".card");
+
+tarjetas.forEach((tarjeta, index) => {
+
     setTimeout(() => {
 
-    const tarjetas = document.querySelectorAll(".card");
+        tarjeta.classList.add("visible");
 
-    if (tarjetas[index]) {
-        tarjetas[index].classList.add("visible");
-    }
+    }, index * 80);
 
-}, index * 80);
+});
 
-
-  });
 }
 
 async function verTablaCompleta(jornada) {
