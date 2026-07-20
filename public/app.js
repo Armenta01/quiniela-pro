@@ -404,14 +404,31 @@ for (let i = u.picks.length; i < totalPartidos; i++) {
 async function guardarTodo() {
 
 
-  if (quinielaCerrada) return alert("🔒 Cerrado");
+ if (quinielaCerrada) {
+
+    mostrarMensaje(
+        "Quiniela cerrada",
+        "La quiniela de esta jornada ya no acepta pronósticos.",
+        "🔒"
+    );
+
+    return;
+
+}
 
   let usuario = document.getElementById("usuario").value.trim();
   let telefono = document.getElementById("telefono").value.trim();
 
 if (!/^\d{10}$/.test(telefono)) {
-  alert("Ingresa un WhatsApp válido de 10 dígitos");
-  return;
+
+    mostrarMensaje(
+        "WhatsApp inválido",
+        "Ingresa un número de WhatsApp válido de 10 dígitos.",
+        "📱"
+    );
+
+    return;
+
 }
 
 
@@ -419,11 +436,28 @@ if (!/^\d{10}$/.test(telefono)) {
 usuario = usuario.replace(/[^a-zA-Z0-9\s]/g, "");
 
 if (usuario.length < 3) {
-  alert("Nombre mínimo 3 caracteres");
-  return;
+
+    mostrarMensaje(
+        "Nombre inválido",
+        "El nombre debe tener al menos 3 caracteres.",
+        "👤"
+    );
+
+    return;
+
 }
 
-  if (!usuario) return alert("Pon tu nombre");
+  if (!usuario) {
+
+    mostrarMensaje(
+        "Nombre requerido",
+        "Por favor escribe tu nombre para continuar.",
+        "👤"
+    );
+
+    return;
+
+}
 
   localStorage.setItem("miNombre", usuario);
 
@@ -1085,5 +1119,43 @@ function mostrarConfirmacion(titulo, mensaje){
         };
 
     });
+
+}
+
+// ==============================
+// MODAL DE MENSAJE
+// ==============================
+
+function mostrarMensaje(titulo, mensaje, icono = "⚠️") {
+
+    const modal = document.getElementById("modalPersonalizado");
+
+    const modalIcono = document.getElementById("modalIcono");
+
+    const modalTitulo = document.getElementById("modalTitulo");
+
+    const modalMensaje = document.getElementById("modalMensaje");
+
+    const btnAceptar = document.getElementById("btnAceptar");
+
+    const btnCancelar = document.getElementById("btnCancelar");
+
+    modalIcono.innerHTML = icono;
+
+    modalTitulo.innerHTML = titulo;
+
+    modalMensaje.innerHTML = mensaje;
+
+    btnCancelar.style.display = "none";
+
+    modal.classList.add("activo");
+
+    btnAceptar.onclick = () => {
+
+        modal.classList.remove("activo");
+
+        btnCancelar.style.display = "inline-block";
+
+    };
 
 }
