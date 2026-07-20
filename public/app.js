@@ -489,19 +489,40 @@ if (usuario.length < 3) {
   const visitante = parseInt(gv);
 
   if (isNaN(local) || isNaN(visitante)) {
-    alert("⚠️ Marcador inválido");
+
+    mostrarMensaje(
+        "Marcador inválido",
+        "Debes ingresar únicamente números.",
+        "⚠️"
+    );
+
     return;
-  }
+
+}
 
   if (local < 0 || visitante < 0) {
-    alert("⚠️ No se permiten goles negativos");
-    return;
-  }
 
-  if (local > 20 || visitante > 20) {
-    alert("⚠️ Marcador fuera de rango (máx 20)");
+    mostrarMensaje(
+        "Marcador inválido",
+        "No se permiten goles negativos.",
+        "🚫"
+    );
+
     return;
-  }
+
+}
+
+ if (local > 20 || visitante > 20) {
+
+    mostrarMensaje(
+        "Marcador fuera de rango",
+        "El marcador máximo permitido es de 20 goles.",
+        "📈"
+    );
+
+    return;
+
+}
 
   lista.push({
     partido_id: p.id,
@@ -510,10 +531,17 @@ if (usuario.length < 3) {
   });
 }
 
-    if (lista.length === 0) {
-      alert("No capturaste resultados");
-      return;
-    }
+   if (lista.length === 0) {
+
+    mostrarMensaje(
+        "Sin pronósticos",
+        "Debes capturar al menos un marcador antes de guardar.",
+        "📝"
+    );
+
+    return;
+
+}
 
     if (btn) btn.disabled = true;
 
@@ -530,10 +558,18 @@ if (usuario.length < 3) {
 
     const data = await res.json();
 
-    if (!res.ok) {
-      if (btn) btn.disabled = false;
-      alert(data.error || "Error al guardar");
-      return;
+   if (!res.ok) {
+
+    if (btn) btn.disabled = false;
+
+    mostrarMensaje(
+        "No fue posible guardar",
+        data.error || "Ocurrió un error al guardar la quiniela.",
+        "❌"
+    );
+
+    return;
+
 }
 
     let mensaje = `📊 Quiniela Semana ${jornadaActual}\n`;
@@ -575,12 +611,20 @@ setTimeout(() => {
 
 }, 1000);
 
-  } catch (err) {
+  } 
+  catch (err) {
+
     console.error(err);
-    alert("❌ Error de conexión");
+
+    mostrarMensaje(
+        "Error de conexión",
+        "No fue posible comunicarse con el servidor. Intenta nuevamente.",
+        "📡"
+    );
 
     if (btn) btn.disabled = false;
-  }
+
+}
   
 }
 
@@ -1034,10 +1078,17 @@ function verMiPosicion(){
   const nombre =
     localStorage.getItem("miNombre");
 
-  if(!nombre){
-    alert("No se encontró tu nombre");
+ if(!nombre){
+
+    mostrarMensaje(
+        "Nombre no encontrado",
+        "Primero debes guardar una quiniela para poder localizar tu posición.",
+        "👤"
+    );
+
     return;
-  }
+
+}
 
   const filas =
     document.querySelectorAll(".fila");
@@ -1062,9 +1113,16 @@ function verMiPosicion(){
   });
 
   if(!encontrada){
-    alert("No apareces en esta jornada");
+
+    mostrarMensaje(
+        "Sin resultados",
+        "No apareces registrado en la tabla de esta jornada.",
+        "📋"
+    );
+
     return;
-  }
+
+}
 
   encontrada.scrollIntoView({
     behavior:"smooth",
@@ -1146,6 +1204,26 @@ function mostrarMensaje(titulo, mensaje, icono = "⚠️") {
     const btnCancelar = document.getElementById("btnCancelar");
 
     modalIcono.innerHTML = icono;
+
+    modalIcono.className = "modal-icono";
+
+if (icono === "❌" || icono === "🚫") {
+
+    modalIcono.classList.add("error");
+
+} else if (icono === "⚠️") {
+
+    modalIcono.classList.add("warning");
+
+} else if (icono === "✅") {
+
+    modalIcono.classList.add("success");
+
+} else {
+
+    modalIcono.classList.add("info");
+
+}
 
     modalTitulo.innerHTML = titulo;
 
