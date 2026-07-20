@@ -217,8 +217,6 @@ const horaFormateada = horaParte;
     `;
 
   });
-const tarjetas = document.querySelectorAll(".card");
-
 }
 
 async function verTablaCompleta(jornada) {
