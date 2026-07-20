@@ -44,9 +44,12 @@ window.onload = async () => {
     }
 
     // Mostrar contenido con efecto
+  setTimeout(() => {
     if (contenido) {
         contenido.classList.add("visible");
     }
+
+    }, 300);
 
 }, 1800);
 
