@@ -46,9 +46,9 @@ input, select, button {
   padding:12px;
   border-radius:15px;
 
-   opacity:0;
+   opacity:1;
 
-    transform:translateY(20px);
+    transform:translateY(0);
 
     transition:
         opacity .45s ease,
