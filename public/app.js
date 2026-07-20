@@ -474,11 +474,16 @@ if (usuario.length < 3) {
   const gv = document.getElementById("v" + p.id).value;
 
   if (gl === "" || gv === "") {
-    alert(
-      `⚠️ Falta capturar el marcador de:\n\n${p.local} vs ${p.visitante}`
+
+    mostrarMensaje(
+        "Marcador incompleto",
+        `Falta capturar el marcador de:<br><br><strong>${p.local} vs ${p.visitante}</strong>`,
+        "⚠️"
     );
+
     return;
-  }
+
+}
 
   const local = parseInt(gl);
   const visitante = parseInt(gv);
