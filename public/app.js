@@ -585,12 +585,11 @@ const fechaHora =
 
 let mensaje = "";
 
-mensaje += "━━━━━━━━━━━━━━━━━━\n\n";
 mensaje += "🏆 *Quinielas El Inge*\n\n";
 mensaje += `👤 Jugador: *${usuario}*\n`;
 mensaje += `📅 Semana: *${jornadaActual}*\n`;
 mensaje += `🕒 Registrada: *${fechaHora}*\n\n`;
-mensaje += "━━━━━━ *PRONÓSTICOS* ━━━━━━\n\n";
+mensaje += "━━━ *PRONÓSTICOS* ━━━\n\n";
 
 lista.forEach(p => {
 
@@ -602,7 +601,7 @@ lista.forEach(p => {
 
 });
 
-mensaje += "\n━━━━━━━━━━━━━━━━━━\n\n";
+mensaje += "\n━━━━━━━━━━━━━\n";
 mensaje += "🍀 *¡Mucha suerte!*\n\n";
 
 
