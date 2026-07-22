@@ -573,14 +573,38 @@ if (usuario.length < 3) {
 
 }
 
-    let mensaje = `📊 Quiniela Semana ${jornadaActual}\n`;
-    mensaje += `👤 ${usuario}\n\n`;
+const ahora = new Date();
 
-    lista.forEach(p => {
-      const partido = partidos.find(x => x.id === p.partido_id);
-      if (!partido) return;
-      mensaje += `⚽ ${partido.local} ${p.local}-${p.visitante} ${partido.visitante}\n`;
+const fechaHora =
+    ahora.toLocaleDateString("es-MX") +
+    " " +
+    ahora.toLocaleTimeString("es-MX", {
+        hour: "2-digit",
+        minute: "2-digit"
     });
+
+let mensaje = "";
+
+mensaje += "━━━━━━━━━━━━━━━━━━\n\n";
+mensaje += "🏆 *Quinielas El Inge*\n\n";
+mensaje += `👤 Jugador: *${usuario}*\n`;
+mensaje += `📅 Semana: *${jornadaActual}*\n`;
+mensaje += `🕒 Registrada: *${fechaHora}*\n\n`;
+mensaje += "━━━━━━ *PRONÓSTICOS* ━━━━━━\n\n";
+
+lista.forEach(p => {
+
+    const partido = partidos.find(x => x.id === p.partido_id);
+
+    if (!partido) return;
+
+    mensaje += `⚽ ${partido.local} *[${p.local}]-[${p.visitante}]* ${partido.visitante}\n`;
+
+});
+
+mensaje += "\n━━━━━━━━━━━━━━━━━━\n\n";
+mensaje += "🍀 *¡Mucha suerte!*\n\n";
+
 
    const phone = "524531336012";
 const texto = encodeURIComponent(mensaje);
