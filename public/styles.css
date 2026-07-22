@@ -237,12 +237,12 @@ button {
 }
 
 .amarillo {
-  background: #eab308;
+  background: #fde275;
   color: #000000;
 }
 
 .rojo {
-  background: #ef4444;
+  background: #fecaca;
   color: #ffffff;
 }
 
@@ -443,12 +443,12 @@ button {
 }
 
 .amarillo span {
-  background: #eab308;
+  background: #fef3c7;
   color: #000;
 }
 
 .rojo span {
-  background: #ef4444;
+  background: #fecaca;
   color: #fff;
 }
 
