@@ -155,10 +155,10 @@ function filtrarParticipantes(){
 
 }
 
-
 async function reiniciarRecordatorios(){
 
-    const confirmar = confirm(
+    const confirmar = await mostrarConfirmacion(
+        "Reiniciar recordatorios",
         "¿Deseas reiniciar todos los recordatorios para una nueva jornada?"
     );
 
@@ -176,13 +176,17 @@ async function reiniciarRecordatorios(){
 
         if(data.ok){
 
-            alert("✅ Recordatorios reiniciados correctamente.");
+            mostrarToast("Recordatorios reiniciados correctamente", "✅");
 
             cargarRecordatorios();
 
         }else{
 
-            alert("❌ No fue posible reiniciar los recordatorios.");
+            mostrarMensaje(
+                "Error",
+                "No fue posible reiniciar los recordatorios.",
+                "❌"
+            );
 
         }
 
@@ -190,7 +194,11 @@ async function reiniciarRecordatorios(){
 
         console.error(err);
 
-        alert("❌ Error de conexión con el servidor.");
+        mostrarMensaje(
+            "Error de conexión",
+            "No fue posible comunicarse con el servidor.",
+            "📡"
+        );
 
     }
 
