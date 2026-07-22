@@ -588,7 +588,7 @@ let mensaje = "";
 mensaje += "🏆 *Quinielas El Inge*\n\n";
 mensaje += `👤 Jugador: *${usuario}*\n`;
 mensaje += `📅 Semana: *${jornadaActual}*\n`;
-mensaje += `🕒 Registrada: *${fechaHora}*\n\n`;
+mensaje += `🕒 Registro: *${fechaHora}*\n\n`;
 mensaje += "━━━ *PRONÓSTICOS* ━━━\n\n";
 
 lista.forEach(p => {
