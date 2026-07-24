@@ -1414,18 +1414,15 @@ premio.value = [
 
 
 premio.font = {
-    name: "Arial Black",
-    bold: true,
-    size: 24,
-    color: { argb: "FF000000" }
+  bold: true,
+  size: 24,
+  color: { argb: "FFFFFFFF" }
 };
 
-premio.fill = {
-    type: "pattern",
-    pattern: "solid",
-    fgColor: {
-        argb: "FFFFD700"
-    }
+premio.alignment = {
+  horizontal: "center",
+  vertical: "middle",
+  wrapText: true
 };
 
 sheet.getRow(5).height = 28;
