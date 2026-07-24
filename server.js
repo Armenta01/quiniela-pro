@@ -1415,7 +1415,7 @@ premio.value = [
 
 premio.font = {
   bold: true,
-  size: 24,
+  size: 22,
   color: { argb: "FFFFFFFF" }
 };
 
