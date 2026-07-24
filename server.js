@@ -730,14 +730,15 @@ const inicio = fechaBD.clone().subtract(6, "hours");
 
 const ahora = moment();
 
-console.log("BD:", primerPartido.rows[0].fecha);
-console.log("Inicio:", inicio.format());
-console.log("Ahora:", ahora.format());
-console.log("Cerrada:", ahora.isSameOrAfter(inicio));
-
-  
-console.log("Inicio:", inicio.format());
-console.log("Ahora :", ahora.format());
+// 👇 Reemplaza los console.log por estos
+    console.log("================================");
+    console.log("BD:", primerPartido.rows[0].fecha);
+    console.log("UTC:", fechaBD.format());
+    console.log("México:", fechaBD.clone().tz("America/Mexico_City").format());
+    console.log("Inicio:", inicio.format());
+    console.log("Ahora:", moment().tz("America/Mexico_City").format());
+    console.log("Cerrada:", ahora.isSameOrAfter(inicio));
+    console.log("================================");
 
 if (ahora.isSameOrAfter(inicio)) {
 
