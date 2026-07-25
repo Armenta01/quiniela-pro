@@ -724,22 +724,22 @@ try{
 
 if (primerPartido.rows.length > 0) {
 
-const fechaBD = moment(primerPartido.rows[0].fecha);
+const fechaBD = moment
+    .utc(primerPartido.rows[0].fecha)
+    .tz("America/Mexico_City");
 
-const ahora = moment();
+const ahora = moment().tz("America/Mexico_City");
 
 console.log("BD:", primerPartido.rows[0].fecha);
-console.log("Fecha partido:", fechaBD.format());
-console.log("Ahora:", ahora.format());
+console.log("Fecha México:", fechaBD.format());
+console.log("Ahora México:", ahora.format());
 console.log("Cerrada:", ahora.isSameOrAfter(fechaBD));
 
 if (ahora.isSameOrAfter(fechaBD)) {
-
     return res.status(403).json({
-        ok:false,
-        error:"La jornada ya inició."
+        ok: false,
+        error: "La jornada ya inició."
     });
-
 }
 }
 
