@@ -715,7 +715,7 @@ app.post('/admin/editar-pronosticos', async (req, res) => {
 try{
 
     const primerPartido = await client.query(`
-    SELECT fecha
+    SELECT fecha::text AS fecha
     FROM partidos
     WHERE jornada = $1
     ORDER BY fecha ASC
@@ -728,12 +728,16 @@ if (primerPartido.rows.length > 0) {
 console.log(typeof primerPartido.rows[0].fecha);
 console.log(primerPartido.rows[0].fecha instanceof Date);
 
-const fechaBD = moment(primerPartido.rows[0].fecha);
+const fechaBD = moment.tz(
+    primerPartido.rows[0].fecha,
+    "YYYY-MM-DD HH:mm:ss",
+    "America/Mexico_City"
+);
 
-const ahora = moment();
+const ahora = moment.tz("America/Mexico_City");
 
-console.log("Fecha BD:", fechaBD.format());
-console.log("Ahora:", ahora.format());
+console.log("Fecha México:", fechaBD.format());
+console.log("Ahora México:", ahora.format());
 
 if (ahora.isSameOrAfter(fechaBD)) {
 
