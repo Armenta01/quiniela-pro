@@ -724,23 +724,16 @@ try{
 
 if (primerPartido.rows.length > 0) {
 
-  const fechaBD = moment.utc(primerPartido.rows[0].fecha);
-
-const inicio = fechaBD.clone().subtract(6, "hours");
+const fechaBD = moment(primerPartido.rows[0].fecha);
 
 const ahora = moment();
 
-// 👇 Reemplaza los console.log por estos
-    console.log("================================");
-    console.log("BD:", primerPartido.rows[0].fecha);
-    console.log("UTC:", fechaBD.format());
-    console.log("México:", fechaBD.clone().tz("America/Mexico_City").format());
-    console.log("Inicio:", inicio.format());
-    console.log("Ahora:", moment().tz("America/Mexico_City").format());
-    console.log("Cerrada:", ahora.isSameOrAfter(inicio));
-    console.log("================================");
+console.log("BD:", primerPartido.rows[0].fecha);
+console.log("Fecha partido:", fechaBD.format());
+console.log("Ahora:", ahora.format());
+console.log("Cerrada:", ahora.isSameOrAfter(fechaBD));
 
-if (ahora.isSameOrAfter(inicio)) {
+if (ahora.isSameOrAfter(fechaBD)) {
 
     return res.status(403).json({
         ok:false,
