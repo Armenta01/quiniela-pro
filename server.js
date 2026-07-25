@@ -724,22 +724,24 @@ try{
 
 if (primerPartido.rows.length > 0) {
 
-const fechaBD = moment
-    .utc(primerPartido.rows[0].fecha)
-    .tz("America/Mexico_City");
+  console.log(primerPartido.rows[0].fecha);
+console.log(typeof primerPartido.rows[0].fecha);
+console.log(primerPartido.rows[0].fecha instanceof Date);
 
-const ahora = moment().tz("America/Mexico_City");
+const fechaBD = moment(primerPartido.rows[0].fecha);
 
-console.log("BD:", primerPartido.rows[0].fecha);
-console.log("Fecha México:", fechaBD.format());
-console.log("Ahora México:", ahora.format());
-console.log("Cerrada:", ahora.isSameOrAfter(fechaBD));
+const ahora = moment();
+
+console.log("Fecha BD:", fechaBD.format());
+console.log("Ahora:", ahora.format());
 
 if (ahora.isSameOrAfter(fechaBD)) {
+
     return res.status(403).json({
-        ok: false,
-        error: "La jornada ya inició."
+        ok:false,
+        error:"La jornada ya inició."
     });
+
 }
 }
 
@@ -1176,9 +1178,13 @@ app.post('/admin/partidos', async (req, res) => {
   liga = liga ? liga.trim() : null;
 
   // FIX HORARIO MEXICO
-  const fechaMexico = moment
-    .tz(fecha, "YYYY-MM-DDTHH:mm", "America/Mexico_City")
-    .format("YYYY-MM-DD HH:mm:ss");
+  const fechaUTC = moment
+  .tz(fecha, "YYYY-MM-DDTHH:mm", "America/Mexico_City")
+  .utc()
+  .toDate();
+
+console.log("Fecha recibida:", fecha);
+console.log("Fecha UTC:", fechaUTC);
   try {
 
     // Obtener el siguiente orden de la jornada
@@ -1213,7 +1219,7 @@ if (!Number.isInteger(orden) || orden <= 0) {
 `, [
   local,
   visitante,
-  fechaMexico,
+  fechaUTC,
   jornada,
   orden,
   liga || null,
