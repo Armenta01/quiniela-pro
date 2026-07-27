@@ -198,22 +198,29 @@ app.get('/partidos', async (req, res) => {
   const { jornada } = req.query;
 
   const result = await pool.query(`
-    SELECT 
-      id,
-      local,
-      visitante,
-      TO_CHAR(fecha, 'YYYY-MM-DD HH24:MI') as fecha,
-      logo_local,
-      logo_visitante,
-      goles_local,
-      goles_visitante,
-      jornada,
-      liga
+    SELECT
+        id,
+        local,
+        visitante,
+        fecha,
+        logo_local,
+        logo_visitante,
+        goles_local,
+        goles_visitante,
+        jornada,
+        liga
     FROM partidos
     WHERE jornada = $1
     ORDER BY orden
-  `, [jornada]);
+`, [jornada]);
 
+result.rows.forEach(p => {
+    p.fecha = moment
+        .tz(p.fecha, "YYYY-MM-DD HH:mm:ss", "America/Mexico_City")
+        .format("YYYY-MM-DD HH:mm");
+});
+
+res.json(result.rows);
   res.json(result.rows);
 });
 
