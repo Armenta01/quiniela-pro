@@ -1201,13 +1201,12 @@ app.post('/admin/partidos', async (req, res) => {
   liga = liga ? liga.trim() : null;
 
   // FIX HORARIO MEXICO
-  const fechaUTC = moment
+  const fechaMexico = moment
   .tz(fecha, "YYYY-MM-DDTHH:mm", "America/Mexico_City")
-  .utc()
-  .toDate();
+  .format("YYYY-MM-DD HH:mm:ss");
 
 console.log("Fecha recibida:", fecha);
-console.log("Fecha UTC:", fechaUTC);
+console.log("Fecha México:", fechaMexico);
   try {
 
     // Obtener el siguiente orden de la jornada
@@ -1242,7 +1241,7 @@ if (!Number.isInteger(orden) || orden <= 0) {
 `, [
   local,
   visitante,
-  fechaUTC,
+  fechaMexico,
   jornada,
   orden,
   liga || null,
