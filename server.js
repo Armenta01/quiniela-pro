@@ -194,11 +194,12 @@ app.get('/jornadas', async (req, res) => {
 
 // 🔥 PARTIDOS
 app.get('/partidos', async (req, res) => {
+  try {
 
-  const { jornada } = req.query;
+    const { jornada } = req.query;
 
-  const result = await pool.query(`
-    SELECT
+    const result = await pool.query(`
+      SELECT
         id,
         local,
         visitante,
@@ -209,20 +210,27 @@ app.get('/partidos', async (req, res) => {
         goles_visitante,
         jornada,
         liga
-    FROM partidos
-    WHERE jornada = $1
-    ORDER BY orden
-`, [jornada]);
+      FROM partidos
+      WHERE jornada = $1
+      ORDER BY orden
+    `, [jornada]);
 
-result.rows.forEach(p => {
-    p.fecha = moment
+    result.rows.forEach(p => {
+      p.fecha = moment
         .tz(p.fecha, "YYYY-MM-DD HH:mm:ss", "America/Mexico_City")
         .format("YYYY-MM-DD HH:mm");
+    });
+
+    res.json(result.rows);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      error: "Error obteniendo partidos"
+    });
+  }
 });
 
-res.json(result.rows);
-  res.json(result.rows);
-});
 
 app.get('/check-user', async (req, res) => {
   const { nombre, jornada } = req.query;
