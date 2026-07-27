@@ -1,7 +1,11 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
-const { Pool } = require('pg');
+const { Pool, types } = require('pg');
+
+// timestamp without time zone (OID 1114)
+// Devolver SIEMPRE como texto
+types.setTypeParser(1114, value => value);
 const ExcelJS = require('exceljs');
 const fetch = require('node-fetch');
 const moment = require('moment-timezone');
