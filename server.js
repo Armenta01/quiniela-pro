@@ -253,6 +253,10 @@ app.post('/guardar', async (req, res) => {
 
 nombre = nombre.trim();
   const envioId = Date.now().toString() + "_" + Math.random().toString(36).substring(2,8);
+
+  const fechaEnvio = moment
+  .tz("America/Mexico_City")
+  .format("YYYY-MM-DD HH:mm:ss");
   
   try {
     if (!nombre || nombre.length < 2) {
@@ -344,9 +348,10 @@ if (nuevo === viejo) {
   jornada,
   envio_id,
   telefono,
-  estado_pago
+  estado_pago,
+  fecha_envio
 )
-VALUES($1,$2,$3,$4,$5,$6,$7,$8)
+VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)
 `, [
     userId,
     p.partido_id,
@@ -355,7 +360,8 @@ VALUES($1,$2,$3,$4,$5,$6,$7,$8)
     jornada,
     envioId,
     telefono,
-    "Pendiente"
+    "Pendiente",
+    fechaEnvio
 ]);
 }
 
