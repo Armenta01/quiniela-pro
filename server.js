@@ -609,7 +609,7 @@ app.get('/admin/participantes', async (req, res) => {
   SELECT DISTINCT ON (pr.envio_id)
      u.nombre,
      pr.telefono,
-     pr.fecha_envio,
+     TO_CHAR(pr.fecha_envio, 'DD/MM/YYYY HH24:MI:SS') AS fecha_envio,
      pr.envio_id
   FROM predicciones pr
   JOIN users u
