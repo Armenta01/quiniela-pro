@@ -117,7 +117,7 @@ async function jornadaBloqueada(jornada) {
 
   const ahora = moment.tz("America/Mexico_City");
 
-  return ahora >= limite;
+  const bloqueada = ahora.valueOf() >= limite.valueOf();
 }
 
 async function obtenerCampeon(jornada) {
@@ -1155,7 +1155,7 @@ const limite = fechaPartido
     const ahora = moment.tz("America/Mexico_City");
 
     // 🔥 COMPARACIÓN REAL
-    const bloqueada = ahora >= limite;
+    const bloqueada = ahora.valueOf() >= limite.valueOf();
 
     res.json({
       bloqueada,
