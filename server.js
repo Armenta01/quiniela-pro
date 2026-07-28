@@ -102,10 +102,11 @@ async function jornadaBloqueada(jornada) {
 
   if (!result.rows[0].fecha) return false;
 
-  const fechaPartido = moment.tz(
-    result.rows[0].fecha,
-    "America/Mexico_City"
-  );
+ const fechaPartido = moment.tz(
+  result.rows[0].fecha,
+  "YYYY-MM-DD HH:mm:ss",
+  "America/Mexico_City"
+);
 
  const limite = fechaPartido
   .clone()
@@ -116,7 +117,7 @@ async function jornadaBloqueada(jornada) {
 
   const ahora = moment.tz("America/Mexico_City");
 
-  return ahora.isAfter(limite);
+  return ahora >= limite;
 }
 
 async function obtenerCampeon(jornada) {
@@ -1138,6 +1139,7 @@ app.get('/limite', async (req, res) => {
     // 🔥 FECHA DEL PARTIDO EN MÉXICO
     const fechaPartido = moment.tz(
   r.rows[0].fecha,
+  "YYYY-MM-DD HH:mm:ss",
   "America/Mexico_City"
 );
 
@@ -1153,7 +1155,7 @@ const limite = fechaPartido
     const ahora = moment.tz("America/Mexico_City");
 
     // 🔥 COMPARACIÓN REAL
-    const bloqueada = ahora.isAfter(limite);
+    const bloqueada = ahora >= limite;
 
     res.json({
       bloqueada,
