@@ -330,8 +330,13 @@ async function resetearTodo() {
 
   if (!password) return;
 
-  const confirmacion = confirm("⚠️ Esto borrará TODO ¿Estás seguro?");
-  if (!confirmacion) return;
+  const confirmacion = await mostrarConfirmacion(
+    "Reset de temporada",
+    "Esto borrará toda la información de la temporada. ¿Deseas continuar?"
+);
+
+if (!confirmacion) return;
+
 
   const res = await fetch('/reset', {
     method: 'POST',
@@ -344,11 +349,19 @@ async function resetearTodo() {
   const data = await res.json();
 
   if (!res.ok) {
-    alert(data.error || "❌ Error al resetear");
+    mostrarMensaje(
+    "Error",
+    data.error || "No fue posible resetear.",
+    "❌"
+);
+
     return;
   }
 
-  alert("🔥 Sistema reiniciado");
+  mostrarToast(
+    "Sistema reiniciado correctamente",
+    "🔥"
+);
 
   location.reload();
 }
@@ -386,7 +399,11 @@ async function cargarPartidos() {
     const data = await res.json();
 
     if (!res.ok) {
-  alert(data.error); // 🔥 AQUÍ VERÁS EL ERROR REAL
+   mostrarMensaje(
+        "Error",
+        data.error,
+        "❌"
+    ); // 🔥 AQUÍ VERÁS EL ERROR REAL
   return;
 }
 
@@ -435,7 +452,11 @@ async function guardarResultado(id) {
   const gv = document.getElementById("rv"+id).value;
 
   if (gl === "" || gv === "") {
-    alert("Pon marcador");
+    mostrarMensaje(
+    "Marcador incompleto",
+    "Debes capturar ambos marcadores.",
+    "⚠️"
+);
     return;
   }
 
@@ -453,24 +474,28 @@ async function guardarResultado(id) {
     const data = await res.json();
 
     if (data.ok) {
-      alert("✅ Resultado guardado");
+      mostrarToast("Resultado guardado", "✅");
     } else {
-      alert("❌ Error");
+       mostrarMensaje(
+        "Error",
+        data.error || "No fue posible guardar el resultado.",
+        "❌"
+      );
     }
 
   } catch (err) {
     console.error(err);
-    alert("❌ Error servidor");
+    mostrarMensaje("Servidor", "Error de comunicación con el servidor.", "❌");
   }
 }
 
 async function eliminarPartido(id) {
+const confirmar = await mostrarConfirmacion(
+    "Eliminar partido",
+    "¿Deseas eliminar este partido?"
+);
 
-  const confirmar = confirm(
-    "⚠️ ¿Eliminar este partido?"
-  );
-
-  if (!confirmar) return;
+if (!confirmar) return;
 
   try {
 
@@ -485,21 +510,29 @@ async function eliminarPartido(id) {
 
     if (data.ok) {
 
-      alert("✅ Partido eliminado");
+    mostrarToast("Partido eliminado correctamente", "✅");
 
-      cargarPartidos();
+    cargarPartidos();
 
-    } else {
+}else{
 
-      alert("❌ Error");
+    mostrarMensaje(
+        "Error",
+        "No fue posible eliminar el partido.",
+        "❌"
+    );
 
-    }
+}
 
-  } catch (err) {
+}catch (err) {
 
     console.error(err);
 
-    alert("❌ Error servidor");
+    mostrarMensaje(
+    "Servidor",
+    "Error de comunicación con el servidor.",
+    "❌"
+);
 
   }
 }
@@ -755,10 +788,12 @@ function mostrarJugadores(jugadores){
 
     jugadores.forEach(j=>{
 
-        lista.innerHTML += `
+
+
+      lista.innerHTML += `
 
 <div class="partido jugador-item"
-     onclick="seleccionarJugador(${j.id})">
+     onclick="seleccionarJugador(${j.id}, this)">
 
     👤 ${j.nombre}
 
@@ -849,7 +884,11 @@ async function cargarPronosticos(){
 async function guardarCambiosPronosticos(){
 
     if(!jugadorSeleccionado){
-        alert("Selecciona un jugador.");
+        mostrarMensaje(
+    "Participante",
+    "Selecciona un participante.",
+    "⚠️"
+);
         return;
     }
 
@@ -901,11 +940,18 @@ async function guardarCambiosPronosticos(){
 
         if(data.ok){
 
-            alert("✅ Pronósticos actualizados correctamente.");
+           mostrarToast(
+    "Pronósticos actualizados correctamente",
+    "✅"
+);
 
         }else{
 
-            alert(data.error || "Error");
+            mostrarMensaje(
+    "Error",
+    data.error || "No fue posible actualizar los pronósticos.",
+    "❌"
+);
 
         }
 
@@ -913,7 +959,11 @@ async function guardarCambiosPronosticos(){
 
         console.error(err);
 
-        alert("❌ Error del servidor.");
+        mostrarMensaje(
+    "Servidor",
+    "Error de comunicación con el servidor.",
+    "❌"
+);
 
     }
 
