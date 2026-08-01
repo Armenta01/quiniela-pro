@@ -203,6 +203,7 @@ if (sessionStorage.getItem("admin") !== "true") {
 
 </div>
 
+<script src="ui.js"></script>
 
 <script>
 let editandoId = null;
@@ -215,7 +216,11 @@ let editandoId = null;
   const jornada = document.getElementById("jornada").value;
 
   if (!jornada) {
-    alert("Selecciona una jornada");
+    mostrarMensaje(
+    "Jornada",
+    "Selecciona una jornada.",
+    "⚠️"
+);
     return;
   }
 

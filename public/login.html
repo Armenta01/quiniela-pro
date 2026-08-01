@@ -176,6 +176,7 @@ button:hover{
 
 </div>
 
+<script src="ui.js"></script>
 <script>
 
 async function login() {
@@ -207,7 +208,11 @@ async function login() {
 
     }else{
 
-      alert(data.error || "Error login");
+       mostrarMensaje(
+        "Acceso denegado",
+        data.error || "Usuario o contraseña incorrectos.",
+        "❌"
+    );
 
     }
 
@@ -215,7 +220,11 @@ async function login() {
 
     console.error(err);
 
-    alert("Error conexión servidor");
+    mostrarMensaje(
+        "Error",
+        "No fue posible conectar con el servidor.",
+        "⚠️"
+    );
 
   }
 
