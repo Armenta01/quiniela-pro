@@ -264,12 +264,28 @@
 
 </div>
 
-<div id="toast" class="toast">
-    <span id="toastIcono">✅</span>
-    <span id="toastTexto">Mensaje</span>
-</div>
+<div id="ui-container"></div>
 
-<script src="app.js"></script>
+<div id="ui-container"></div>
+
+<script src="ui.js"></script>
+
+<script>
+
+fetch("ui.html")
+.then(r => r.text())
+.then(html => {
+
+    document.getElementById("ui-container").innerHTML = html;
+
+    const script = document.createElement("script");
+    script.src = "app.js";
+    document.body.appendChild(script);
+
+});
+
+</script>
+
 
 </body>
 </html>

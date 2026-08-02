@@ -47,6 +47,72 @@ function mostrarConfirmacion(titulo, mensaje){
 }
 
 // ==============================
+// PASSWORD
+// ==============================
+
+function mostrarPassword(titulo,mensaje){
+
+return new Promise((resolve)=>{
+
+const modal=document.getElementById("modalPersonalizado");
+
+const icono=document.getElementById("modalIcono");
+
+const tituloModal=document.getElementById("modalTitulo");
+
+const mensajeModal=document.getElementById("modalMensaje");
+
+const input=document.getElementById("modalInput");
+
+const btnAceptar=document.getElementById("btnAceptar");
+
+const btnCancelar=document.getElementById("btnCancelar");
+
+icono.innerHTML="🔐";
+
+icono.className="modal-icono info";
+
+tituloModal.innerHTML=titulo;
+
+mensajeModal.innerHTML=mensaje;
+
+input.value="";
+
+input.style.display="block";
+
+btnCancelar.style.display="inline-block";
+
+modal.classList.add("activo");
+
+input.focus();
+
+btnAceptar.onclick=()=>{
+
+const valor=input.value;
+
+modal.classList.remove("activo");
+
+input.style.display="none";
+
+resolve(valor);
+
+};
+
+btnCancelar.onclick=()=>{
+
+modal.classList.remove("activo");
+
+input.style.display="none";
+
+resolve(null);
+
+};
+
+});
+
+}
+
+// ==============================
 // MODAL DE MENSAJE
 // ==============================
 
