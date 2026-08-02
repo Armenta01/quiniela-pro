@@ -182,10 +182,17 @@ value="${p.goles_visitante}">
 
 async function guardarCambiosPronosticos(){
 
-    if(!jugadorSeleccionado){
-        alert("Selecciona un participante.");
-        return;
-    }
+    if (!jugadorSeleccionado) {
+
+    mostrarMensaje(
+        "Selecciona un participante",
+        "Primero elige un jugador de la lista.",
+        "👤"
+    );
+
+    return;
+
+}
 
     const gl =
         document.querySelectorAll(".gl");
@@ -238,13 +245,20 @@ async function guardarCambiosPronosticos(){
 
     const data = await r.json();
 
-    if(data.ok){
+    if (data.ok) {
 
-         alert("✅ Pronósticos actualizados correctamente.");
+    mostrarToast(
+        "Pronósticos actualizados correctamente.",
+        "✅"
+    );
 
-    }else{
+} else {
 
-        alert("❌ " + (data.error || "No fue posible guardar."));
+    mostrarMensaje(
+        "Error",
+        data.error || "No fue posible guardar.",
+        "❌"
+    );
 
 }
 
@@ -272,8 +286,11 @@ async function verificarEstadoEdicion(){
 
         document.getElementById("btnGuardar").style.cursor = "not-allowed";
 
-        alert("La edición está cerrada porque el primer partido ya comenzó.");
-
+        mostrarMensaje(
+    "Edición cerrada",
+    "La edición ya no está disponible porque el primer partido comenzó.",
+    "🔒"
+);
     }
 
 }
