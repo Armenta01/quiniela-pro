@@ -1,4 +1,18 @@
 // ==============================
+// CARGAR UI
+// ==============================
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    if (document.getElementById("modalPersonalizado")) return;
+
+    const html = await fetch("ui.html").then(r => r.text());
+
+    document.body.insertAdjacentHTML("beforeend", html);
+
+});
+
+// ==============================
 // MODAL DE CONFIRMACIÓN
 // ==============================
 
