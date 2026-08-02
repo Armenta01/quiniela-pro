@@ -643,9 +643,9 @@ setTimeout(() => {
     console.error(err);
 
     mostrarMensaje(
-        "Error de conexión",
-        "No fue posible comunicarse con el servidor. Intenta nuevamente.",
-        "📡"
+        "Error",
+        err.message,
+        "❌"
     );
 
     if (btn) btn.disabled = false;
