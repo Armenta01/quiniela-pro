@@ -611,7 +611,7 @@ const url = `https://wa.me/${phone}?text=${texto}`;
 
 mostrarToast("¡Quiniela enviada correctamente!", "✅");
 
-//confetti();
+confetti();
 
 setTimeout(() => {
 
