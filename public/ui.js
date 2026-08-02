@@ -190,22 +190,8 @@ function mostrarMensaje(titulo, mensaje, icono = "⚠️") {
 
 function mostrarToast(texto, icono = "✅") {
 
-    const toast = document.getElementById("toast");
-
-    const toastTexto = document.getElementById("toastTexto");
-
-    const toastIcono = document.getElementById("toastIcono");
-
-    toastTexto.innerHTML = texto;
-
-    toastIcono.innerHTML = icono;
-
-    toast.classList.add("mostrar");
-
-    setTimeout(() => {
-
-        toast.classList.remove("mostrar");
-
-    }, 3000);
+    console.log(document.getElementById("toast"));
+    console.log(document.getElementById("toastTexto"));
+    console.log(document.getElementById("toastIcono"));
 
 }
