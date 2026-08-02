@@ -134,24 +134,5 @@ async function cargarParticipantes() {
 cargarParticipantes();
 
 </script>
-
-<div id="ui-container"></div>
-
-<script src="ui.js"></script>
-
-<script>
-
-fetch("ui.html")
-.then(r=>r.text())
-.then(html=>{
-
-document.getElementById("ui-container").innerHTML=html;
-
-});
-
-</script>
-
-<script src="ui.js"></script>
-
 </body>
 </html>
