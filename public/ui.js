@@ -1,16 +1,4 @@
-// ==============================
-// CARGAR UI
-// ==============================
 
-document.addEventListener("DOMContentLoaded", async () => {
-
-    if (document.getElementById("modalPersonalizado")) return;
-
-    const html = await fetch("ui.html").then(r => r.text());
-
-    document.body.insertAdjacentHTML("beforeend", html);
-
-});
 
 // ==============================
 // MODAL DE CONFIRMACIÓN
@@ -190,8 +178,22 @@ function mostrarMensaje(titulo, mensaje, icono = "⚠️") {
 
 function mostrarToast(texto, icono = "✅") {
 
-    console.log(document.getElementById("toast"));
-    console.log(document.getElementById("toastTexto"));
-    console.log(document.getElementById("toastIcono"));
+    const toast = document.getElementById("toast");
+    const toastTexto = document.getElementById("toastTexto");
+    const toastIcono = document.getElementById("toastIcono");
+
+    if (!toast || !toastTexto || !toastIcono) {
+        console.error("No existe el toast en el HTML.");
+        return;
+    }
+
+    toastTexto.textContent = texto;
+    toastIcono.textContent = icono;
+
+    toast.classList.add("mostrar");
+
+    setTimeout(() => {
+        toast.classList.remove("mostrar");
+    }, 3000);
 
 }
