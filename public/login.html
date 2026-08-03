@@ -187,6 +187,18 @@ async function login() {
     const user = document.getElementById("user").value.trim();
     const password = document.getElementById("pass").value.trim();
 
+    // Validar campos
+    if (!user || !password) {
+
+      mostrarMensaje(
+        "Campos incompletos",
+        "Debes escribir el usuario y la contraseña.",
+        "⚠️"
+      );
+
+      return;
+    }
+
     const res = await fetch('/admin/login', {
       method:'POST',
       headers:{
@@ -232,6 +244,55 @@ async function login() {
 }
 
 </script>
+
+<!-- MODAL -->
+
+<div id="modalPersonalizado" class="modal-overlay">
+
+    <div class="modal">
+
+        <div id="modalIcono" class="modal-icono">⚠️</div>
+
+        <h2 id="modalTitulo">Título</h2>
+
+        <p id="modalMensaje">Mensaje</p>
+
+        <input
+            id="modalInput"
+            type="password"
+            class="modal-input"
+            placeholder="Contraseña..."
+            style="display:none;">
+
+        <div class="modal-botones">
+
+            <button
+                id="btnCancelar"
+                class="btn-modal cancelar">
+                Cancelar
+            </button>
+
+            <button
+                id="btnAceptar"
+                class="btn-modal aceptar">
+                Aceptar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- TOAST -->
+
+<div id="toast" class="toast">
+
+    <span id="toastIcono">✅</span>
+
+    <span id="toastTexto"></span>
+
+</div>
 
 <script src="ui.js"></script>
 </body>
