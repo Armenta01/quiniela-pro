@@ -559,8 +559,10 @@ if (usuario.length < 3) {
 
 enviandoQuiniela = true;
 
-if (btn)
+if (btn) {
     btn.disabled = true;
+    btn.textContent = "⏳ Enviando...";
+}
 
     const res = await fetch('/guardar', {
       method: 'POST',
@@ -577,10 +579,16 @@ if (btn)
 
     if (!res.ok) {
 
+    setTimeout(() => {
+
     enviandoQuiniela = false;
 
-    if (btn)
+    if (btn) {
         btn.disabled = false;
+        btn.textContent = "✅ Enviar Quiniela";
+    }
+
+}, 5000);
 
     mostrarMensaje(
         "No fue posible guardar",
