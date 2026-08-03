@@ -248,6 +248,41 @@ async function descargarImagenTabla() {
 
     const tabla = document.getElementById("imagenTabla");
 
+    const tablaImagen = document.getElementById("tablaImagenExcel");
+
+tablaImagen.innerHTML = `
+<div style="
+    width:1200px;
+    background:#000;
+    color:white;
+    font-family:Arial;
+">
+
+    <div style="
+        background:#1f4e79;
+        padding:15px;
+        text-align:center;
+        font-size:34px;
+        font-weight:bold;
+    ">
+        🏆 PREMIOS SEMANA ${jornada}
+    </div>
+
+    <div style="
+        background:#5b87c5;
+        text-align:center;
+        padding:25px;
+        font-size:26px;
+        font-weight:bold;
+    ">
+        🥇 Primer Lugar<br>
+        $1,400 MXN<br>
+        Premio único
+    </div>
+
+</div>
+`;
+
     if (!tabla) {
 
         mostrarMensaje(
