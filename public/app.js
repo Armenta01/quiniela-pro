@@ -575,10 +575,12 @@ if (btn)
 
     const data = await res.json();
 
-   if (!res.ok) {
-enviandoQuiniela = false;
+    if (!res.ok) {
 
-   
+    enviandoQuiniela = false;
+
+    if (btn)
+        btn.disabled = false;
 
     mostrarMensaje(
         "No fue posible guardar",
@@ -650,12 +652,20 @@ setTimeout(() => {
   i.value = "";
   });
 
+  enviandoQuiniela = false;
 
+if (btn)
+    btn.disabled = false;
 
 }, 1000);
 
   } 
   catch(err){
+
+    enviandoQuiniela = false;
+
+    if (btn)
+        btn.disabled = false;
 
     console.error(err);
 
@@ -666,12 +676,8 @@ setTimeout(() => {
     );
 
 }
+
 finally{
-
-    enviandoQuiniela = false;
-
-    if(btn)
-        btn.disabled = false;
 
 }
   
@@ -829,6 +835,7 @@ async function limpiarPronosticos() {
     document.querySelectorAll('input[id^="v"]').forEach(i => {
         i.value = "";
     });
+    
 
     mostrarToast("Pronósticos eliminados correctamente", "🗑️");
 
