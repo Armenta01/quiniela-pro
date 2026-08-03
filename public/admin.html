@@ -247,38 +247,50 @@ async function descargarImagenTabla() {
     const jornada = document.getElementById("jornada").value;
 
     const tabla = document.getElementById("imagenTabla");
+const tablaImagen = document.getElementById("tablaImagenExcel");
 
-    const tablaImagen = document.getElementById("tablaImagenExcel");
+// Obtener los datos del servidor
+const respuesta = await fetch(`/tabla-imagen?jornada=${jornada}`);
+const json = await respuesta.json();
 
 tablaImagen.innerHTML = `
 <div style="
-    width:1200px;
     background:#000;
     color:white;
     font-family:Arial;
+    width:max-content;
 ">
 
     <div style="
-        background:#1f4e79;
+        background:#1F4E78;
         padding:15px;
         text-align:center;
         font-size:34px;
         font-weight:bold;
     ">
-        🏆 PREMIOS SEMANA ${jornada}
+        🏆 PREMIOS SEMANA ${json.jornada}
     </div>
 
     <div style="
-        background:#5b87c5;
+        background:#5B87C5;
         text-align:center;
         padding:25px;
         font-size:26px;
         font-weight:bold;
     ">
         🥇 Primer Lugar<br>
-        $1,400 MXN<br>
+        $${Number(json.premio).toLocaleString()} MXN<br>
         Premio único
     </div>
+
+    <table
+        id="tablaHTML"
+        style="
+            border-collapse:collapse;
+            background:#000;
+            color:white;
+        ">
+    </table>
 
 </div>
 `;
