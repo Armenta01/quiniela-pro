@@ -583,7 +583,7 @@ if (btn) {
 
 if (btn) {
     btn.disabled = false;
-    btn.textContent = "✅ Enviar Quiniela";
+    btn.textContent = "Guardar Quiniela";
 }
 
     mostrarMensaje(
@@ -660,7 +660,7 @@ setTimeout(() => {
 
 if (btn) {
     btn.disabled = false;
-    btn.textContent = "✅ Enviar Quiniela";
+    btn.textContent = "Guardar Quiniela";
 }
 
 }, 5000);
@@ -672,7 +672,7 @@ if (btn) {
 
 if (btn) {
     btn.disabled = false;
-    btn.textContent = "✅ Enviar Quiniela";
+    btn.textContent = "Guardar Quiniela";
 }
 
     console.error(err);
