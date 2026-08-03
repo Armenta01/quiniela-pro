@@ -419,6 +419,76 @@ tablaHTML.innerHTML +=
     filaVisitante;
 
 
+    // ===== PARTICIPANTES =====
+
+json.tabla.forEach(jugador => {
+
+    let fila = "<tr>";
+
+    // Nombre
+    fila += `
+    <td style="
+        background:#2F5597;
+        color:white;
+        font-weight:bold;
+        border:1px solid black;
+        padding:8px;
+        min-width:180px;
+    ">
+        ${jugador.nombre}
+    </td>
+    `;
+
+    // Pronósticos
+    jugador.picks.forEach((pick, i) => {
+
+        let color = "#F44336"; // rojo
+
+        if (jugador.detalles[i] === "verde")
+            color = "#2ECC71";
+
+        else if (jugador.detalles[i] === "amarillo")
+            color = "#F1C40F";
+
+        else if (jugador.detalles[i] === "gris")
+            color = "#BDBDBD";
+
+        fila += `
+        <td style="
+            background:${color};
+            color:black;
+            font-weight:bold;
+            border:1px solid black;
+            text-align:center;
+            padding:6px;
+            min-width:120px;
+            font-size:20px;
+        ">
+            ${pick}
+        </td>
+        `;
+    });
+
+    // Puntos
+    fila += `
+    <td style="
+        background:#FFD54F;
+        color:black;
+        font-weight:bold;
+        border:1px solid black;
+        text-align:center;
+        font-size:22px;
+    ">
+        ${jugador.puntos}
+    </td>
+    `;
+
+    fila += "</tr>";
+
+    tablaHTML.innerHTML += fila;
+
+});
+
     if (!tabla) {
 
         mostrarMensaje(
