@@ -473,7 +473,6 @@ json.tabla.forEach(jugador => {
         `;
     });
 
-    // Puntos
   // Puntos
 const colorPuntos =
     jugador.puntos === maxPuntos
@@ -525,13 +524,79 @@ fila += `
 
         });
 
-        const enlace = document.createElement("a");
+        const imagen = canvas.toDataURL("image/png");
 
-        enlace.download = `Tabla Semana ${jornada}.png`;
+const esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+              (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
-        enlace.href = canvas.toDataURL("image/png");
+if (esIOS) {
 
-        enlace.click();
+    // En iPhone/iPad abre la imagen en una pestaña nueva
+    const nuevaVentana = window.open();
+
+    nuevaVentana.document.write(`
+        <html>
+        <head>
+            <title>Tabla Semana ${jornada}</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <style>
+                body{
+                    margin:0;
+                    background:#111;
+                    display:flex;
+                    justify-content:center;
+                    align-items:center;
+                    min-height:100vh;
+                    font-family:Arial,sans-serif;
+                    color:white;
+                    text-align:center;
+                }
+
+                img{
+                    max-width:100%;
+                    height:auto;
+                }
+
+                .mensaje{
+                    position:fixed;
+                    top:15px;
+                    left:15px;
+                    right:15px;
+                    background:#000000cc;
+                    padding:12px;
+                    border-radius:10px;
+                    font-size:16px;
+                }
+            </style>
+        </head>
+
+        <body>
+
+            <div class="mensaje">
+                Mantén presionada la imagen y selecciona
+                <b>"Guardar en Fotos"</b>.
+            </div>
+
+            <img src="${imagen}">
+
+        </body>
+
+        </html>
+    `);
+
+} else {
+
+    // Android, Windows y Mac descargan normalmente
+    const enlace = document.createElement("a");
+
+    enlace.download = `Tabla Semana ${jornada}.png`;
+
+    enlace.href = imagen;
+
+    enlace.click();
+
+}
+
 
         mostrarToast("Imagen descargada correctamente.", "✅");
 
