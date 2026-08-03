@@ -1819,23 +1819,54 @@ app.get("/tabla-imagen", async (req, res) => {
 
     try {
 
-        res.send(`
-            <div style="
-                background:#1f4e78;
-                color:white;
-                padding:30px;
-                font-family:Arial;
-                width:1200px;
-                text-align:center;
-            ">
+      // Obtener partidos
+const partidosResult = await pool.query(`
+    SELECT *
+    FROM partidos
+    WHERE jornada = $1
+    ORDER BY COALESCE(orden,999), id
+`, [jornada]);
 
-                <h1>🏆 PREMIOS SEMANA ${jornada}</h1>
+const partidos = partidosResult.rows;
 
-                <h2>Prueba de imagen</h2>
+// Obtener tabla (igual que Excel)
+const tabla = await fetchTabla(jornada);
 
-            </div>
-        `);
+// Obtener participantes
+const bolsaResult = await pool.query(`
+SELECT COUNT(DISTINCT envio_id) AS participantes
+FROM predicciones
+WHERE jornada = $1
+`, [jornada]);
 
+const participantes = parseInt(
+    bolsaResult.rows[0].participantes || 0
+);
+
+const recaudado = participantes * 50;
+
+const bolsaPremios = recaudado * 0.80;
+
+let premioPrimerLugar = 0;
+
+if (participantes <= 750) {
+    premioPrimerLugar = bolsaPremios;
+} else {
+    premioPrimerLugar = bolsaPremios * 0.65;
+}
+
+res.send(`
+    <h1>Semana ${jornada}</h1>
+
+    <p>Participantes: ${participantes}</p>
+
+    <p>Premio: $${premioPrimerLugar.toLocaleString()}</p>
+
+    <p>Partidos: ${partidos.length}</p>
+
+    <p>Jugadores: ${tabla.length}</p>
+`);
+  
     } catch (err) {
 
         console.error(err);
