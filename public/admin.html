@@ -295,6 +295,121 @@ tablaImagen.innerHTML = `
 </div>
 `;
 
+const tablaHTML = document.getElementById("tablaHTML");
+
+// ===== FILA 1 =====
+let filaLocal = "<tr>";
+
+filaLocal += `
+<td style="
+background:#2F5597;
+color:white;
+font-weight:bold;
+padding:8px;
+border:1px solid black;
+text-align:center;
+min-width:180px;
+">
+Jugador
+</td>
+`;
+
+json.partidos.forEach(p => {
+
+    filaLocal += `
+    <td style="
+        background:#1A1A1A;
+        color:white;
+        font-weight:bold;
+        border:1px solid black;
+        min-width:120px;
+        text-align:center;
+        padding:6px;
+    ">
+        ${p.local}
+    </td>
+    `;
+
+});
+
+filaLocal += `
+<td style="
+background:#70AD47;
+color:white;
+font-weight:bold;
+border:1px solid black;
+padding:6px;
+text-align:center;
+min-width:70px;
+">
+Puntos
+</td>
+`;
+
+filaLocal += "</tr>";
+
+// ===== FILA 2 =====
+
+let filaResultado = "<tr>";
+
+filaResultado += `<td style="background:#2F5597;border:1px solid black;"></td>`;
+
+json.partidos.forEach(p=>{
+
+    filaResultado += `
+    <td style="
+        background:#FFEB3B;
+        color:black;
+        font-weight:bold;
+        border:1px solid black;
+        text-align:center;
+        font-size:20px;
+        padding:6px;
+    ">
+        ${p.goles_local}-${p.goles_visitante}
+    </td>
+    `;
+
+});
+
+filaResultado += `<td style="background:#70AD47;border:1px solid black;"></td>`;
+
+filaResultado += "</tr>";
+
+// ===== FILA 3 =====
+
+let filaVisitante = "<tr>";
+
+filaVisitante += `<td style="background:#2F5597;border:1px solid black;"></td>`;
+
+json.partidos.forEach(p=>{
+
+    filaVisitante += `
+    <td style="
+        background:#1A1A1A;
+        color:white;
+        font-weight:bold;
+        border:1px solid black;
+        text-align:center;
+        padding:6px;
+    ">
+        ${p.visitante}
+    </td>
+    `;
+
+});
+
+filaVisitante += `<td style="background:#70AD47;border:1px solid black;"></td>`;
+
+filaVisitante += "</tr>";
+
+
+tabla.innerHTML =
+    filaLocal +
+    filaResultado +
+    filaVisitante;
+    
+
     if (!tabla) {
 
         mostrarMensaje(
