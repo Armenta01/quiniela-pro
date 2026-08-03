@@ -600,6 +600,70 @@ return Object.values(tabla)
 }
 
 
+app.get("/tabla-imagen", async (req, res) => {
+
+    const jornada = req.query.jornada || 1;
+
+    try {
+
+        const partidosResult = await pool.query(`
+            SELECT *
+            FROM partidos
+            WHERE jornada = $1
+            ORDER BY COALESCE(orden,999), id
+        `,[jornada]);
+
+        const partidos = partidosResult.rows;
+
+        const tabla = await fetchTabla(jornada);
+
+        const bolsaResult = await pool.query(`
+            SELECT COUNT(DISTINCT envio_id) participantes
+            FROM predicciones
+            WHERE jornada = $1
+        `,[jornada]);
+
+        const participantes =
+            parseInt(bolsaResult.rows[0].participantes || 0);
+
+        const recaudado = participantes * 50;
+
+        const bolsa = recaudado * 0.80;
+
+        const premio =
+            participantes <= 750
+                ? bolsa
+                : bolsa * 0.65;
+
+        res.json({
+
+            jornada,
+
+            premio,
+
+            participantes,
+
+            partidos,
+
+            tabla
+
+        });
+
+    }
+
+    catch(err){
+
+        console.error(err);
+
+        res.status(500).json({
+            error:true
+        });
+
+    }
+
+});
+
+
 app.get('/tabla', async (req, res) => {
   const { jornada } = req.query;
   const tabla = await fetchTabla(jornada);
