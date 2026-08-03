@@ -363,7 +363,12 @@ let filaResultado = "<tr>";
 
 filaResultado += `<td style="background:#2F5597;border:1px solid black;"></td>`;
 
-json.partidos.forEach(p=>{
+json.partidos.forEach(p => {
+
+    const marcador =
+        p.goles_local == null || p.goles_visitante == null
+            ? "⌛️"
+            : `${p.goles_local}-${p.goles_visitante}`;
 
     filaResultado += `
     <td style="
@@ -375,7 +380,7 @@ json.partidos.forEach(p=>{
         font-size:20px;
         padding:6px;
     ">
-        ${p.goles_local}-${p.goles_visitante}
+        ${marcador}
     </td>
     `;
 
