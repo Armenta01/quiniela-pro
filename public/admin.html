@@ -109,6 +109,10 @@ if (sessionStorage.getItem("admin") !== "true") {
 📥 Descargar Excel
 </button>
 
+<button class="btn-verde" onclick="descargarImagenTabla()">
+📷 Descargar Imagen
+</button>
+
 <button onclick="location.href='/editar-quiniela.html'">
     📝 Editar Quiniela
 </button>
@@ -145,7 +149,12 @@ if (sessionStorage.getItem("admin") !== "true") {
 
 </div>
 
-<div class="lista" id="lista"></div>
+<div id="imagenTabla">
+
+    <div class="lista" id="lista"></div>
+
+</div>
+
 <div class="lista" id="listaParticipantes"></div>
 
 <hr>
@@ -224,6 +233,60 @@ let editandoId = null;
 
   window.open(`/exportar-excel?jornada=${jornada}`, "_blank");
 }
+
+async function descargarImagenTabla() {
+
+    const jornada = document.getElementById("jornada").value;
+
+    const tabla = document.getElementById("imagenTabla");
+
+    if (!tabla) {
+
+        mostrarMensaje(
+            "Tabla",
+            "No existe la tabla para descargar.",
+            "⚠️"
+        );
+
+        return;
+    }
+
+    mostrarToast("Generando imagen...", "📷");
+
+    try {
+
+        const canvas = await html2canvas(tabla, {
+
+            scale: 3,
+            useCORS: true,
+            backgroundColor: "#121A33"
+
+        });
+
+        const enlace = document.createElement("a");
+
+        enlace.download = `Tabla Semana ${jornada}.png`;
+
+        enlace.href = canvas.toDataURL("image/png");
+
+        enlace.click();
+
+        mostrarToast("Imagen descargada correctamente.", "✅");
+
+    } catch (err) {
+
+        console.error(err);
+
+        mostrarMensaje(
+            "Error",
+            "No fue posible generar la imagen.",
+            "❌"
+        );
+
+    }
+
+}
+
 
 async function crearPartido() {
   const local = document.getElementById('local').value;
@@ -1027,6 +1090,7 @@ async function guardarCambiosPronosticos(){
 </div>
 
 <script src="ui.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 </body>
 </html>
