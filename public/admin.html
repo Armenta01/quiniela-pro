@@ -255,6 +255,7 @@ async function descargarImagenTabla() {
 
     try {
 
+      await new Promise(resolve => setTimeout(resolve, 300));
         const canvas = await html2canvas(tabla, {
 
             scale: 3,
