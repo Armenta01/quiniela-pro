@@ -418,6 +418,10 @@ tablaHTML.innerHTML +=
     filaResultado +
     filaVisitante;
 
+// Obtener la mayor cantidad de puntos
+const maxPuntos = Math.max(
+    ...json.tabla.map(j => j.puntos)
+);
 
     // ===== PARTICIPANTES =====
 
@@ -427,17 +431,17 @@ json.tabla.forEach(jugador => {
 
     // Nombre
     fila += `
-    <td style="
-        background:#2F5597;
-        color:white;
-        font-weight:bold;
-        border:1px solid black;
-        padding:8px;
-        min-width:180px;
-    ">
-        ${jugador.nombre}
-    </td>
-    `;
+<td style="
+    background:#FFFFFF;
+    color:#000;
+    font-weight:bold;
+    border:1px solid black;
+    padding:8px;
+    min-width:180px;
+">
+    ${jugador.nombre}
+</td>
+`;
 
     // Pronósticos
     jugador.picks.forEach((pick, i) => {
@@ -470,18 +474,24 @@ json.tabla.forEach(jugador => {
     });
 
     // Puntos
-    fila += `
-    <td style="
-        background:#FFD54F;
-        color:black;
-        font-weight:bold;
-        border:1px solid black;
-        text-align:center;
-        font-size:22px;
-    ">
-        ${jugador.puntos}
-    </td>
-    `;
+  // Puntos
+const colorPuntos =
+    jugador.puntos === maxPuntos
+        ? "#FFD54F"
+        : "#FFFFFF";
+
+fila += `
+<td style="
+    background:${colorPuntos};
+    color:black;
+    font-weight:bold;
+    border:1px solid black;
+    text-align:center;
+    font-size:22px;
+">
+    ${jugador.puntos}
+</td>
+`;
 
     fila += "</tr>";
 
