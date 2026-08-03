@@ -263,9 +263,11 @@ tablaImagen.innerHTML = `
 ">
 
 <table
+id="tablaHTML"
 style="
 border-collapse:collapse;
 background:#000;
+color:white;
 ">
 
 <tr>
@@ -298,15 +300,6 @@ Premio único
 </td>
 </tr>
 
-</table>
-
-<table
-id="tablaHTML"
-style="
-border-collapse:collapse;
-background:#000;
-color:white;
-">
 </table>
 
 </div>
@@ -420,7 +413,7 @@ filaVisitante += `<td style="background:#70AD47;border:1px solid black;"></td>`;
 filaVisitante += "</tr>";
 
 
-tablaHTML.innerHTML =
+tablaHTML.innerHTML +=
     filaLocal +
     filaResultado +
     filaVisitante;
