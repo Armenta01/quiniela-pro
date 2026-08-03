@@ -579,16 +579,12 @@ if (btn) {
 
     if (!res.ok) {
 
-    setTimeout(() => {
-
     enviandoQuiniela = false;
 
-    if (btn) {
-        btn.disabled = false;
-        btn.textContent = "✅ Enviar Quiniela";
-    }
-
-}, 5000);
+if (btn) {
+    btn.disabled = false;
+    btn.textContent = "✅ Enviar Quiniela";
+}
 
     mostrarMensaje(
         "No fue posible guardar",
@@ -662,18 +658,22 @@ setTimeout(() => {
 
   enviandoQuiniela = false;
 
-if (btn)
+if (btn) {
     btn.disabled = false;
+    btn.textContent = "✅ Enviar Quiniela";
+}
 
-}, 1000);
+}, 5000);
 
   } 
   catch(err){
 
     enviandoQuiniela = false;
 
-    if (btn)
-        btn.disabled = false;
+if (btn) {
+    btn.disabled = false;
+    btn.textContent = "✅ Enviar Quiniela";
+}
 
     console.error(err);
 
