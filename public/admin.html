@@ -149,12 +149,20 @@ if (sessionStorage.getItem("admin") !== "true") {
 
 </div>
 
-<div id="imagenTabla">
+<div class="lista" id="lista"></div>
 
-    <div class="lista" id="lista"></div>
+<!-- Contenedor SOLO para generar la imagen -->
+<div id="imagenTabla" style="
+    position:absolute;
+    left:-99999px;
+    top:0;
+    background:#000;
+    padding:20px;
+">
+
+    <div id="tablaImagenExcel"></div>
 
 </div>
-
 <div class="lista" id="listaParticipantes"></div>
 
 <hr>

@@ -1813,69 +1813,6 @@ for (let col = 1; col <= sheet.columnCount; col++) {
   }
 });
 
-app.get("/tabla-imagen", async (req, res) => {
-
-    const jornada = req.query.jornada || 1;
-
-    try {
-
-      // Obtener partidos
-const partidosResult = await pool.query(`
-    SELECT *
-    FROM partidos
-    WHERE jornada = $1
-    ORDER BY COALESCE(orden,999), id
-`, [jornada]);
-
-const partidos = partidosResult.rows;
-
-// Obtener tabla (igual que Excel)
-const tabla = await fetchTabla(jornada);
-
-// Obtener participantes
-const bolsaResult = await pool.query(`
-SELECT COUNT(DISTINCT envio_id) AS participantes
-FROM predicciones
-WHERE jornada = $1
-`, [jornada]);
-
-const participantes = parseInt(
-    bolsaResult.rows[0].participantes || 0
-);
-
-const recaudado = participantes * 50;
-
-const bolsaPremios = recaudado * 0.80;
-
-let premioPrimerLugar = 0;
-
-if (participantes <= 750) {
-    premioPrimerLugar = bolsaPremios;
-} else {
-    premioPrimerLugar = bolsaPremios * 0.65;
-}
-
-res.send(`
-    <h1>Semana ${jornada}</h1>
-
-    <p>Participantes: ${participantes}</p>
-
-    <p>Premio: $${premioPrimerLugar.toLocaleString()}</p>
-
-    <p>Partidos: ${partidos.length}</p>
-
-    <p>Jugadores: ${tabla.length}</p>
-`);
-  
-    } catch (err) {
-
-        console.error(err);
-
-        res.status(500).send("Error");
-
-    }
-
-});
 
 app.post('/admin/login', (req, res) => {
 
