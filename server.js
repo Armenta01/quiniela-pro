@@ -1813,6 +1813,39 @@ for (let col = 1; col <= sheet.columnCount; col++) {
   }
 });
 
+app.get("/tabla-imagen", async (req, res) => {
+
+    const jornada = req.query.jornada || 1;
+
+    try {
+
+        res.send(`
+            <div style="
+                background:#1f4e78;
+                color:white;
+                padding:30px;
+                font-family:Arial;
+                width:1200px;
+                text-align:center;
+            ">
+
+                <h1>🏆 PREMIOS SEMANA ${jornada}</h1>
+
+                <h2>Prueba de imagen</h2>
+
+            </div>
+        `);
+
+    } catch (err) {
+
+        console.error(err);
+
+        res.status(500).send("Error");
+
+    }
+
+});
+
 app.post('/admin/login', (req, res) => {
 
   const user = (req.body.user || "").trim();
