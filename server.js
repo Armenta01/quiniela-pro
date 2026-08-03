@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const { Pool, types } = require('pg');
+const enviosEnProceso = new Set();
 
 // timestamp without time zone (OID 1114)
 // Devolver SIEMPRE como texto
@@ -253,6 +254,16 @@ app.post('/guardar', async (req, res) => {
  let { nombre, telefono, jornada, pronosticos } = req.body;
 
 nombre = nombre.trim();
+const llaveEnvio = `${nombre.toLowerCase()}-${jornada}`;
+
+if (enviosEnProceso.has(llaveEnvio)) {
+  return res.status(429).json({
+    error: "Tu quiniela ya se está procesando, espera un momento."
+  });
+}
+
+enviosEnProceso.add(llaveEnvio);
+
   const envioId = Date.now().toString() + "_" + Math.random().toString(36).substring(2,8);
 
   const fechaEnvio = moment
@@ -366,12 +377,21 @@ VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)
 ]);
 }
 
-    res.json({ ok: true });
+   res.json({ ok: true });
 
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Error interno" });
-  }
+} catch (err) {
+
+   console.error(err);
+
+   res.status(500).json({
+      error: "Error interno"
+   });
+
+} finally {
+
+   enviosEnProceso.delete(llaveEnvio);
+
+}
 });
 
 app.post('/admin/resultado', async (req, res) => {
