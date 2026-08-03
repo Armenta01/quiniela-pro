@@ -404,6 +404,19 @@ for (let i = u.picks.length; i < totalPartidos; i++) {
 // 🔥 GUARDAR
 async function guardarTodo() {
 
+  if (enviandoQuiniela) {
+
+    mostrarToast(
+        "Tu quiniela ya se está enviando...",
+        "⏳"
+    );
+
+    return;
+}
+
+
+const btn = document.getElementById("btnGuardar");
+
 
  if (quinielaCerrada) {
 
@@ -416,6 +429,7 @@ async function guardarTodo() {
     return;
 
 }
+
 
   let usuario = document.getElementById("usuario").value.trim();
   let telefono = document.getElementById("telefono").value.trim();
@@ -462,7 +476,6 @@ if (usuario.length < 3) {
 
   localStorage.setItem("miNombre", usuario);
 
-  const btn = document.getElementById("btnGuardar");
 
   try {
     const partidos = await (await fetch(`/partidos?jornada=${jornadaActual}`)).json();
@@ -544,7 +557,10 @@ if (usuario.length < 3) {
 
 }
 
-    if (btn) btn.disabled = true;
+enviandoQuiniela = true;
+
+if (btn)
+    btn.disabled = true;
 
     const res = await fetch('/guardar', {
       method: 'POST',
@@ -560,8 +576,9 @@ if (usuario.length < 3) {
     const data = await res.json();
 
    if (!res.ok) {
+enviandoQuiniela = false;
 
-    if (btn) btn.disabled = false;
+   
 
     mostrarMensaje(
         "No fue posible guardar",
@@ -633,12 +650,12 @@ setTimeout(() => {
   i.value = "";
   });
 
-  if (btn) btn.disabled = false;
+
 
 }, 1000);
 
   } 
-  catch (err) {
+  catch(err){
 
     console.error(err);
 
@@ -648,7 +665,13 @@ setTimeout(() => {
         "❌"
     );
 
-    if (btn) btn.disabled = false;
+}
+finally{
+
+    enviandoQuiniela = false;
+
+    if(btn)
+        btn.disabled = false;
 
 }
   
