@@ -42,39 +42,64 @@ async function cargarRecordatorios(){
             ? new Date(u.fecha_recordatorio).toLocaleString("es-MX")
             : "";
 
-        card.innerHTML = `
+            card.innerHTML = `
 
-<div class="nombre">
-👤 ${u.nombre}
+<div class="acciones-swipe">
+
+    <button
+        class="btn-swipe btn-quitar"
+        onclick="quitarUno(${u.id})">
+
+        ➖
+
+    </button>
+
+    <button
+        class="btn-swipe btn-eliminar"
+        onclick="eliminarUno(${u.id})">
+
+        🗑
+
+    </button>
+
 </div>
 
-<div class="telefono">
-📱 ${u.telefono}
+<div class="card-contenido">
+
+    <div class="nombre">
+        👤 ${u.nombre}
+    </div>
+
+    <div class="telefono">
+        📱 ${u.telefono}
+    </div>
+
+    <button
+        id="btn-${u.id}"
+        style="background:${color}"
+        ${u.recordatorio_enviado ? "disabled" : ""}
+    >
+
+        ${textoBoton}
+
+    </button>
+
+    ${
+        u.recordatorio_enviado
+        ?
+        `<div class="fecha-recordatorio">
+            🕒 ${fecha}
+        </div>`
+        :
+        `<div class="estado-pendiente">
+            🟢 Pendiente
+        </div>`
+    }
+
 </div>
-
-<button
-id="btn-${u.id}"
-style="background:${color}"
-${u.recordatorio_enviado ? "disabled" : ""}
->
-
-${textoBoton}
-
-</button>
-
-${
-u.recordatorio_enviado
-?
-`<div class="fecha-recordatorio">
-🕒 ${fecha}
-</div>`
-:
-`<div class="estado-pendiente">
-🟢 Pendiente
-</div>`
-}
 
 `;
+        
 
         // BOTÓN WHATSAPP
         const boton = card.querySelector("button");
