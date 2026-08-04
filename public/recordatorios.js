@@ -176,6 +176,50 @@ async function cargarRecordatorios(){
 
 }
 
+let inicioX = 0;
+let moviendo = false;
+
+card.addEventListener("touchstart", e => {
+
+    inicioX = e.touches[0].clientX;
+
+});
+
+card.addEventListener("touchmove", e => {
+
+    const actualX = e.touches[0].clientX;
+
+    const dx = inicioX - actualX;
+
+    const contenido =
+        card.querySelector(".card-contenido");
+
+    if(dx > 20){
+
+        moviendo = true;
+
+        contenido.style.transform =
+            "translateX(-140px)";
+
+    }
+
+    if(dx < -20){
+
+        moviendo = false;
+
+        contenido.style.transform =
+            "translateX(0px)";
+
+    }
+
+});
+
+card.addEventListener("touchend",()=>{
+
+    moviendo = false;
+
+});
+
 function enviarWhatsApp(id, nombre, telefono){
 
     const mensaje =
