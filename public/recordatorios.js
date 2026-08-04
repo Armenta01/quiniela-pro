@@ -4,11 +4,11 @@ let seleccionados = [];
 
 async function cargarRecordatorios(){
 
-    // Obtener la jornada actual
+    // Obtener jornada
     const j = await fetch('/jornada-actual');
     const jornada = (await j.json()).jornada;
 
-    // Obtener pendientes
+    // Obtener participantes
     const r = await fetch(`/recordatorios?jornada=${jornada}`);
     const usuarios = await r.json();
 
@@ -18,93 +18,136 @@ async function cargarRecordatorios(){
     const lista = document.getElementById("lista");
 
     lista.innerHTML = "";
+
     usuarios.forEach(u=>{
 
-    const textoBoton =
-        u.recordatorio_enviado
-        ? "✅ Enviado"
-        : "📲 WhatsApp";
+        const card = document.createElement("div");
 
-    const fechaEnvio =
-        u.fecha_recordatorio
-        ? new Date(u.fecha_recordatorio).toLocaleString('es-MX')
-        : "";
+        card.className = "card";
 
-    const deshabilitado =
-        u.recordatorio_enviado
-        ? "disabled"
-        : "";
+        card.dataset.id = u.id;
 
-    const color =
-        u.recordatorio_enviado
-        ? "#64748b"
-        : "#22c55e";
+        const textoBoton =
+            u.recordatorio_enviado
+            ? "✅ Enviado"
+            : "📲 WhatsApp";
 
-    lista.innerHTML += `
+        const color =
+            u.recordatorio_enviado
+            ? "#64748b"
+            : "#22c55e";
 
-<div
-    class="card"
-    data-id="${u.id}"
+        const fecha =
+            u.fecha_recordatorio
+            ? new Date(u.fecha_recordatorio).toLocaleString("es-MX")
+            : "";
+
+        card.innerHTML = `
+
+<div class="nombre">
+👤 ${u.nombre}
+</div>
+
+<div class="telefono">
+📱 ${u.telefono}
+</div>
+
+<button
+id="btn-${u.id}"
+style="background:${color}"
+${u.recordatorio_enviado ? "disabled" : ""}
 >
 
-    <div class="nombre">
-        👤 ${u.nombre}
-    </div>
+${textoBoton}
 
-    <div class="telefono">
-        📱 ${u.telefono}
-    </div>
+</button>
 
-    <button
-        id="btn-${u.id}"
-        style="background:${color}"
-        ${deshabilitado}
-        onclick="enviarWhatsApp(${u.id},'${u.nombre}','${u.telefono}')">
-
-        ${textoBoton}
-
-    </button>
-
-    ${
-        u.recordatorio_enviado
-        ? `<div class="fecha-recordatorio">
-             🕒 ${fechaEnvio}
-           </div>`
-        : `<div class="estado-pendiente">
-             🟢 Pendiente
-           </div>`
-    }
-
-</div>
+${
+u.recordatorio_enviado
+?
+`<div class="fecha-recordatorio">
+🕒 ${fecha}
+</div>`
+:
+`<div class="estado-pendiente">
+🟢 Pendiente
+</div>`
+}
 
 `;
 
-const card = lista.lastElementChild;
+        // BOTÓN WHATSAPP
+        const boton = card.querySelector("button");
 
-let tiempo;
+        boton.onclick = ()=>{
 
-card.addEventListener("contextmenu", (e) => {
+            enviarWhatsApp(
+                u.id,
+                u.nombre,
+                u.telefono
+            );
 
-    e.preventDefault();
+        };
 
-    modoSeleccion = true;
+        // --------- SELECCIÓN ---------
 
-    seleccionar(card, u.id);
+        let timer;
 
-});
+        card.addEventListener("mousedown",()=>{
 
-card.addEventListener("click", (e) => {
+            timer = setTimeout(()=>{
 
-    if (!modoSeleccion) return;
+                modoSeleccion = true;
 
-    // No seleccionar si se tocó el botón de WhatsApp
-    if (e.target.tagName === "BUTTON") return;
+                seleccionar(card,u.id);
 
-    seleccionar(card, u.id);
+            },500);
 
-});
+        });
 
-});
+        card.addEventListener("mouseup",()=>{
+
+            clearTimeout(timer);
+
+        });
+
+        card.addEventListener("mouseleave",()=>{
+
+            clearTimeout(timer);
+
+        });
+
+        card.addEventListener("touchstart",()=>{
+
+            timer = setTimeout(()=>{
+
+                modoSeleccion = true;
+
+                seleccionar(card,u.id);
+
+            },500);
+
+        });
+
+        card.addEventListener("touchend",()=>{
+
+            clearTimeout(timer);
+
+        });
+
+        card.addEventListener("click",(e)=>{
+
+            if(!modoSeleccion) return;
+
+            if(e.target.tagName==="BUTTON") return;
+
+            seleccionar(card,u.id);
+
+        });
+
+        lista.appendChild(card);
+
+    });
 
 }
 
