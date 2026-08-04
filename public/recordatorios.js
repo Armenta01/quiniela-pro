@@ -18,38 +18,6 @@ async function cargarRecordatorios(){
     const lista = document.getElementById("lista");
 
     lista.innerHTML = "";
-
-    const card =
-lista.lastElementChild;
-
-let tiempo;
-
-card.addEventListener("touchstart",()=>{
-
-    tiempo = setTimeout(()=>{
-
-        modoSeleccion = true;
-
-        seleccionar(card,u.id);
-
-    },500);
-
-});
-
-card.addEventListener("touchend",()=>{
-
-    clearTimeout(tiempo);
-
-});
-
-card.addEventListener("click",()=>{
-
-    if(!modoSeleccion) return;
-
-    seleccionar(card,u.id);
-
-});
-
     usuarios.forEach(u=>{
 
     const textoBoton =
@@ -110,6 +78,40 @@ card.addEventListener("click",()=>{
 </div>
 
 `;
+
+const card = lista.lastElementChild;
+
+let tiempo;
+
+card.addEventListener("touchstart", () => {
+
+    tiempo = setTimeout(() => {
+
+        modoSeleccion = true;
+
+        seleccionar(card, u.id);
+
+    }, 500);
+
+});
+
+card.addEventListener("touchend", () => {
+
+    clearTimeout(tiempo);
+
+});
+
+card.addEventListener("click", (e) => {
+
+    if (!modoSeleccion) return;
+
+    // No seleccionar si se tocó el botón de WhatsApp
+    if (e.target.tagName === "BUTTON") return;
+
+    seleccionar(card, u.id);
+
+});
+
 });
 
 }
