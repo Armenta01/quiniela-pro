@@ -155,12 +155,6 @@ u.recordatorio_enviado
 
 }
 
-card.addEventListener("touchend",()=>{
-
-    moviendo = false;
-
-});
-
 function enviarWhatsApp(id, nombre, telefono){
 
     const mensaje =
