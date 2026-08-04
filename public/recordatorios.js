@@ -311,3 +311,21 @@ function seleccionar(card,id){
     actualizarSeleccion();
 
 }
+
+function cancelarSeleccion(){
+
+    modoSeleccion = false;
+
+    seleccionados = [];
+
+    document
+        .querySelectorAll(".card")
+        .forEach(card=>{
+
+            card.style.border = "none";
+
+        });
+
+    actualizarSeleccion();
+
+}
