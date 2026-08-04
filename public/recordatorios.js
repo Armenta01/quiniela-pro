@@ -41,65 +41,41 @@ async function cargarRecordatorios(){
             u.fecha_recordatorio
             ? new Date(u.fecha_recordatorio).toLocaleString("es-MX")
             : "";
-
+            
             card.innerHTML = `
 
-<div class="acciones-swipe">
-
-    <button
-        class="btn-swipe btn-quitar"
-        onclick="quitarUno(${u.id})">
-
-        ➖
-
-    </button>
-
-    <button
-        class="btn-swipe btn-eliminar"
-        onclick="eliminarUno(${u.id})">
-
-        🗑
-
-    </button>
-
+<div class="nombre">
+👤 ${u.nombre}
 </div>
 
-<div class="card-contenido">
-
-    <div class="nombre">
-        👤 ${u.nombre}
-    </div>
-
-    <div class="telefono">
-        📱 ${u.telefono}
-    </div>
-
-    <button
-        id="btn-${u.id}"
-        style="background:${color}"
-        ${u.recordatorio_enviado ? "disabled" : ""}
-    >
-
-        ${textoBoton}
-
-    </button>
-
-    ${
-        u.recordatorio_enviado
-        ?
-        `<div class="fecha-recordatorio">
-            🕒 ${fecha}
-        </div>`
-        :
-        `<div class="estado-pendiente">
-            🟢 Pendiente
-        </div>`
-    }
-
+<div class="telefono">
+📱 ${u.telefono}
 </div>
+
+<button
+id="btn-${u.id}"
+style="background:${color}"
+${u.recordatorio_enviado ? "disabled" : ""}
+>
+
+${textoBoton}
+
+</button>
+
+${
+u.recordatorio_enviado
+?
+`<div class="fecha-recordatorio">
+🕒 ${fecha}
+</div>`
+:
+`<div class="estado-pendiente">
+🟢 Pendiente
+</div>`
+}
 
 `;
-        
+
 
         // BOTÓN WHATSAPP
         const boton = card.querySelector("button");
@@ -172,47 +148,12 @@ async function cargarRecordatorios(){
 
         lista.appendChild(card);
 
+
     });
 
+
+
 }
-
-let inicioX = 0;
-let moviendo = false;
-
-card.addEventListener("touchstart", e => {
-
-    inicioX = e.touches[0].clientX;
-
-});
-
-card.addEventListener("touchmove", e => {
-
-    const actualX = e.touches[0].clientX;
-
-    const dx = inicioX - actualX;
-
-    const contenido =
-        card.querySelector(".card-contenido");
-
-    if(dx > 20){
-
-        moviendo = true;
-
-        contenido.style.transform =
-            "translateX(-140px)";
-
-    }
-
-    if(dx < -20){
-
-        moviendo = false;
-
-        contenido.style.transform =
-            "translateX(0px)";
-
-    }
-
-});
 
 card.addEventListener("touchend",()=>{
 
