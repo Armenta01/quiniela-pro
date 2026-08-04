@@ -444,6 +444,38 @@ app.post('/recordatorio/enviado', async (req, res) => {
 
 });
 
+app.post('/recordatorios/quitar', async (req, res) => {
+
+    const { ids } = req.body;
+
+    try{
+
+        await pool.query(
+
+            `
+            UPDATE users
+            SET ocultar_recordatorio = TRUE
+            WHERE id = ANY($1)
+            `,
+
+            [ids]
+
+        );
+
+        res.json({ ok:true });
+
+    }catch(err){
+
+        console.error(err);
+
+        res.status(500).json({
+            error:"No fue posible quitar los participantes."
+        });
+
+    }
+
+});
+
 
 app.delete('/admin/partido/:id', async (req, res) => {
 
@@ -2088,8 +2120,9 @@ app.get('/recordatorios', async (req, res) => {
         u.recordatorio_enviado,
         u.fecha_recordatorio
       FROM users u
-      WHERE u.telefono IS NOT NULL
+        WHERE u.telefono IS NOT NULL
         AND TRIM(u.telefono) <> ''
+        AND u.ocultar_recordatorio = FALSE
         AND NOT EXISTS (
 
           SELECT 1

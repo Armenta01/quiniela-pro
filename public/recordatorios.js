@@ -329,3 +329,56 @@ function cancelarSeleccion(){
     actualizarSeleccion();
 
 }
+
+document.getElementById("btnQuitarSeleccion")
+.addEventListener("click", async ()=>{
+
+    if(seleccionados.length===0) return;
+
+    const ok = await mostrarConfirmacion(
+        "Quitar participantes",
+        `¿Deseas quitar ${seleccionados.length} participante(s) de Recordatorios?`
+    );
+
+    if(!ok) return;
+
+    const r = await fetch("/recordatorios/quitar",{
+
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+
+            ids: seleccionados
+
+        })
+
+    });
+
+    const data = await r.json();
+
+    if(data.ok){
+
+        mostrarToast(
+            "Participantes quitados.",
+            "✅"
+        );
+
+        cancelarSeleccion();
+
+        cargarRecordatorios();
+
+    }else{
+
+        mostrarMensaje(
+            "Error",
+            data.error,
+            "❌"
+        );
+
+    }
+
+});
