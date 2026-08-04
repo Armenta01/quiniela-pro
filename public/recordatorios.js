@@ -1,3 +1,7 @@
+let modoSeleccion = false;
+
+let seleccionados = [];
+
 async function cargarRecordatorios(){
 
     // Obtener la jornada actual
@@ -14,6 +18,37 @@ async function cargarRecordatorios(){
     const lista = document.getElementById("lista");
 
     lista.innerHTML = "";
+
+    const card =
+lista.lastElementChild;
+
+let tiempo;
+
+card.addEventListener("touchstart",()=>{
+
+    tiempo = setTimeout(()=>{
+
+        modoSeleccion = true;
+
+        seleccionar(card,u.id);
+
+    },500);
+
+});
+
+card.addEventListener("touchend",()=>{
+
+    clearTimeout(tiempo);
+
+});
+
+card.addEventListener("click",()=>{
+
+    if(!modoSeleccion) return;
+
+    seleccionar(card,u.id);
+
+});
 
     usuarios.forEach(u=>{
 
@@ -39,7 +74,10 @@ async function cargarRecordatorios(){
 
     lista.innerHTML += `
 
-<div class="card">
+<div
+    class="card"
+    data-id="${u.id}"
+>
 
     <div class="nombre">
         👤 ${u.nombre}
@@ -124,6 +162,18 @@ fetch('/recordatorio/enviado', {
 
 cargarRecordatorios();
 
+function actualizarSeleccion(){
+
+    document.getElementById("contadorSeleccion").innerHTML =
+        `${seleccionados.length} seleccionados`;
+
+    document.getElementById("barraSeleccion").style.display =
+        seleccionados.length
+        ? "flex"
+        : "none";
+
+}
+
 function filtrarParticipantes(){
 
     const texto =
@@ -201,5 +251,26 @@ async function reiniciarRecordatorios(){
         );
 
     }
+
+}
+
+function seleccionar(card,id){
+
+    if(seleccionados.includes(id)){
+
+        seleccionados =
+            seleccionados.filter(x=>x!==id);
+
+        card.style.border="none";
+
+    }else{
+
+        seleccionados.push(id);
+
+        card.style.border="4px solid #22c55e";
+
+    }
+
+    actualizarSeleccion();
 
 }
