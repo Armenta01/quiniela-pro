@@ -83,21 +83,13 @@ const card = lista.lastElementChild;
 
 let tiempo;
 
-card.addEventListener("touchstart", () => {
+card.addEventListener("contextmenu", (e) => {
 
-    tiempo = setTimeout(() => {
+    e.preventDefault();
 
-        modoSeleccion = true;
+    modoSeleccion = true;
 
-        seleccionar(card, u.id);
-
-    }, 500);
-
-});
-
-card.addEventListener("touchend", () => {
-
-    clearTimeout(tiempo);
+    seleccionar(card, u.id);
 
 });
 
