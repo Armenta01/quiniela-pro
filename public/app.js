@@ -561,7 +561,7 @@ enviandoQuiniela = true;
 
 if (btn) {
     btn.disabled = true;
-    btn.textContent = "⏳ Enviando...";
+    btn.textContent = "📲 Abriendo WhatsApp...";
 }
 
     const res = await fetch('/guardar', {
@@ -636,7 +636,7 @@ mostrarToast("¡Quiniela enviada correctamente!", "✅");
 
 confetti();
 
-setTimeout(() => {
+
 
   if (/Android|iPhone/i.test(navigator.userAgent)) {
     window.location.href = url;   // 📱 móvil
@@ -644,6 +644,8 @@ setTimeout(() => {
     window.open(url, "_blank");   // 💻 computadora
   }
 
+// Esperar solo para volver a habilitar el botón
+setTimeout(() => {
   // Limpiar formulario
   document.getElementById("usuario").value = "";
   document.getElementById("telefono").value = "";
@@ -663,7 +665,7 @@ if (btn) {
     btn.textContent = "Guardar Quiniela";
 }
 
-}, 5000);
+}, 3000);
 
   } 
   catch(err){
