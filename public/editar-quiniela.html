@@ -80,17 +80,40 @@
 
         <div class="panel panel-pronosticos">
 
-            <div class="panel-titulo">
+           <div class="panel-titulo">
 
-                <span id="tituloJugador">
+    <span id="tituloJugador">
+        Selecciona un participante
+    </span>
 
-                    Selecciona un participante
+</div>
 
-                </span>
+<div style="padding:15px;">
 
-            </div>
+    <input
+        id="nuevoNombre"
+        type="text"
+        placeholder="Nombre del participante"
+        style="
+            width:100%;
+            padding:10px;
+            margin-bottom:10px;
+            font-size:16px;
+        ">
 
-            <div id="listaPronosticos"></div>
+    <button
+        onclick="guardarNombreJugador()"
+        style="
+            width:100%;
+            padding:10px;
+            margin-bottom:20px;
+        ">
+        ✏️ Cambiar nombre
+    </button>
+
+</div>
+
+<div id="listaPronosticos"></div> 
 
         </div>
 

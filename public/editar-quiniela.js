@@ -80,7 +80,7 @@ function mostrarJugadores(lista){
         contenedor.innerHTML += `
 
 <div class="jugador-card"
-onclick="seleccionarJugador(${j.id},'${j.nombre}','${j.envio_id}')">
+onclick='seleccionarJugador(${j.id}, ${JSON.stringify(j.nombre)}, "${j.envio_id}")'
 
     <div class="nombre-jugador">
         👤 ${j.nombre}
@@ -120,14 +120,16 @@ async function seleccionarJugador(id,nombre,envio_id){
 
     jugadorSeleccionado = {
 
-        id: id,
+    id,
+    nombre,
+    envio_id
 
-        envio_id: envio_id
-
-    };
+};
 
     document.getElementById("tituloJugador").innerHTML =
         "👤 " + nombre;
+
+    document.getElementById("nuevoNombre").value = nombre;
 
     await cargarPronosticos();
 
@@ -291,6 +293,73 @@ async function verificarEstadoEdicion(){
     "La edición ya no está disponible porque el primer partido comenzó.",
     "🔒"
 );
+    }
+
+}
+
+async function guardarNombreJugador(){
+
+    if(!jugadorSeleccionado) return;
+
+    const nombre =
+        document.getElementById("nuevoNombre").value.trim();
+
+    if(nombre === ""){
+        mostrarMensaje(
+            "Nombre",
+            "Escribe un nombre.",
+            "⚠️"
+        );
+        return;
+    }
+
+    const r = await fetch("/admin/cambiar-nombre",{
+
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+
+            user_id: jugadorSeleccionado.id,
+
+            nombre
+
+        })
+
+    });
+
+    const data = await r.json();
+
+    if(data.ok){
+
+        mostrarToast(
+            "Nombre actualizado.",
+            "✅"
+        );
+
+        jugadorSeleccionado.nombre = nombre;
+
+        document.getElementById("tituloJugador").innerHTML =
+            "👤 " + nombre;
+
+        await cargarJugadores();
+        await cargarPronosticos();
+
+        document.getElementById("buscarJugador").dispatchEvent(
+        new Event("input")
+        );
+
+    }else{
+
+        mostrarMensaje(
+            "Error",
+            data.error,
+            "❌"
+        );
+
     }
 
 }

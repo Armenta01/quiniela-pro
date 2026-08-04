@@ -906,6 +906,35 @@ if (ahora.isSameOrAfter(fechaBD)) {
 
 });
 
+app.post("/admin/cambiar-nombre", async (req,res)=>{
+
+    const { user_id, nombre } = req.body;
+
+    try{
+
+        await pool.query(
+            `
+            UPDATE users
+            SET nombre = $1
+            WHERE id = $2
+            `,
+            [nombre.trim(), user_id]
+        );
+
+        res.json({ok:true});
+
+    }catch(err){
+
+        console.error(err);
+
+        res.status(500).json({
+            error:"No fue posible actualizar el nombre."
+        });
+
+    }
+
+});
+
 // =========================================
 // ESTADO DE QUINIELAS
 // =========================================
