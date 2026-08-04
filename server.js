@@ -476,6 +476,36 @@ app.post('/recordatorios/quitar', async (req, res) => {
 
 });
 
+app.post('/recordatorios/eliminar', async (req, res) => {
+
+    const { ids } = req.body;
+
+    try{
+
+        await pool.query(
+
+            `
+            DELETE FROM users
+            WHERE id = ANY($1)
+            `,
+
+            [ids]
+
+        );
+
+        res.json({ ok:true });
+
+    }catch(err){
+
+        console.error(err);
+
+        res.status(500).json({
+            error:"No fue posible eliminar los participantes."
+        });
+
+    }
+
+});
 
 app.delete('/admin/partido/:id', async (req, res) => {
 

@@ -382,3 +382,70 @@ document.getElementById("btnQuitarSeleccion")
     }
 
 });
+
+document.getElementById("btnEliminarSeleccion")
+.addEventListener("click", async ()=>{
+
+    if(seleccionados.length === 0) return;
+
+    const ok = await mostrarConfirmacion(
+        "Eliminar participantes",
+        `¿Eliminar definitivamente ${seleccionados.length} participante(s)?\n\nTambién se eliminarán sus quinielas si existen.\n\nEsta acción no se puede deshacer.`
+    );
+
+    if(!ok) return;
+
+    try{
+
+        const r = await fetch("/recordatorios/eliminar",{
+
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+
+                ids: seleccionados
+
+            })
+
+        });
+
+        const data = await r.json();
+
+        if(data.ok){
+
+            mostrarToast(
+                "Participantes eliminados.",
+                "🗑"
+            );
+
+            cancelarSeleccion();
+
+            cargarRecordatorios();
+
+        }else{
+
+            mostrarMensaje(
+                "Error",
+                data.error,
+                "❌"
+            );
+
+        }
+
+    }catch(err){
+
+        console.error(err);
+
+        mostrarMensaje(
+            "Error",
+            "No fue posible eliminar.",
+            "❌"
+        );
+
+    }
+
+});
