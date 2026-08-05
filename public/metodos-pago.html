@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Métodos de Pago</title>
+
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="logo.png">
+
+</head>
+
+<body>
+
+<div class="contenedor-pagos">
+
+    <h1>💳 Métodos de Pago</h1>
+
+    <!-- BanCoppel -->
+    <div class="tarjeta-pago">
+
+        <h2>🏦 BanCoppel</h2>
+
+        <p><strong>Titular</strong></p>
+
+        <p>Eduardo Armenta López</p>
+
+        <p><strong>Tarjeta</strong></p>
+
+        <p id="tarjetaBanCoppel">
+            4169 1606 0973 8225
+        </p>
+
+        <button id="btnCopiarTarjeta">
+            📋 Copiar tarjeta
+        </button>
+
+        <p><strong>CLABE</strong></p>
+
+        <p id="clabeBanCoppel">
+            137593105314456900
+        </p>
+
+        <button id="btnCopiarClabe">
+            📋 Copiar CLABE
+        </button>
+
+    </div>
+
+    <!-- Mercado Pago -->
+    <div class="tarjeta-pago">
+
+        <h2>💙 Mercado Pago</h2>
+
+        <p><strong>Titular</strong></p>
+
+        <p>Eduardo Armenta López</p>
+
+        <p><strong>Tarjeta</strong></p>
+
+        <p id="tarjetaMP">
+            7229 6901 0321 2869
+        </p>
+
+        <button id="btnCopiarMP">
+            📋 Copiar tarjeta
+        </button>
+
+    </div>
+
+    <div class="aviso-pago">
+
+        ⚠️ Una vez realizado el pago,
+        envía tu comprobante para validar
+        tu participación.
+
+    </div>
+
+    <button id="btnEnviarComprobante">
+
+        📤 ENVIAR COMPROBANTE
+
+    </button>
+
+</div>
+
+<script src="metodos-pago.js"></script>
+
+</body>
+
+</html>
