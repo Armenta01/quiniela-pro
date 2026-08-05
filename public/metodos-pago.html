@@ -190,6 +190,170 @@ transform:scale(1);
 
 }
 
+.metodo{
+
+    background:#1f2937;
+
+    border:2px solid rgba(255,255,255,.08);
+
+    border-radius:24px;
+
+    padding:30px;
+
+    margin-bottom:30px;
+
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.05),
+        0 8px 25px rgba(0,0,0,.25);
+
+}
+
+.metodo h2{
+
+    color:#2563eb;
+
+    font-size:34px;
+
+    font-weight:900;
+
+    margin:0 0 12px;
+
+}
+
+.banco{
+
+    color:#3b82f6;
+
+    font-size:22px;
+
+    margin-bottom:25px;
+
+}
+
+.info{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:28px;
+
+}
+
+.icono{
+
+    font-size:72px;
+
+    width:90px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    color:#2563eb;
+
+}
+
+.datos{
+
+    flex:1;
+
+}
+
+.caja{
+
+    background:#151b23;
+
+    border:2px solid rgba(255,255,255,.08);
+
+    border-radius:20px;
+
+    padding:28px;
+
+}
+
+.caja p{
+
+    color:white;
+
+    font-size:22px;
+
+    margin:10px 0;
+
+}
+
+.caja strong{
+
+    color:#38bdf8;
+
+    letter-spacing:2px;
+
+}
+
+.caja button{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:12px;
+
+    width:100%;
+
+    margin-top:22px;
+
+    background:#5fa8ff;
+
+    color:white;
+
+    border:none;
+
+    border-radius:16px;
+
+    padding:18px;
+
+    font-size:22px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+}
+
+.caja button:hover{
+
+    background:#4f95ea;
+
+    transform:translateY(-2px);
+
+}
+
+.caja button:hover{
+
+    transform:translateY(-2px);
+
+    background:#3b82f6;
+
+}
+
+.aviso{
+
+    margin-top:22px;
+
+    color:#d9a441;
+
+    font-size:21px;
+
+    font-weight:700;
+
+}
+
 </style>
 
 </head>
@@ -201,57 +365,93 @@ transform:scale(1);
     <h1>💳 Métodos de Pago</h1>
 
     <!-- BanCoppel -->
-    <div class="tarjeta-pago">
+    <div class="metodo">
 
-        <h2>🏦 BanCoppel</h2>
+    <h2>TRANSFERENCIA BANCARIA (1)</h2>
 
-        <p><strong>Titular</strong></p>
+    <p class="banco">
+        Banco: BanCoppel
+    </p>
 
-        <p>Eduardo Armenta López</p>
+    <div class="info">
 
-        <p><strong>Tarjeta</strong></p>
+        <div class="icono">
+            🏦
+        </div>
 
-        <p id="tarjetaBanCoppel">
-            4169 1606 0973 8225
-        </p>
+        <div class="datos">
 
-        <button id="btnCopiarTarjeta">
-            📋 Copiar tarjeta
-        </button>
+            <div class="caja">
 
-        <p><strong>CLABE</strong></p>
+                <p>
+                    Tarjeta:
+                    <strong id="banTarjeta">
+                        4169160609738225
+                    </strong>
+                </p>
 
-        <p id="clabeBanCoppel">
-            137593105314456900
-        </p>
+                <p>
+                    CLABE:
+                    <strong id="banClabe">
+                        137593105314456900
+                    </strong>
+                </p>
 
-        <button id="btnCopiarClabe">
-            📋 Copiar CLABE
-        </button>
+                <button onclick="copiarBanCoppel()">
+                    📋 Copiar datos
+                </button>
+
+            </div>
+
+        </div>
 
     </div>
 
+</div>
     <!-- Mercado Pago -->
-    <div class="tarjeta-pago">
+    <div class="metodo">
 
-        <h2>💙 Mercado Pago</h2>
+    <h2>TRANSFERENCIA BANCARIA (1)</h2>
 
-        <p><strong>Titular</strong></p>
+    <p class="banco">
+        Banco: BanCoppel
+    </p>
 
-        <p>Eduardo Armenta López</p>
+    <div class="info">
 
-        <p><strong>Tarjeta</strong></p>
+        <div class="icono">
+            🏦
+        </div>
 
-        <p id="tarjetaMP">
-            7229 6901 0321 2869
-        </p>
+        <div class="datos">
 
-        <button id="btnCopiarMP">
-            📋 Copiar tarjeta
-        </button>
+            <div class="caja">
+
+                <p>
+                    Tarjeta:
+                    <strong id="banTarjeta">
+                        4169160609738225
+                    </strong>
+                </p>
+
+                <p>
+                    CLABE:
+                    <strong id="banClabe">
+                        137593105314456900
+                    </strong>
+                </p>
+
+                <button onclick="copiarBanCoppel()">
+                    📋 Copiar datos
+                </button>
+
+            </div>
+
+        </div>
 
     </div>
 
+</div>
     <div class="aviso-pago">
 
         ⚠️ Una vez realizado el pago,
