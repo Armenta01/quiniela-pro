@@ -17,29 +17,28 @@ function copiarTexto(texto, boton) {
     }, 2000);
 
 }
-
 // BanCoppel
-function copiarBanCoppel() {
+function copiarBanCoppel(btn){
 
     const datos =
 `Tarjeta:
-4169160609738225
+4169 1606 0973 8225
 
 CLABE:
 137593105314456900`;
 
-    copiarTexto(datos, event.target);
+    copiarTexto(datos, btn);
 
 }
 
 // Mercado Pago
-function copiarMercadoPago() {
+function copiarMercadoPago(btn){
 
     const datos =
-`Tarjeta:
-7229690103212869`;
+`CLABE:
+TU_CLABE_AQUI`;
 
-    copiarTexto(datos, event.target);
+    copiarTexto(datos, btn);
 
 }
 
