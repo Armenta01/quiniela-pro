@@ -21,11 +21,7 @@ function copiarTexto(texto, boton) {
 function copiarBanCoppel(btn){
 
     const datos =
-`Tarjeta:
-4169 1606 0973 8225
-
-CLABE:
-137593105314456900`;
+`137593105314456900`;
 
     copiarTexto(datos, btn);
 
@@ -35,8 +31,7 @@ CLABE:
 function copiarMercadoPago(btn){
 
     const datos =
-`CLABE:
-TU_CLABE_AQUI`;
+`722969010004811581`;
 
     copiarTexto(datos, btn);
 
