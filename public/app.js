@@ -28,7 +28,7 @@ window.onload = async () => {
 
   actualizarContador();
 
-  setInterval(actualizarContador, 60000);
+  setInterval(actualizarContador, 1000);
 
   setTimeout(mostrarRankingPopup, 1000);
 
@@ -928,6 +928,11 @@ async function actualizarContador() {
       (diff % (1000 * 60 * 60))
       / (1000 * 60)
     );
+
+    const segundos = Math.floor(
+    (diff % (1000 * 60)) / 1000
+);
+
 info.innerHTML = `
     <div class="costo">
         💰 Costo: $50 MXN
