@@ -1047,23 +1047,19 @@ async function cargarBolsa(jornada) {
   const nombres = bolsa.campeones
     .map(c => c.nombre)
     .join("<br>");
-
-    let contenido = "";
+let contenido = "";
 
 if (bolsa.bolsaPremios < 2500) {
 
     contenido = `
-        <div style="
-            font-size:18px;
-            line-height:1.6;
-            color:#fff;
-        ">
-            🔥 Bolsa acumulada en crecimiento
+        <div style="font-size:18px; line-height:1.7;">
+            🔥 <strong>Bolsa acumulada en crecimiento</strong>
 
             <br><br>
 
-            💰 La bolsa se mostrará automáticamente
-            al superar los <strong>$2,500 MXN</strong>.
+            💰 El monto oficial se mostrará
+            automáticamente al superar los
+            <strong>$2,500 MXN</strong>.
         </div>
     `;
 
@@ -1075,9 +1071,7 @@ if (bolsa.bolsaPremios < 2500) {
 
         <br><br>
 
-        👥 Premio único
-        <br>
-        (Hasta 750 participantes)
+        👤 Premio único
     `;
 
 } else {
@@ -1102,40 +1096,11 @@ document.getElementById("bolsaInfo").innerHTML = `
     </div>
 
     <div class="premios">
-
         ${contenido}
-
     </div>
 
 </div>
 `;
-
-} else {
-
-  document.getElementById("bolsaInfo").innerHTML = `
-    <div class="bolsa-box">
-
-      <div class="bolsa-titulo">
-        🏆 PREMIOS SEMANA ${jornada}
-      </div>
-
-      <div class="premios">
-
-        <br><br>
-
-        🥇 1er Lugar:
-        $${Math.round(bolsa.primerLugar)} MXN
-
-        ${
-          bolsa.segundoLugar > 0
-          ? `<br>🥈 2do Lugar: $${Math.round(bolsa.segundoLugar)} MXN`
-          : `<br>👥 Menos de 750 participantes: premio único`
-        }
-
-      </div>
-
-    </div>
-  `;
 
 }
 }
