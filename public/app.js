@@ -1079,6 +1079,9 @@ async function cargarBolsa(jornada) {
         🔥 <strong>Bolsa acumulada en crecimiento</strong>
 
         <br><br>
+        🔥 <span class="bolsa-creciendo">
+      <strong>¡La bolsa sigue creciendo!</strong>
+          </span>
       `;
 
     } else if (bolsa.segundoLugar === 0) {
