@@ -319,7 +319,7 @@ for (let envio of existentes.rows) {
     [envio.envio_id]
   );
 
- const viejo = JSON.stringify(
+  const viejo = JSON.stringify(
   rows.rows.map(x => ({
     partido_id: x.partido_id,
     local: x.goles_local,
@@ -341,6 +341,8 @@ if (viejo === nuevo) {
   return res.status(400).json({
     error: "Ya enviaste los mismos resultados, captura una quiniela distinta."
   });
+}
+
 }
 
 // convertir lista actual a string para comparar
