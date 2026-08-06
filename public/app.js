@@ -1082,8 +1082,9 @@ async function cargarBolsa(jornada) {
           <br><br>
 
           👑 <strong>¡El próximo campeón puede ser tú!</strong>
+          <br>
           🏆 No dejes pasar la oportunidad de competir y ganar.
-          💰 ¡Registra tu quiniela antes de que cierre la jornada!
+         
       `;
 
     } else if (bolsa.segundoLugar === 0) {
