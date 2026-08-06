@@ -1075,13 +1075,10 @@ async function cargarBolsa(jornada) {
     if (bolsa.bolsaPremios < 2500) {
 
       contenido = `
+       <br><br>
         🔥 <strong>Bolsa acumulada en crecimiento</strong>
 
         <br><br>
-
-        💰 El monto oficial se mostrará
-        automáticamente al superar los
-        <strong>$2,500 MXN</strong>.
       `;
 
     } else if (bolsa.segundoLugar === 0) {
