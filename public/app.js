@@ -1048,32 +1048,67 @@ async function cargarBolsa(jornada) {
     .map(c => c.nombre)
     .join("<br>");
 
-  document.getElementById("bolsaInfo").innerHTML = `
-    <div class="bolsa-box">
+    let contenido = "";
 
-      <div class="bolsa-titulo">
-        🏆 CAMPEÓN SEMANA ${jornada}
-      </div>
+if (bolsa.bolsaPremios < 2500) {
 
-      <div class="premios">
+    contenido = `
+        <div style="
+            font-size:18px;
+            line-height:1.6;
+            color:#fff;
+        ">
+            🔥 Bolsa acumulada en crecimiento
 
+            <br><br>
+
+            💰 La bolsa se mostrará automáticamente
+            al superar los <strong>$2,500 MXN</strong>.
+        </div>
+    `;
+
+} else if (bolsa.segundoLugar === 0) {
+
+    contenido = `
+        🥇 1er Lugar:
+        <strong>$${Math.round(bolsa.primerLugar)} MXN</strong>
+
+        <br><br>
+
+        👥 Premio único
         <br>
+        (Hasta 750 participantes)
+    `;
 
-        🥇 <strong>${nombres}</strong>
+} else {
+
+    contenido = `
+        🥇 1er Lugar:
+        <strong>$${Math.round(bolsa.primerLugar)} MXN</strong>
 
         <br><br>
 
-        🏅 ${bolsa.campeones[0].puntos} puntos
+        🥈 2do Lugar:
+        <strong>$${Math.round(bolsa.segundoLugar)} MXN</strong>
+    `;
 
-        <br><br>
+}
 
-        💰 Premio:
-        $${Math.round(bolsa.primerLugar)} MXN
+document.getElementById("bolsaInfo").innerHTML = `
+<div class="bolsa-box">
 
-      </div>
+    <div class="bolsa-titulo">
+        🏆 PREMIOS SEMANA ${jornada}
+    </div>
+
+    <div class="premios">
+
+        ${contenido}
 
     </div>
-  `;
+
+</div>
+`;
 
 } else {
 
