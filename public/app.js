@@ -1042,41 +1042,64 @@ async function cargarBolsa(jornada) {
   const res = await fetch(`/bolsa?jornada=${jornada}`);
   const bolsa = await res.json();
 
+  // ===========================
+  // SI YA TERMINÓ LA JORNADA
+  // ===========================
   if (bolsa.jornadaTerminada && bolsa.campeones.length > 0) {
 
-  const nombres = bolsa.campeones
-    .map(c => c.nombre)
-    .join("<br>");
-let contenido = "";
+    const nombres = bolsa.campeones
+      .map(c => c.nombre)
+      .join("<br>");
 
-if (bolsa.bolsaPremios < 2500) {
-
-    contenido = `
-        <div style="font-size:18px; line-height:1.7;">
-            🔥 <strong>Bolsa acumulada en crecimiento</strong>
-
-            <br><br>
-
-            💰 El monto oficial se mostrará
-            automáticamente al superar los
-            <strong>$2,500 MXN</strong>.
+    document.getElementById("bolsaInfo").innerHTML = `
+      <div class="bolsa-box">
+        <div class="bolsa-titulo">
+          🏆 CAMPEÓN SEMANA ${jornada}
         </div>
+
+        <div class="premios">
+          👑 ${nombres}
+        </div>
+      </div>
     `;
 
-} else if (bolsa.segundoLugar === 0) {
+  }
 
-    contenido = `
+  // ===========================
+  // JORNADA ABIERTA
+  // ===========================
+  else {
+
+    let contenido = "";
+
+    if (bolsa.bolsaPremios < 2500) {
+
+      contenido = `
+        🔥 <strong>Bolsa acumulada en crecimiento</strong>
+
+        <br><br>
+
+        💰 El monto oficial se mostrará
+        automáticamente al superar los
+        <strong>$2,500 MXN</strong>.
+      `;
+
+    } else if (bolsa.segundoLugar === 0) {
+
+      contenido = `
         🥇 1er Lugar:
         <strong>$${Math.round(bolsa.primerLugar)} MXN</strong>
 
         <br><br>
 
         👤 Premio único
-    `;
+        <br>
+        (Hasta 750 participantes)
+      `;
 
-} else {
+    } else {
 
-    contenido = `
+      contenido = `
         🥇 1er Lugar:
         <strong>$${Math.round(bolsa.primerLugar)} MXN</strong>
 
@@ -1084,25 +1107,26 @@ if (bolsa.bolsaPremios < 2500) {
 
         🥈 2do Lugar:
         <strong>$${Math.round(bolsa.segundoLugar)} MXN</strong>
+      `;
+
+    }
+
+    document.getElementById("bolsaInfo").innerHTML = `
+      <div class="bolsa-box">
+
+        <div class="bolsa-titulo">
+          🏆 PREMIOS SEMANA ${jornada}
+        </div>
+
+        <div class="premios">
+          ${contenido}
+        </div>
+
+      </div>
     `;
 
-}
+  }
 
-document.getElementById("bolsaInfo").innerHTML = `
-<div class="bolsa-box">
-
-    <div class="bolsa-titulo">
-        🏆 PREMIOS SEMANA ${jornada}
-    </div>
-
-    <div class="premios">
-        ${contenido}
-    </div>
-
-</div>
-`;
-
-}
 }
 
 function toggleMenu() {
