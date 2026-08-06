@@ -1075,11 +1075,15 @@ async function cargarBolsa(jornada) {
     if (bolsa.bolsaPremios < 2500) {
 
       contenido = `
-       <br><br>
+       <br>
         🔥 <span class="bolsa-creciendo">
       <strong>¡Bolsa acumulada en crecimiento!</strong>
           </span>
           <br><br>
+
+          👑 <strong>¡El próximo campeón puede ser tú!</strong>
+          🏆 No dejes pasar la oportunidad de competir y ganar.
+          💰 ¡Registra tu quiniela antes de que cierre la jornada!
       `;
 
     } else if (bolsa.segundoLugar === 0) {
