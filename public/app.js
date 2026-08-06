@@ -634,9 +634,15 @@ const url = `https://wa.me/${phone}?text=${texto}`;
 
 mostrarToast("¡Quiniela enviada correctamente!", "✅");
 
-confetti();
+if (typeof confetti === "function") {
 
+    confetti({
+        particleCount: 180,
+        spread: 100,
+        origin: { y: 0.6 }
+    });
 
+}
 
   if (/Android|iPhone/i.test(navigator.userAgent)) {
     window.location.href = url;   // 📱 móvil
