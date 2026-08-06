@@ -961,6 +961,11 @@ info.innerHTML = `
                 <small>MIN</small>
             </div>
 
+            <div class="tiempo">
+                <span>${segundos.toString().padStart(2,"0")}</span>
+                <small>SEG</small>
+            </div>
+
         </div>
 
     </div>
