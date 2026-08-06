@@ -310,24 +310,37 @@ const existentes = await pool.query(
 
 for (let envio of existentes.rows) {
   const rows = await pool.query(
-    `SELECT goles_local, goles_visitante 
-     FROM predicciones 
-     WHERE envio_id = $1`,
+    `SELECT partido_id,
+            goles_local,
+            goles_visitante
+     FROM predicciones
+     WHERE envio_id = $1
+     ORDER BY partido_id`,
     [envio.envio_id]
   );
 
-  const viejo = JSON.stringify(
-    rows.rows.map(x => ({
-      local: x.goles_local,
-      visitante: x.goles_visitante
+ const viejo = JSON.stringify(
+  rows.rows.map(x => ({
+    partido_id: x.partido_id,
+    local: x.goles_local,
+    visitante: x.goles_visitante
+  }))
+);
+
+const nuevo = JSON.stringify(
+  [...pronosticos]
+    .sort((a, b) => a.partido_id - b.partido_id)
+    .map(x => ({
+      partido_id: x.partido_id,
+      local: x.local === "" ? null : parseInt(x.local),
+      visitante: x.visitante === "" ? null : parseInt(x.visitante)
     }))
-  );
+);
 
-  const nuevo = JSON.stringify(pronosticos);
-
-  if (viejo === nuevo) {
-    return res.status(400).json({ error: "Ya enviaste esta misma quiniela" });
-  }
+if (viejo === nuevo) {
+  return res.status(400).json({
+    error: "Ya enviaste los mismos resultados, captura una quiniela distinta."
+  });
 }
 
 // convertir lista actual a string para comparar
