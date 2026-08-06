@@ -928,28 +928,58 @@ async function actualizarContador() {
       (diff % (1000 * 60 * 60))
       / (1000 * 60)
     );
-
-    info.innerHTML = `
-      <div class="costo">
+info.innerHTML = `
+    <div class="costo">
         💰 Costo: $50 MXN
-      </div>
+    </div>
 
-      <div class="contador">
-        ⏰ Cierra en: ${dias}d ${horas}h ${minutos}m
-      </div>
-    `;
+    <div class="contador-box">
+
+        <div class="contador-titulo">
+            ⏳ CIERRE DE REGISTROS
+        </div>
+
+        <div class="contador-digital">
+
+            <div class="tiempo">
+                <span>${dias}</span>
+                <small>DÍAS</small>
+            </div>
+
+            <div class="tiempo">
+                <span>${horas}</span>
+                <small>HORAS</small>
+            </div>
+
+            <div class="tiempo">
+                <span>${minutos}</span>
+                <small>MIN</small>
+            </div>
+
+        </div>
+
+    </div>
+`;
 
   } catch (err) {
 
     info.innerHTML = `
-      <div class="costo">
+    <div class="costo">
         💰 Costo: $50 MXN
-      </div>
+    </div>
 
-      <div class="contador">
-        ⏰ Actualizando...
-      </div>
-    `;
+    <div class="contador-box">
+
+        <div class="contador-titulo">
+            ⏳ CIERRE DE REGISTROS
+        </div>
+
+        <div class="contador">
+            Actualizando...
+        </div>
+
+    </div>
+`;
 
   }
 

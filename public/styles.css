@@ -2424,3 +2424,108 @@ color:#111827;
 }
 
 }
+
+.contador-box{
+
+    margin-top:20px;
+    text-align:center;
+
+}
+
+.contador-titulo{
+
+    color:#fff;
+    font-size:18px;
+    font-weight:800;
+    margin-bottom:18px;
+    letter-spacing:1px;
+
+}
+
+.contador-digital{
+
+    display:flex;
+    justify-content:center;
+    gap:16px;
+    flex-wrap:wrap;
+
+}
+
+.tiempo{
+
+    width:80px;
+
+}
+
+.tiempo span{
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    height:72px;
+
+    background:#111827;
+
+    border:2px solid #FFD700;
+
+    border-radius:14px;
+
+    color:#fff;
+
+    font-size:34px;
+
+    font-weight:900;
+
+    box-shadow:
+        0 0 15px rgba(255,215,0,.25);
+
+    transition:.25s;
+
+}
+
+.tiempo small{
+
+    display:block;
+
+    margin-top:8px;
+
+    color:#FFD700;
+
+    font-weight:700;
+
+    font-size:12px;
+
+    letter-spacing:1px;
+
+}
+
+@media(max-width:768px){
+
+.contador-digital{
+
+    gap:8px;
+
+}
+
+.tiempo{
+
+    width:64px;
+
+}
+
+.tiempo span{
+
+    height:58px;
+
+    font-size:26px;
+
+}
+
+.tiempo small{
+
+    font-size:10px;
+
+}
+
+}
