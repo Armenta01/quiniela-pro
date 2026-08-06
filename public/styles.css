@@ -133,6 +133,24 @@ input, select, button {
   font-size: 16px;
   font-weight: bold;
 
+  transition: .25s;
+
+}
+
+.score input:focus {
+
+  background: #d1d5db;
+
+  color: #111827;
+
+  border: 2px solid #9ca3af;
+
+  outline: none;
+
+  box-shadow: 0 0 8px rgba(156,163,175,.35);
+
+  transform: scale(1.05);
+
 }
 
 .meta {
