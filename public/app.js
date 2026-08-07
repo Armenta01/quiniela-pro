@@ -1131,7 +1131,7 @@ if (jornadaCerrada) {
   contenido = `
       <div class="mensaje-juego">
 
-    ⚽ <strong>¡MUCHA SUERTE A TODOS LOS PARTICIPANTES!</strong>
+     <strong>¡MUCHA SUERTE A TODOS LOS PARTICIPANTES!</strong>
 
     <br>
 
