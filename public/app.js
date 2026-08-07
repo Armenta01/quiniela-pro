@@ -1085,7 +1085,7 @@ if (jornadaCerrada) {
 
     ⚽ <strong>¡MUCHA SUERTE A TODOS LOS PARTICIPANTES!</strong>
 
-    <br><br>
+    <br>
 
     🏆 Los resultados y la tabla de posiciones
     se actualizarán conforme finalicen los partidos.
