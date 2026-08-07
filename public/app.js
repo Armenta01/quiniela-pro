@@ -1081,11 +1081,16 @@ async function cargarBolsa(jornada) {
 if (jornadaCerrada) {
 
   contenido = `
-      ⚽ <strong>¡Mucha suerte a todos los participantes!</strong>
+      <div class="mensaje-juego">
 
-      <br><br>
+    ⚽ <strong>¡MUCHA SUERTE A TODOS LOS PARTICIPANTES!</strong>
 
-      🏆 Los resultados y la tabla se actualizarán conforme finalicen los partidos.
+    <br><br>
+
+    🏆 Los resultados y la tabla de posiciones
+    se actualizarán conforme finalicen los partidos.
+
+</div>
   `;
 
 }
@@ -1137,7 +1142,7 @@ else if (bolsa.bolsaPremios < 2500) {
       <div class="bolsa-box">
 
         <div class="bolsa-titulo">
-          🏆 PREMIOS SEMANA ${jornada}
+          ${jornadaCerrada ? `⚽ SEMANA ${jornada} EN JUEGO` : `🏆 PREMIOS SEMANA ${jornada}`}
         </div>
 
         <div class="premios">
