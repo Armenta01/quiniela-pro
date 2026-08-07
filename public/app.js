@@ -1104,7 +1104,6 @@ document.getElementById("bolsaInfo").innerHTML = `
 
         ${premios}
 
-        <br>
 
         ${mensaje}
 
