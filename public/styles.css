@@ -2593,3 +2593,65 @@ color:#111827;
     }
 
 }
+
+.premio-campeon{
+
+    display:block;
+
+    margin:12px 0;
+
+    font-size:42px;
+
+    font-weight:900;
+
+    color:#FFD700;
+
+    text-shadow:
+        0 0 8px rgba(255,215,0,.8),
+        0 0 18px rgba(255,215,0,.6),
+        0 0 35px rgba(255,215,0,.4);
+
+    animation:brilloPremio 2s infinite alternate;
+
+}
+
+@keyframes brilloPremio{
+
+from{
+
+    transform:scale(1);
+
+    text-shadow:
+        0 0 8px rgba(255,215,0,.7),
+        0 0 18px rgba(255,215,0,.5);
+
+}
+
+to{
+
+    transform:scale(1.05);
+
+    text-shadow:
+        0 0 18px rgba(255,215,0,1),
+        0 0 35px rgba(255,215,0,.8),
+        0 0 55px rgba(255,215,0,.5);
+
+}
+
+}
+
+.nombre-campeon{
+
+    margin:10px 0;
+
+    font-size:28px;
+
+    font-weight:800;
+
+    color:#7CFF3B;
+
+    text-shadow:
+        0 0 6px #39ff14,
+        0 0 15px #39ff14;
+
+}

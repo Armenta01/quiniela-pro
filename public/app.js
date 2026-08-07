@@ -1051,22 +1051,71 @@ async function cargarBolsa(jornada) {
   // SI YA TERMINÓ LA JORNADA
   // ===========================
   if (bolsa.jornadaTerminada && bolsa.campeones.length > 0) {
-
     const nombres = bolsa.campeones
-      .map(c => c.nombre)
-      .join("<br>");
+  .map(c => `<div class="nombre-campeon">👑 ${c.nombre}</div>`)
+  .join("<br>");
 
-    document.getElementById("bolsaInfo").innerHTML = `
-      <div class="bolsa-box">
-        <div class="bolsa-titulo">
-          🏆 CAMPEÓN SEMANA ${jornada}
-        </div>
+const titulo =
+    bolsa.campeones.length === 1
+        ? `🏆 CAMPEÓN SEMANA ${jornada}`
+        : `🏆 CAMPEONES SEMANA ${jornada}`;
 
-        <div class="premios">
-          👑 ${nombres}
-        </div>
-      </div>
+let premios = "";
+
+if (bolsa.segundoLugar === 0) {
+
+    premios = `
+        💰 <strong>Premio ganado</strong>
+
+        <br>
+
+        <span class="premio-campeon">
+            $${Math.round(bolsa.primerLugar)} MXN
+        </span>
     `;
+
+} else {
+
+    premios = `
+        🥇 1er Lugar:
+        <strong>$${Math.round(bolsa.primerLugar)} MXN</strong>
+
+        <br><br>
+
+        🥈 2do Lugar:
+        <strong>$${Math.round(bolsa.segundoLugar)} MXN</strong>
+    `;
+
+}
+
+const mensaje =
+    bolsa.campeones.length === 1
+        ? "🎉 ¡Muchas felicidades al campeón!"
+        : "🎉 ¡Muchas felicidades a los campeones!";
+
+document.getElementById("bolsaInfo").innerHTML = `
+<div class="bolsa-box">
+
+    <div class="bolsa-titulo">
+        ${titulo}
+    </div>
+
+    <div class="premios">
+
+        ${premios}
+
+        <br><br>
+
+        ${mensaje}
+
+        <br><br>
+
+        ${nombres}
+
+    </div>
+
+</div>
+`;
 
   }
 
