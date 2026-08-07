@@ -1080,7 +1080,7 @@ if (bolsa.segundoLugar === 0) {
         🥇 1er Lugar:
         <strong>$${Math.round(bolsa.primerLugar)} MXN</strong>
 
-        <br><br>
+        <br>
 
         🥈 2do Lugar:
         <strong>$${Math.round(bolsa.segundoLugar)} MXN</strong>
@@ -1104,11 +1104,11 @@ document.getElementById("bolsaInfo").innerHTML = `
 
         ${premios}
 
-        <br><br>
+        <br>
 
         ${mensaje}
 
-        <br><br>
+        <br>
 
         ${nombres}
 
