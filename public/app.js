@@ -26,8 +26,6 @@ window.onload = async () => {
 
   cargarBolsa(jornadaActual);
 
-  actualizarContador();
-
   setInterval(actualizarContador, 1000);
 
   setTimeout(mostrarRankingPopup, 1000);
@@ -887,111 +885,67 @@ function generarAleatorio() {
   });
 
 }
-
 async function actualizarContador() {
 
-  const info = document.getElementById("infoQuiniela");
+    const info = document.getElementById("infoQuiniela");
 
-  if (!info) return;
+    if (!info) return;
 
-  try {
+    try {
 
-    info.style.display = "block";
+        const r = await fetch(`/limite?jornada=${jornadaActual}`);
 
-    const r = await fetch(`/limite?jornada=${jornadaActual}`);
+        if (!r.ok) {
+            throw new Error("Error obteniendo límite");
+        }
 
-    if (!r.ok) {
-      throw new Error("Error obteniendo límite");
+        const d = await r.json();
+
+        // Jornada cerrada
+        if (d.bloqueada) {
+            info.style.display = "none";
+            return;
+        }
+
+        info.style.display = "block";
+
+        const limite = new Date(d.limite);
+        const ahora = new Date();
+
+        const diff = limite - ahora;
+
+        const dias = Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
+
+        const horas = Math.max(0, Math.floor(
+            (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+        ));
+
+        const minutos = Math.max(0, Math.floor(
+            (diff % (1000 * 60 * 60)) / (1000 * 60)
+        ));
+
+        const segundos = Math.max(0, Math.floor(
+            (diff % (1000 * 60)) / 1000
+        ));
+
+        // Actualizar SOLO los números
+        document.getElementById("dias").textContent =
+            dias.toString().padStart(2, "0");
+
+        document.getElementById("horas").textContent =
+            horas.toString().padStart(2, "0");
+
+        document.getElementById("minutos").textContent =
+            minutos.toString().padStart(2, "0");
+
+        document.getElementById("segundos").textContent =
+            segundos.toString().padStart(2, "0");
+
+    } catch (err) {
+
+        console.error(err);
+
     }
-
-    const d = await r.json();
-
-    // Si ya cerró, ocultar la barra
-    if (d.bloqueada) {
-      info.style.display = "none";
-      return;
-    }
-
-    const limite = new Date(d.limite);
-    const ahora = new Date();
-
-    const diff = limite - ahora;
-
-    const dias = Math.floor(diff / (1000 * 60 * 60 * 24));
-
-    const horas = Math.floor(
-      (diff % (1000 * 60 * 60 * 24))
-      / (1000 * 60 * 60)
-    );
-
-    const minutos = Math.floor(
-      (diff % (1000 * 60 * 60))
-      / (1000 * 60)
-    );
-
-    const segundos = Math.floor(
-    (diff % (1000 * 60)) / 1000
-);
-
-info.innerHTML = `
-    <div class="costo">
-        💰 Costo: $50 MXN
-    </div>
-
-    <div class="contador-box">
-
-        <div class="contador-titulo">
-            ⏳ CIERRE DE REGISTROS
-        </div>
-
-        <div class="contador-digital">
-
-            <div class="tiempo">
-                <span>${dias}</span>
-                <small>DÍAS</small>
-            </div>
-
-            <div class="tiempo">
-                <span>${horas}</span>
-                <small>HORAS</small>
-            </div>
-
-            <div class="tiempo">
-                <span>${minutos}</span>
-                <small>MIN</small>
-            </div>
-
-            <div class="tiempo">
-                <span>${segundos.toString().padStart(2,"0")}</span>
-                <small>SEG</small>
-            </div>
-
-        </div>
-
-    </div>
-`;
-
-  } catch (err) {
-
-    info.innerHTML = `
-    <div class="costo">
-        💰 Costo: $50 MXN
-    </div>
-
-    <div class="contador-box">
-
-        <div class="contador-titulo">
-            ⏳ CIERRE DE REGISTROS
-        </div>
-
-        <div class="contador">
-            Actualizando...
-        </div>
-
-    </div>
-`;
-
-  }
 
 }
 
