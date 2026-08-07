@@ -2547,7 +2547,6 @@ color:#111827;
 }
 
 }
-
 .mensaje-juego{
 
     text-align:center;
@@ -2557,35 +2556,40 @@ color:#111827;
 
 .mensaje-juego strong{
 
-    display:inline-block;
+    font-size:34px;
+    font-weight:900;
 
-    padding:12px 22px;
+    color:#7CFF3B;
 
-    font-size:24px;
-    font-weight:800;
+    text-transform:uppercase;
 
-    color:#fff;
+    text-shadow:
+        0 0 8px #39ff14,
+        0 0 18px #39ff14,
+        0 0 30px #00ff88;
 
-    background:#28a745;
-
-    border-radius:12px;
-
-    box-shadow:0 0 20px rgba(40,167,69,.6);
-
-    animation: brillo 1.8s infinite alternate;
-
+    animation: brilloVerde 2s ease-in-out infinite;
 }
 
-@keyframes brillo{
+@keyframes brilloVerde{
 
-    from{
-        transform:scale(1);
-        box-shadow:0 0 10px rgba(40,167,69,.4);
+    0%{
+        text-shadow:
+            0 0 5px #39ff14,
+            0 0 10px #39ff14;
     }
 
-    to{
-        transform:scale(1.04);
-        box-shadow:0 0 25px rgba(40,167,69,.9);
+    50%{
+        text-shadow:
+            0 0 15px #39ff14,
+            0 0 35px #39ff14,
+            0 0 55px #00ff88;
+    }
+
+    100%{
+        text-shadow:
+            0 0 5px #39ff14,
+            0 0 10px #39ff14;
     }
 
 }
