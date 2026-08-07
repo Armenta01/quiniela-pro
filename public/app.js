@@ -1042,6 +1042,11 @@ async function cargarBolsa(jornada) {
   const res = await fetch(`/bolsa?jornada=${jornada}`);
   const bolsa = await res.json();
 
+  const r = await fetch(`/limite?jornada=${jornada}`);
+  const limite = await r.json();
+
+  const jornadaCerrada = limite.bloqueada;
+
   // ===========================
   // SI YA TERMINÓ LA JORNADA
   // ===========================
@@ -1072,7 +1077,21 @@ async function cargarBolsa(jornada) {
 
     let contenido = "";
 
-    if (bolsa.bolsaPremios < 2500) {
+// 🔒 Jornada cerrada (partidos en curso)
+if (jornadaCerrada) {
+
+  contenido = `
+      ⚽ <strong>¡Mucha suerte a todos los participantes!</strong>
+
+      <br><br>
+
+      🏆 Los resultados y la tabla se actualizarán conforme finalicen los partidos.
+  `;
+
+}
+
+// 🟢 Jornada abierta
+else if (bolsa.bolsaPremios < 2500) {
 
       contenido = `
        <br>
