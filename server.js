@@ -1502,7 +1502,7 @@ sheet.views = [
   {
     state: "frozen",
     xSplit: 1,
-    ySplit: 10
+    ySplit: 12
   }
 ];
 
@@ -1765,6 +1765,24 @@ sheet.getColumn(filaLocal.length).width = 10;
         };
 
     });
+
+});
+
+// 📅 FECHA Y HORA EN AMARILLO
+rowFecha.eachCell((cell) => {
+
+    cell.font = {
+        bold: true,
+        color: { argb: "FFFFFF00" },
+        name: "Arial",
+        size: 10
+    };
+
+    cell.alignment = {
+        horizontal: "center",
+        vertical: "middle",
+        wrapText: true
+    };
 
 });
 
