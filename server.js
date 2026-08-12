@@ -1682,12 +1682,22 @@ sheet.addRow([]);
 // =========================================
 
 const filaLocal = ["Jugador"];
+const filaFecha = [""];
 const filaResultado = [""];
 const filaVisitante = [""];
 
 partidos.forEach(p => {
 
     filaLocal.push(p.local);
+
+    // 📅 FECHA Y HORA DEL PARTIDO
+    filaFecha.push(
+        p.fecha
+            ? moment
+                .tz(p.fecha, "YYYY-MM-DD HH:mm:ss", "America/Mexico_City")
+                .format("DD/MM/YYYY HH:mm")
+            : "—"
+    );
 
     filaResultado.push(
         (p.goles_local != null && p.goles_visitante != null)
@@ -1704,8 +1714,9 @@ filaResultado.push("");
 filaVisitante.push("");
 
 const rowLocal = sheet.insertRow(9, filaLocal);
-const rowResultado = sheet.insertRow(10, filaResultado);
-const rowVisitante = sheet.insertRow(11, filaVisitante);
+const rowFecha = sheet.insertRow(10, filaFecha);
+const rowResultado = sheet.insertRow(11, filaResultado);
+const rowVisitante = sheet.insertRow(12, filaVisitante);
 
 // Ancho columnas
 sheet.getColumn(1).width = 22;
@@ -1719,7 +1730,7 @@ sheet.getColumn(filaLocal.length).width = 10;
 // ESTILO CABECERA
 // =========================================
 
-[rowLocal, rowResultado, rowVisitante].forEach(row => {
+[rowLocal, rowFecha, rowResultado, rowVisitante].forEach(row => {
 
     row.height = 22;
 
