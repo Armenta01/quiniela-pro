@@ -325,21 +325,47 @@ Jugador
 
 json.partidos.forEach(p => {
 
+    const fechaPartido = p.fecha
+        ? new Date(p.fecha).toLocaleString("es-MX", {
+            day: "2-digit",
+            month: "short",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false
+        })
+        : "";
+
     filaLocal += `
     <td style="
         background:#1A1A1A;
-        color:white;
         font-weight:bold;
         border:1px solid black;
         min-width:120px;
         text-align:center;
         padding:6px;
     ">
-        ${p.local}
+
+        <span style="
+            color:#FFD700;
+            font-size:13px;
+        ">
+            ${fechaPartido}
+        </span>
+
+        <span style="
+            color:white;
+            font-size:14px;
+            margin-left:5px;
+        ">
+            ${p.local}
+        </span>
+
     </td>
     `;
 
 });
+
+
 
 filaLocal += `
 <td style="
