@@ -306,20 +306,20 @@ Premio único
 `;
 const tablaHTML = document.getElementById("tablaHTML");
 
-// ===== FILA 1 =====
-let filaLocal = "<tr>";
+// ===== FILA 1: FECHA Y HORA =====
+let filaFecha = "<tr>";
 
-filaLocal += `
+filaFecha += `
 <td style="
-background:#2F5597;
-color:white;
-font-weight:bold;
-padding:8px;
-border:1px solid black;
-text-align:center;
-min-width:180px;
+    background:#2F5597;
+    color:white;
+    font-weight:bold;
+    padding:8px;
+    border:1px solid black;
+    text-align:center;
+    min-width:180px;
 ">
-Jugador
+    Jugador
 </td>
 `;
 
@@ -335,49 +335,86 @@ json.partidos.forEach(p => {
         })
         : "";
 
-    filaLocal += `
+    filaFecha += `
     <td style="
         background:#1A1A1A;
+        color:#FFD700;
         font-weight:bold;
         border:1px solid black;
         min-width:120px;
         text-align:center;
         padding:6px;
+        font-size:13px;
     ">
+        ${fechaPartido}
+    </td>
+    `;
+});
 
-        <span style="
-            color:#FFD700;
-            font-size:13px;
-        ">
-            ${fechaPartido}
-        </span>
+filaFecha += `
+<td style="
+    background:#70AD47;
+    color:white;
+    font-weight:bold;
+    border:1px solid black;
+    padding:6px;
+    text-align:center;
+    min-width:70px;
+">
+    Puntos
+</td>
+`;
 
-        <span style="
-            color:white;
-            font-size:14px;
-            margin-left:5px;
-        ">
-            ${p.local}
-        </span>
+filaFecha += "</tr>";
 
+
+// ===== FILA 2: EQUIPO LOCAL =====
+let filaLocal = "<tr>";
+
+filaLocal += `
+<td style="
+    background:#2F5597;
+    color:white;
+    font-weight:bold;
+    padding:8px;
+    border:1px solid black;
+    text-align:center;
+    min-width:180px;
+">
+    Jugador
+</td>
+`;
+
+json.partidos.forEach(p => {
+
+    filaLocal += `
+    <td style="
+        background:#1A1A1A;
+        color:white;
+        font-weight:bold;
+        border:1px solid black;
+        min-width:120px;
+        text-align:center;
+        padding:6px;
+        font-size:14px;
+    ">
+        ${p.local}
     </td>
     `;
 
 });
 
-
-
 filaLocal += `
 <td style="
-background:#70AD47;
-color:white;
-font-weight:bold;
-border:1px solid black;
-padding:6px;
-text-align:center;
-min-width:70px;
+    background:#70AD47;
+    color:white;
+    font-weight:bold;
+    border:1px solid black;
+    padding:6px;
+    text-align:center;
+    min-width:70px;
 ">
-Puntos
+    Puntos
 </td>
 `;
 
@@ -445,6 +482,7 @@ filaVisitante += "</tr>";
 
 
 tablaHTML.innerHTML +=
+    filaFecha +
     filaLocal +
     filaResultado +
     filaVisitante;
