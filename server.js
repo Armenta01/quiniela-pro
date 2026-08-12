@@ -1713,8 +1713,8 @@ filaLocal.push("Puntos");
 filaResultado.push("");
 filaVisitante.push("");
 
-const rowLocal = sheet.insertRow(9, filaLocal);
-const rowFecha = sheet.insertRow(10, filaFecha);
+const rowFecha = sheet.insertRow(9, filaFecha);
+const rowLocal = sheet.insertRow(10, filaLocal);
 const rowResultado = sheet.insertRow(11, filaResultado);
 const rowVisitante = sheet.insertRow(12, filaVisitante);
 
