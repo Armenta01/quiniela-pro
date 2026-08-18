@@ -107,9 +107,9 @@ input, select, button {
   }
 
   .team{
-    max-width:95px;
-    overflow:hidden;
-  }
+  max-width:120px;
+  overflow:visible;
+}
 
   .team span{
     font-size:12px;
@@ -1794,13 +1794,22 @@ body h1{
   align-items:center;
   justify-content:center;
   gap:6px;
+  width:100%;
+  min-width:0;
+  overflow:visible;
 }
 
 .nombre-abajo{
+  width:100%;
+  max-width:140px;
   text-align:center;
   font-size:13px;
   line-height:1.1;
   font-weight:600;
+  white-space:normal;
+  overflow:visible;
+  word-break:normal;
+  overflow-wrap:break-word;
 }
 
 .team img{
