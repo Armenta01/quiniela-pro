@@ -1249,6 +1249,7 @@ async function cargarJugadores(){
     alert("Terminé");
 
 }
+
 function mostrarJugadores(jugadores){
 
     const lista =
@@ -1258,12 +1259,10 @@ function mostrarJugadores(jugadores){
 
     jugadores.forEach(j=>{
 
-
-
-      lista.innerHTML += `
+        lista.innerHTML += `
 
 <div class="partido jugador-item"
-     onclick="seleccionarJugador(${j.id}, this)">
+     onclick="seleccionarJugador('${j.envio_id}', this)">
 
     👤 ${j.nombre}
 
@@ -1272,7 +1271,6 @@ function mostrarJugadores(jugadores){
 `;
 
     });
-
 }
 
 document
@@ -1300,12 +1298,15 @@ document
 
 let jugadorSeleccionado = null;
 
-async function seleccionarJugador(id,elemento){
+async function seleccionarJugador(envioId, elemento){
 
-    jugadorSeleccionado = id;
+    jugadorSeleccionado = envioId;
 
     const jugador =
-        window.jugadoresEditor.find(j => j.id == id);
+        window.jugadoresEditor.find(
+            j => j.envio_id === envioId
+        );
+        
 
     document.getElementById("tituloJugador").style.display = "block";
 
