@@ -1659,8 +1659,25 @@ titulo.border = {
   left: { style: "medium" },
   right: { style: "medium" }
 };
+// =========================================
+// PREMIO + LOGO
+// =========================================
 
-// Premio
+// Fondo azul para toda la sección
+sheet.mergeCells("A5:K7");
+
+const fondoPremio = sheet.getCell("A5");
+
+fondoPremio.fill = {
+  type: "pattern",
+  pattern: "solid",
+  fgColor: {
+    argb: "FF4F81BD"
+  }
+};
+
+
+// Texto del premio centrado
 sheet.mergeCells("C5:I7");
 
 const premio = sheet.getCell("C5");
@@ -1672,7 +1689,6 @@ premio.value = [
     ? "Premio único"
     : "1° Lugar"
 ].join("\n");
-
 
 premio.font = {
   bold: true,
@@ -1686,27 +1702,23 @@ premio.alignment = {
   wrapText: true
 };
 
-sheet.getRow(5).height = 28;
-sheet.getRow(6).height = 28;
 
-premio.fill = {
-  type: "pattern",
-  pattern: "solid",
-  fgColor: {
-    argb: "FF4F81BD"
-  }
-};
+// Altura de la sección
+sheet.getRow(5).height = 40;
+sheet.getRow(6).height = 40;
+sheet.getRow(7).height = 40;
 
-premio.border = {
-  top: { style: "medium" },
-  bottom: { style: "medium" },
-  left: { style: "medium" },
-  right: { style: "medium" }
-};
-sheet.getRow(5).height = 26;
-sheet.getRow(6).height = 26;
-sheet.getRow(7).height = 26;
 
+// LOGO A LA IZQUIERDA
+const logo = workbook.addImage({
+  filename: "./public/logo2.png",
+  extension: "png"
+});
+
+sheet.addImage(logo, {
+  tl: { col: 0.3, row: 4.1 },
+  br: { col: 2.0, row: 7.0 }
+});
 // Separación antes de la tabla
 sheet.addRow([]);
 sheet.addRow([]);
