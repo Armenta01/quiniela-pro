@@ -982,31 +982,72 @@ if (ahora.isSameOrAfter(fechaBD)) {
     }
 
 });
+app.post("/admin/cambiar-nombre", async (req, res) => {
 
-app.post("/admin/cambiar-nombre", async (req,res)=>{
+    const { envio_id, nombre } = req.body;
 
-    const { user_id, nombre } = req.body;
+    if (!envio_id || !nombre || !nombre.trim()) {
+        return res.status(400).json({
+            ok: false,
+            error: "envio_id y nombre son requeridos."
+        });
+    }
 
-    try{
+    const client = await pool.connect();
 
-        await pool.query(
-            `
-            UPDATE users
-            SET nombre = $1
-            WHERE id = $2
-            `,
-            [nombre.trim(), user_id]
-        );
+    try {
 
-        res.json({ok:true});
+        await client.query("BEGIN");
 
-    }catch(err){
+        // Cambia el usuario asociado SOLAMENTE a esta quiniela
+        const usuarioActual = await client.query(`
+            SELECT user_id
+            FROM predicciones
+            WHERE envio_id = $1
+            LIMIT 1
+        `, [envio_id]);
+
+        if (usuarioActual.rows.length === 0) {
+            throw new Error("Quiniela no encontrada.");
+        }
+
+        // Creamos un usuario independiente para esta quiniela
+        const nuevoUsuario = await client.query(`
+            INSERT INTO users (nombre)
+            VALUES ($1)
+            RETURNING id
+        `, [nombre.trim()]);
+
+        const nuevoUserId = nuevoUsuario.rows[0].id;
+
+        // Solamente los registros de ESTA quiniela cambian al nuevo usuario
+        await client.query(`
+            UPDATE predicciones
+            SET user_id = $1
+            WHERE envio_id = $2
+        `, [nuevoUserId, envio_id]);
+
+        await client.query("COMMIT");
+
+        res.json({
+            ok: true,
+            user_id: nuevoUserId
+        });
+
+    } catch (err) {
+
+        await client.query("ROLLBACK");
 
         console.error(err);
 
         res.status(500).json({
-            error:"No fue posible actualizar el nombre."
+            ok: false,
+            error: "No fue posible actualizar el nombre."
         });
+
+    } finally {
+
+        client.release();
 
     }
 

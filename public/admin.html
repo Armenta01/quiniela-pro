@@ -1259,7 +1259,7 @@ function mostrarJugadores(jugadores){
 
     jugadores.forEach(j=>{
 
-        lista.innerHTML += `
+      lista.innerHTML += `
 
 <div class="partido jugador-item"
      onclick="seleccionarJugador('${j.envio_id}', this)">
@@ -1306,7 +1306,7 @@ async function seleccionarJugador(envioId, elemento){
         window.jugadoresEditor.find(
             j => j.envio_id === envioId
         );
-        
+
 
     document.getElementById("tituloJugador").style.display = "block";
 
@@ -1374,8 +1374,6 @@ async function guardarCambiosPronosticos(){
 
             pronosticos.push({
 
-                user_id: jugadorSeleccionado,
-
                 partido_id: parseInt(
                     gl.id.replace("gl-","")
                 ),
@@ -1401,7 +1399,9 @@ async function guardarCambiosPronosticos(){
                 },
 
                 body:JSON.stringify({
-                    pronosticos
+                    envio_id: jugadorSeleccionado,
+                    jornada: document.getElementById("jornadaEditar").value,
+                    pronosticos: pronosticos
                 })
 
             }
