@@ -296,7 +296,6 @@ async function verificarEstadoEdicion(){
     }
 
 }
-
 async function guardarNombreJugador(){
 
     if(!jugadorSeleccionado) return;
@@ -323,7 +322,7 @@ async function guardarNombreJugador(){
 
         body:JSON.stringify({
 
-            user_id: jugadorSeleccionado.id,
+            envio_id: jugadorSeleccionado.envio_id,
 
             nombre
 
@@ -349,7 +348,7 @@ async function guardarNombreJugador(){
         await cargarPronosticos();
 
         document.getElementById("buscarJugador").dispatchEvent(
-        new Event("input")
+            new Event("input")
         );
 
     }else{
@@ -363,7 +362,6 @@ async function guardarNombreJugador(){
     }
 
 }
-
 
 document
 .getElementById("jornadaEditar")

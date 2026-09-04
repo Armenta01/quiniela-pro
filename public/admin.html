@@ -1327,6 +1327,101 @@ async function seleccionarJugador(envioId, elemento){
 
 }
 
+async function cambiarNombreJugador() {
+
+    if (!jugadorSeleccionado) {
+
+        mostrarMensaje(
+            "Participante",
+            "Selecciona primero una quiniela.",
+            "⚠️"
+        );
+
+        return;
+    }
+
+    const jugador = window.jugadoresEditor.find(
+        j => j.envio_id === jugadorSeleccionado
+    );
+
+    if (!jugador) {
+
+        mostrarMensaje(
+            "Error",
+            "No se encontró la quiniela seleccionada.",
+            "❌"
+        );
+
+        return;
+    }
+
+    const nuevoNombre = prompt(
+        "Escribe el nuevo nombre:",
+        jugador.nombre
+    );
+
+    if (!nuevoNombre || !nuevoNombre.trim()) {
+        return;
+    }
+
+    try {
+
+        const res = await fetch(
+            "/admin/cambiar-nombre",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    envio_id: jugadorSeleccionado,
+                    nombre: nuevoNombre.trim()
+                })
+            }
+        );
+
+        const data = await res.json();
+
+        if (!res.ok || !data.ok) {
+
+            mostrarMensaje(
+                "Error",
+                data.error || "No fue posible actualizar el nombre.",
+                "❌"
+            );
+
+            return;
+        }
+
+        mostrarToast(
+            "Nombre actualizado correctamente",
+            "✅"
+        );
+
+        await cargarJugadores();
+
+        jugadorSeleccionado = null;
+
+        document.getElementById(
+            "tituloJugador"
+        ).style.display = "none";
+
+    } catch (error) {
+
+        console.error(error);
+
+        mostrarMensaje(
+            "Servidor",
+            "Error de comunicación con el servidor.",
+            "❌"
+        );
+
+    }
+
+}
+
 async function cargarPronosticos(){
 
     if(!jugadorSeleccionado){
