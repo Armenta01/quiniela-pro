@@ -516,10 +516,22 @@ tablaHTML.innerHTML +=
     filaResultado +
     filaVisitante;
 
-// Obtener la mayor cantidad de puntos
-const maxPuntos = Math.max(
-    ...json.tabla.map(j => j.puntos)
-);
+// ===== CALCULAR PRIMER Y SEGUNDO LUGAR =====
+
+// Sacamos todos los puntajes diferentes
+const puntosOrdenados = [
+    ...new Set(
+        json.tabla
+            .map(j => Number(j.puntos))
+            .sort((a, b) => b - a)
+    )
+];
+
+// 🥇 Puntaje del primer lugar
+const puntosPrimerLugar = puntosOrdenados[0];
+
+// 🥈 Puntaje del segundo lugar
+const puntosSegundoLugar = puntosOrdenados[1];
 
     // ===== PARTICIPANTES =====
 
@@ -527,10 +539,31 @@ json.tabla.forEach(jugador => {
 
     let fila = "<tr>";
 
+        // ===== COLOR DEL NOMBRE SEGÚN POSICIÓN =====
+
+let colorNombre = "#FFFFFF";
+
+// 🥇 Primer lugar
+if (Number(jugador.puntos) === puntosPrimerLugar) {
+
+    colorNombre = "#FFD700";
+
+}
+
+// 🥈 Segundo lugar
+else if (
+    puntosSegundoLugar !== undefined &&
+    Number(jugador.puntos) === puntosSegundoLugar
+) {
+
+    colorNombre = "#C0C0C0";
+
+}
+
     // Nombre
     fila += `
 <td style="
-    background:#FFFFFF;
+    background:${colorNombre};
     color:#000;
     font-weight:bold;
     border:1px solid black;
@@ -572,12 +605,29 @@ json.tabla.forEach(jugador => {
         `;
     });
 
-  // Puntos
-const colorPuntos =
-    jugador.puntos === maxPuntos
-        ? "#FFD54F"
-        : "#FFFFFF";
+    // ===== COLOR DE LOS PUNTOS SEGÚN POSICIÓN =====
 
+let colorPuntos = "#FFFFFF";
+
+// 🥇 Primer lugar
+if (Number(jugador.puntos) === puntosPrimerLugar) {
+
+    colorPuntos = "#FFD700";
+
+}
+
+// 🥈 Segundo lugar
+else if (
+    puntosSegundoLugar !== undefined &&
+    Number(jugador.puntos) === puntosSegundoLugar
+) {
+
+    colorPuntos = "#C0C0C0";
+
+}
+
+
+// Puntos
 fila += `
 <td style="
     background:${colorPuntos};
@@ -596,6 +646,53 @@ fila += `
     tablaHTML.innerHTML += fila;
 
 });
+
+// ===== LEYENDA DE POSICIONES =====
+
+tablaHTML.innerHTML += `
+<tr>
+
+<td
+    colspan="${json.partidos.length + 2}"
+    style="
+        background:#000000;
+        padding:20px;
+        text-align:center;
+        font-family:Arial;
+    "
+>
+
+    <span style="
+        display:inline-block;
+        background:#FFD700;
+        color:#000000;
+        font-weight:bold;
+        font-size:24px;
+        padding:10px 18px;
+        margin-right:20px;
+        border:2px solid white;
+        border-radius:6px;
+    ">
+        🥇 Primer lugar
+    </span>
+
+    <span style="
+        display:inline-block;
+        background:#C0C0C0;
+        color:#000000;
+        font-weight:bold;
+        font-size:24px;
+        padding:10px 18px;
+        border:2px solid white;
+        border-radius:6px;
+    ">
+        🥈 Segundo lugar
+    </span>
+
+</td>
+
+</tr>
+`;
 
     if (!tabla) {
 
