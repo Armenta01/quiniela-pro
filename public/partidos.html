@@ -411,12 +411,87 @@
 
         }
 
+        /* ==========================================
+   🔔 MENSAJES PROFESIONALES
+========================================== */
+
+.toast {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+
+    min-width: 300px;
+    max-width: 420px;
+
+    padding: 16px 20px;
+
+    background: rgba(15, 27, 46, 0.96);
+
+    color: white;
+
+    border: 1px solid rgba(91,135,197,.45);
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 15px 40px rgba(0,0,0,.45),
+        0 0 20px rgba(37,99,235,.12);
+
+    backdrop-filter: blur(12px);
+
+    font-size: 15px;
+    font-weight: 700;
+
+    z-index: 99999;
+
+    opacity: 0;
+    transform: translateY(-15px);
+
+    pointer-events: none;
+
+    transition:
+        opacity .25s ease,
+        transform .25s ease;
+}
+
+.toast.mostrar {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast.exito {
+    border-left: 5px solid #2ECC71;
+}
+
+.toast.error {
+    border-left: 5px solid #ef4444;
+}
+
+.toast.aviso {
+    border-left: 5px solid #FFD700;
+}
+
+@media (max-width: 600px) {
+
+    .toast {
+        top: 15px;
+        left: 15px;
+        right: 15px;
+
+        min-width: auto;
+        max-width: none;
+
+        text-align: center;
+    }
+}
+
     </style>
 </head>
 
 <body>
 
 <div class="contenedor">
+<div id="toast" class="toast"></div>
 
     <div class="header">
 
@@ -531,6 +606,27 @@
 
 
 <script>
+
+    /* ==========================================
+   🔔 SISTEMA DE MENSAJES
+========================================== */
+
+function mostrarToast(mensaje, tipo = "aviso") {
+
+    const toast = document.getElementById("toast");
+
+    toast.className = "toast " + tipo;
+
+    toast.innerHTML = mensaje;
+
+    requestAnimationFrame(() => {
+        toast.classList.add("mostrar");
+    });
+
+    setTimeout(() => {
+        toast.classList.remove("mostrar");
+    }, 3000);
+}
 
 let partidos = [];
 let partidoEditando = null;
@@ -770,7 +866,7 @@ async function guardarResultado(id) {
 
     if (gl === "" || gv === "") {
 
-        alert("⚠️ Captura ambos marcadores.");
+        mostrarToast("⚠️ Captura ambos marcadores.", "aviso");
 
         return;
     }
@@ -805,16 +901,16 @@ async function guardarResultado(id) {
 
         if (!res.ok || !data.ok) {
 
-            alert(
-                data.error ||
-                "No fue posible guardar el resultado."
+           mostrarToast(
+            "❌ " + (data.error || "No fue posible guardar el resultado."),
+            "error"
             );
 
             return;
         }
 
 
-        alert("✅ Resultado guardado correctamente.");
+        mostrarToast("✅ Resultado guardado correctamente.", "exito");
 
         cargarPartidos();
 
@@ -823,8 +919,9 @@ async function guardarResultado(id) {
 
         console.error(error);
 
-        alert(
-            "❌ Error de comunicación con el servidor."
+        mostrarToast(
+            "❌ Error de comunicación con el servidor.",
+            "error"
         );
 
     }
@@ -931,8 +1028,10 @@ async function guardarEdicion() {
 
     if (!local || !visitante || !fecha) {
 
-        alert("⚠️ Completa equipo local, visitante y fecha.");
-
+        mostrarToast(
+            "⚠️ Completa equipo local, visitante y fecha.",
+            "aviso"
+        );
         return;
     }
 
@@ -971,16 +1070,19 @@ async function guardarEdicion() {
 
         if (!res.ok || !data.ok) {
 
-            alert(
-                data.error ||
-                "No fue posible actualizar el partido."
+            mostrarToast(
+                 "❌ " + (data.error || "No fue posible actualizar el partido."),
+                "error"
             );
 
             return;
         }
 
 
-        alert("✅ Partido actualizado correctamente.");
+        mostrarToast(
+            "✅ Partido actualizado correctamente.",
+            "exito"
+        );
 
         cerrarModal();
 
@@ -1003,8 +1105,9 @@ async function guardarEdicion() {
 
         console.error(error);
 
-        alert(
-            "❌ Error de comunicación con el servidor."
+        mostrarToast(
+             "❌ Error de comunicación con el servidor.",
+            "error"
         );
 
     }
