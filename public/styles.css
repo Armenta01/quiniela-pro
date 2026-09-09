@@ -2912,28 +2912,58 @@ to{
    📱 CELULAR
 ========================================== */
 
+/* ==========================================
+   📱 CELULAR
+========================================== */
+
 @media (max-width: 600px) {
+
+    .admin-container {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .admin-container .card {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .admin-container .form-row {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
 
     .admin-container .form-row input,
     .admin-container .form-row select {
-
+        width: 100% !important;
+        max-width: 100%;
+        min-width: 0;
         height: 56px;
-
         border-radius: 13px;
-
         font-size: 15px;
-
         padding: 0 17px;
+        box-sizing: border-box;
+    }
+
+    .admin-container .form-row input[type="datetime-local"] {
+        width: 100% !important;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+        display: block;
     }
 
     .admin-container .form-row button {
-
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
         height: 40px;
-
     }
 
 }
-
 
 /* =========================================
    TOAST ADMIN - MISMO DISEÑO QUE PARTIDOS
