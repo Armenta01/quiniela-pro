@@ -485,6 +485,82 @@
     }
 }
 
+
+/* ==========================================
+   ⚠️ MODAL ELIMINAR
+========================================== */
+
+.modal-eliminar {
+    max-width: 430px;
+    text-align: center;
+    padding: 35px 30px;
+}
+
+.icono-eliminar {
+    width: 75px;
+    height: 75px;
+
+    margin: 0 auto 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: rgba(185,28,28,.15);
+
+    border: 1px solid rgba(239,68,68,.30);
+
+    font-size: 36px;
+
+    box-shadow:
+        0 0 25px rgba(239,68,68,.12);
+}
+
+.modal-eliminar h2 {
+    margin: 0 0 12px;
+
+    font-size: 25px;
+}
+
+.modal-eliminar p {
+    margin: 0;
+
+    color: #cbd5e1;
+
+    font-size: 16px;
+
+    line-height: 1.5;
+}
+
+.confirmar-eliminar {
+    background: #b91c1c;
+
+    color: white;
+
+    border: none;
+
+    padding: 13px;
+
+    border-radius: 11px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: .2s;
+}
+
+.confirmar-eliminar:hover {
+    background: #dc2626;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 20px rgba(185,28,28,.30);
+}
+
     </style>
 </head>
 
@@ -537,6 +613,43 @@
 
 </div>
 
+<!-- =========================
+     MODAL CONFIRMAR ELIMINACIÓN
+========================= -->
+
+<div class="modal" id="modalEliminar">
+
+    <div class="modal-contenido modal-eliminar">
+
+        <div class="icono-eliminar">
+            ⚠️
+        </div>
+
+        <h2>Eliminar partido</h2>
+
+        <p>
+            ¿Estás seguro de que deseas eliminar este partido?
+        </p>
+
+        <div class="botones-modal">
+
+            <button
+                class="cancelar-edicion"
+                onclick="cerrarModalEliminar()">
+                ✖ Cancelar
+            </button>
+
+            <button
+                class="confirmar-eliminar"
+                onclick="confirmarEliminar()">
+                🗑️ Eliminar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 
 <!-- =========================
      MODAL EDITAR PARTIDO
@@ -630,6 +743,7 @@ function mostrarToast(mensaje, tipo = "aviso") {
 
 let partidos = [];
 let partidoEditando = null;
+let partidoEliminando = null;
 
 
 /* =========================
@@ -1114,6 +1228,26 @@ async function guardarEdicion() {
 
 }
 
+function cerrarModalEliminar() {
+
+    partidoEliminando = null;
+
+    document
+        .getElementById("modalEliminar")
+        .classList.remove("activo");
+}
+
+
+function confirmarEliminar() {
+
+    if (!partidoEliminando) return;
+
+    const id = partidoEliminando;
+
+    cerrarModalEliminar();
+
+    ejecutarEliminacion(id);
+}
 
 /* =========================
    ELIMINAR PARTIDO
@@ -1121,12 +1255,15 @@ async function guardarEdicion() {
 
 async function eliminarPartido(id) {
 
-    const confirmar =
-        confirm("⚠️ ¿Deseas eliminar este partido?");
+    partidoEliminando = id;
+
+    document
+        .getElementById("modalEliminar")
+        .classList.add("activo");
+}
 
 
-    if (!confirmar) return;
-
+async function ejecutarEliminacion(id) {
 
     try {
 
@@ -1145,16 +1282,22 @@ async function eliminarPartido(id) {
 
         if (!res.ok || !data.ok) {
 
-            alert(
-                data.error ||
-                "No fue posible eliminar el partido."
+            mostrarToast(
+                "❌ " +
+                (data.error ||
+                "No fue posible eliminar el partido."),
+                "error"
             );
 
             return;
         }
 
 
-        alert("✅ Partido eliminado correctamente.");
+        mostrarToast(
+            "✅ Partido eliminado correctamente.",
+            "exito"
+        );
+
 
         cargarPartidos();
 
@@ -1163,13 +1306,17 @@ async function eliminarPartido(id) {
 
         console.error(error);
 
-        alert(
-            "❌ Error de comunicación con el servidor."
+        mostrarToast(
+            "❌ Error de comunicación con el servidor.",
+            "error"
         );
 
     }
 
 }
+
+
+
 
 
 /* =========================
