@@ -176,6 +176,8 @@ function mostrarMensaje(titulo, mensaje, icono = "⚠️") {
 // TOAST
 // ==============================
 
+let toastTimer = null;
+
 function mostrarToast(texto, icono = "✅") {
 
     const toast = document.getElementById("toast");
@@ -187,13 +189,31 @@ function mostrarToast(texto, icono = "✅") {
         return;
     }
 
+    // Detectar tipo de mensaje
+    let tipo = "exito";
+
+    if (icono === "⚠️") {
+        tipo = "aviso";
+    } else if (icono === "❌" || icono === "🚫") {
+        tipo = "error";
+    }
+
+    // Texto e icono
     toastTexto.textContent = texto;
     toastIcono.textContent = icono;
 
-    toast.classList.add("mostrar");
+    // Aplicar color
+    toast.className = "toast " + tipo;
 
-    setTimeout(() => {
+    // Mostrar
+    requestAnimationFrame(() => {
+        toast.classList.add("mostrar");
+    });
+
+    // Reiniciar temporizador
+    clearTimeout(toastTimer);
+
+    toastTimer = setTimeout(() => {
         toast.classList.remove("mostrar");
     }, 3000);
-
 }
