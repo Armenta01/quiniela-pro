@@ -820,34 +820,99 @@ if (esIOS) {
 
 }
 
-
 async function crearPartido() {
-  const local = document.getElementById('local').value;
-  const visitante = document.getElementById('visitante').value;
+
+  const local = document.getElementById('local').value.trim();
+  const visitante = document.getElementById('visitante').value.trim();
   const fecha = document.getElementById('fecha').value;
   const jornada = document.getElementById('jornada').value;
-  const liga = document.getElementById('liga').value;
-  const logo_local = document.getElementById('logo_local').value;
-  const logo_visitante = document.getElementById('logo_visitante').value;
+  const liga = document.getElementById('liga').value.trim();
+  const logo_local = document.getElementById('logo_local').value.trim();
+  const logo_visitante = document.getElementById('logo_visitante').value.trim();
 
-  const msg = document.getElementById('msg');
-
+  // Validar campos
   if (!local || !visitante || !fecha) {
-    msg.innerText = "⚠️ Completa todos los campos";
-    msg.style.color = "orange";
+
+    mostrarToast(
+      "⚠️ Completa equipo local, visitante y fecha.",
+      "aviso"
+    );
+
     return;
   }
 
   try {
-if (editandoId) {
 
-  const res = await fetch(
-    `/admin/partido/${editandoId}`,
-    {
-      method: 'PUT',
+    // ==========================================
+    // EDITAR PARTIDO EXISTENTE
+    // ==========================================
+
+    if (editandoId) {
+
+      const res = await fetch(
+        `/admin/partido/${editandoId}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            local,
+            visitante,
+            fecha,
+            jornada,
+            liga,
+            logo_local,
+            logo_visitante
+          })
+        }
+      );
+
+      const data = await res.json();
+
+      if (data.ok) {
+
+        mostrarToast(
+          "✅ Partido actualizado correctamente.",
+          "exito"
+        );
+
+        editandoId = null;
+
+        document.getElementById('local').value = '';
+        document.getElementById('visitante').value = '';
+        document.getElementById('fecha').value = '';
+        document.getElementById('liga').value = '';
+        document.getElementById('logo_local').value = '';
+        document.getElementById('logo_visitante').value = '';
+
+        cargarPartidos();
+
+        return;
+
+      } else {
+
+        mostrarToast(
+          "❌ " + (data.error || "No fue posible actualizar el partido."),
+          "error"
+        );
+
+        return;
+      }
+    }
+
+    // ==========================================
+    // CREAR NUEVO PARTIDO
+    // ==========================================
+
+    const res = await fetch('/admin/partidos', {
+
+      method: 'POST',
+
       headers: {
         'Content-Type': 'application/json'
       },
+
       body: JSON.stringify({
         local,
         visitante,
@@ -857,70 +922,47 @@ if (editandoId) {
         logo_local,
         logo_visitante
       })
-    }
-  );
 
-  const data = await res.json();
-
-  if (data.ok) {
-
-    document.getElementById("msg").innerHTML =
-      "✅ Partido actualizado";
-
-    editandoId = null;
-
-    document.getElementById('local').value = '';
-    document.getElementById('visitante').value = '';
-    document.getElementById('fecha').value = '';
-    document.getElementById('liga').value = '';
-    document.getElementById('logo_local').value = '';
-    document.getElementById('logo_visitante').value = '';
-
-    cargarPartidos();
-
-    return;
-  }
-}
-
-const res = await fetch('/admin/partidos', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    local,
-    visitante,
-    fecha,
-    jornada,
-    liga,
-    logo_local,
-    logo_visitante
-  })
-});
+    });
 
     const data = await res.json();
 
     if (data.ok) {
-      msg.innerText = "✅ Partido guardado";
-      msg.style.color = "lightgreen";
+
+      mostrarToast(
+        "✅ Partido guardado correctamente.",
+        "exito"
+      );
 
       document.getElementById('local').value = '';
       document.getElementById('visitante').value = '';
       document.getElementById('fecha').value = '';
+      document.getElementById('liga').value = '';
+      document.getElementById('logo_local').value = '';
+      document.getElementById('logo_visitante').value = '';
 
       cargarPartidos();
+
     } else {
-      msg.innerText = "❌ Error";
-      msg.style.color = "red";
+
+      mostrarToast(
+        "❌ " + (data.error || "No fue posible guardar el partido."),
+        "error"
+      );
+
     }
 
-  } 
-  catch (err) {
+  } catch (err) {
 
-  console.error(err);
+    console.error(err);
 
-  msg.innerText = "❌ Error al guardar partido";
-  msg.style.color = "red";
+    mostrarToast(
+      "❌ Error de comunicación con el servidor.",
+      "error"
+    );
 
-}
+  }
+
 }
 
 async function resetearTodo() {
