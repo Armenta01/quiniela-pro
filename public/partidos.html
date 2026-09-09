@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Partidos | Quinielas El Inge</title>
+
+    <link rel="icon" type="image/png" href="/logo.png">
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at top, #183b63 0%, #0b1628 45%, #050b14 100%);
+            color: white;
+        }
+
+        .contenedor {
+            width: 100%;
+            max-width: 1200px;
+            margin: auto;
+            padding: 25px;
+        }
+
+        /* =========================
+           ENCABEZADO
+        ========================= */
+
+        .header {
+            background: linear-gradient(135deg, #1F4E78, #0d2742);
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 22px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 15px 40px rgba(0,0,0,.35);
+            margin-bottom: 25px;
+        }
+
+        .logo {
+            width: 85px;
+            height: 85px;
+            object-fit: contain;
+            margin-bottom: 8px;
+        }
+
+        .titulo {
+            margin: 0;
+            font-size: 34px;
+            font-weight: 900;
+            letter-spacing: 1px;
+        }
+
+        .subtitulo {
+            margin: 8px 0 0;
+            color: #dbeafe;
+            font-size: 18px;
+        }
+
+        /* =========================
+           BARRA SUPERIOR
+        ========================= */
+
+        .barra {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .semana {
+            background: rgba(255,255,255,.08);
+            border: 1px solid rgba(255,255,255,.12);
+            padding: 12px 20px;
+            border-radius: 14px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .btn-volver {
+            border: none;
+            background: #2563eb;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 15px;
+            transition: .2s;
+        }
+
+        .btn-volver:hover {
+            transform: translateY(-2px);
+            background: #3b82f6;
+        }
+
+        /* =========================
+           GRID PARTIDOS
+        ========================= */
+
+        #listaPartidos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 22px;
+        }
+
+        .partido-card {
+            background: linear-gradient(
+                145deg,
+                rgba(255,255,255,.10),
+                rgba(255,255,255,.04)
+            );
+
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 22px;
+            padding: 22px;
+            box-shadow: 0 12px 35px rgba(0,0,0,.35);
+            backdrop-filter: blur(10px);
+            transition: .25s;
+        }
+
+        .partido-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255,255,255,.25);
+        }
+
+        .liga {
+            text-align: center;
+            color: #93c5fd;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .fecha {
+            text-align: center;
+            color: #FFD700;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 18px;
+        }
+
+        .equipos {
+            display: grid;
+            grid-template-columns: 1fr 70px 1fr;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .equipo {
+            text-align: center;
+        }
+
+        .equipo img {
+            width: 75px;
+            height: 75px;
+            object-fit: contain;
+            margin-bottom: 8px;
+        }
+
+        .nombre-equipo {
+            font-size: 17px;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .vs {
+            text-align: center;
+            font-size: 22px;
+            font-weight: 900;
+            color: #FFD700;
+        }
+
+        /* =========================
+           RESULTADO
+        ========================= */
+
+        .resultado-titulo {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #cbd5e1;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .resultado {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .resultado input {
+            width: 75px;
+            height: 50px;
+            border: 2px solid rgba(255,255,255,.15);
+            border-radius: 12px;
+            background: rgba(0,0,0,.35);
+            color: white;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            outline: none;
+        }
+
+        .resultado input:focus {
+            border-color: #2563eb;
+        }
+
+        .guion {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* =========================
+           BOTONES
+        ========================= */
+
+        .acciones {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .acciones button {
+            border: none;
+            padding: 12px;
+            border-radius: 11px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: .2s;
+        }
+
+        .btn-resultado {
+            grid-column: 1 / -1;
+            background: #2ECC71;
+            color: #062b16 !important;
+        }
+
+        .btn-resultado:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.08);
+        }
+
+        .btn-editar {
+            background: #2563eb;
+        }
+
+        .btn-editar:hover {
+            background: #3b82f6;
+        }
+
+        .btn-eliminar {
+            background: #b91c1c;
+        }
+
+        .btn-eliminar:hover {
+            background: #dc2626;
+        }
+
+        /* =========================
+           ESTADO
+        ========================= */
+
+        .mensaje {
+            text-align: center;
+            padding: 45px 20px;
+            color: #cbd5e1;
+            font-size: 18px;
+        }
+
+        .cargando {
+            animation: pulso 1.2s infinite;
+        }
+
+        @keyframes pulso {
+            50% {
+                opacity: .5;
+            }
+        }
+
+        /* =========================
+           MODAL EDICIÓN
+        ========================= */
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.78);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.activo {
+            display: flex;
+        }
+
+        .modal-contenido {
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: #0d1b2e;
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 22px;
+            padding: 25px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.55);
+        }
+
+        .modal-contenido h2 {
+            margin-top: 0;
+            text-align: center;
+        }
+
+        .campo {
+            margin-bottom: 14px;
+        }
+
+        .campo label {
+            display: block;
+            margin-bottom: 6px;
+            color: #cbd5e1;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .campo input,
+        .campo select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            background: #111c2e;
+            color: white;
+            outline: none;
+        }
+
+        .botones-modal {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .botones-modal button {
+            border: none;
+            padding: 13px;
+            border-radius: 11px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .guardar-edicion {
+            background: #2ECC71;
+            color: #062b16;
+        }
+
+        .cancelar-edicion {
+            background: #475569;
+            color: white;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 600px) {
+
+            .contenedor {
+                padding: 14px;
+            }
+
+            .titulo {
+                font-size: 27px;
+            }
+
+            #listaPartidos {
+                grid-template-columns: 1fr;
+            }
+
+            .partido-card {
+                padding: 18px;
+            }
+
+            .equipo img {
+                width: 65px;
+                height: 65px;
+            }
+
+            .nombre-equipo {
+                font-size: 15px;
+            }
+
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="contenedor">
+
+    <div class="header">
+
+        <img
+            src="/logo2.png"
+            class="logo"
+            onerror="this.src='/logo.png'"
+        >
+
+        <h1 class="titulo">
+            ⚽ QUINIELAS EL INGE
+        </h1>
+
+        <div class="subtitulo">
+            Administración de partidos
+        </div>
+
+    </div>
+
+
+    <div class="barra">
+
+        <div class="semana" id="tituloSemana">
+            📅 Cargando jornada...
+        </div>
+
+        <button
+            class="btn-volver"
+            onclick="window.location.href='/admin'">
+            ← Volver al panel
+        </button>
+
+    </div>
+
+
+    <div id="listaPartidos">
+
+        <div class="mensaje cargando">
+            ⏳ Cargando partidos...
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     MODAL EDITAR PARTIDO
+========================= -->
+
+<div class="modal" id="modalEditar">
+
+    <div class="modal-contenido">
+
+        <h2>✏️ Editar partido</h2>
+
+        <div class="campo">
+            <label>Equipo local</label>
+            <input id="editLocal" type="text">
+        </div>
+
+        <div class="campo">
+            <label>Equipo visitante</label>
+            <input id="editVisitante" type="text">
+        </div>
+
+        <div class="campo">
+            <label>Fecha y hora</label>
+            <input id="editFecha" type="datetime-local">
+        </div>
+
+        <div class="campo">
+            <label>Liga / competencia</label>
+            <input id="editLiga" type="text">
+        </div>
+
+        <div class="campo">
+            <label>Logo local</label>
+            <input id="editLogoLocal" type="text">
+        </div>
+
+        <div class="campo">
+            <label>Logo visitante</label>
+            <input id="editLogoVisitante" type="text">
+        </div>
+
+        <div class="campo">
+            <label>Semana</label>
+            <select id="editJornada">
+            </select>
+        </div>
+
+        <div class="botones-modal">
+
+            <button
+                class="guardar-edicion"
+                onclick="guardarEdicion()">
+                💾 Guardar cambios
+            </button>
+
+            <button
+                class="cancelar-edicion"
+                onclick="cerrarModal()">
+                ✖ Cancelar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+let partidos = [];
+let partidoEditando = null;
+
+
+/* =========================
+   OBTENER JORNADA
+========================= */
+
+const parametros = new URLSearchParams(window.location.search);
+
+const jornada = parametros.get("jornada") || "1";
+
+
+document.getElementById("tituloSemana").innerText =
+    `📅 Semana ${jornada}`;
+
+
+/* =========================
+   CARGAR PARTIDOS
+========================= */
+
+async function cargarPartidos() {
+
+    const lista = document.getElementById("listaPartidos");
+
+    lista.innerHTML = `
+        <div class="mensaje cargando">
+            ⏳ Cargando partidos...
+        </div>
+    `;
+
+    try {
+
+        const res =
+            await fetch(`/partidos?jornada=${jornada}`);
+
+        if (!res.ok) {
+            throw new Error("Error obteniendo partidos");
+        }
+
+        partidos = await res.json();
+
+        if (!partidos.length) {
+
+            lista.innerHTML = `
+                <div class="mensaje">
+                    ⚽ No hay partidos registrados para esta semana.
+                </div>
+            `;
+
+            return;
+        }
+
+        mostrarPartidos();
+
+    } catch (error) {
+
+        console.error(error);
+
+        lista.innerHTML = `
+            <div class="mensaje">
+                ❌ No fue posible cargar los partidos.
+            </div>
+        `;
+
+    }
+
+}
+
+
+/* =========================
+   MOSTRAR PARTIDOS
+========================= */
+
+function mostrarPartidos() {
+
+    const lista =
+        document.getElementById("listaPartidos");
+
+    lista.innerHTML = "";
+
+    partidos.forEach(p => {
+
+        const fecha =
+            p.fecha
+                ? new Date(p.fecha.replace(" ", "T"))
+                    .toLocaleString("es-MX", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: false
+                    })
+                : "Fecha pendiente";
+
+
+        const resultadoLocal =
+            p.goles_local !== null &&
+            p.goles_local !== undefined
+                ? p.goles_local
+                : "";
+
+        const resultadoVisitante =
+            p.goles_visitante !== null &&
+            p.goles_visitante !== undefined
+                ? p.goles_visitante
+                : "";
+
+
+        lista.innerHTML += `
+
+        <div class="partido-card">
+
+            <div class="liga">
+                ${p.liga || "Partido"}
+            </div>
+
+            <div class="fecha">
+                📅 ${fecha}
+            </div>
+
+
+            <div class="equipos">
+
+                <div class="equipo">
+
+                    ${
+                        p.logo_local
+                        ? `<img src="${p.logo_local}"
+                                onerror="this.style.display='none'">`
+                        : ""
+                    }
+
+                    <div class="nombre-equipo">
+                        ${p.local}
+                    </div>
+
+                </div>
+
+
+                <div class="vs">
+                    VS
+                </div>
+
+
+                <div class="equipo">
+
+                    ${
+                        p.logo_visitante
+                        ? `<img src="${p.logo_visitante}"
+                                onerror="this.style.display='none'">`
+                        : ""
+                    }
+
+                    <div class="nombre-equipo">
+                        ${p.visitante}
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="resultado-titulo">
+                RESULTADO OFICIAL
+            </div>
+
+
+            <div class="resultado">
+
+                <input
+                    type="number"
+                    min="0"
+                    id="rl${p.id}"
+                    value="${resultadoLocal}"
+                    placeholder="0">
+
+                <span class="guion">-</span>
+
+                <input
+                    type="number"
+                    min="0"
+                    id="rv${p.id}"
+                    value="${resultadoVisitante}"
+                    placeholder="0">
+
+            </div>
+
+
+            <div class="acciones">
+
+                <button
+                    class="btn-resultado"
+                    onclick="guardarResultado(${p.id})">
+                    🟢 Guardar resultado
+                </button>
+
+
+                <button
+                    class="btn-editar"
+                    onclick="abrirEditar(${p.id})">
+                    ✏️ Editar
+                </button>
+
+
+                <button
+                    class="btn-eliminar"
+                    onclick="eliminarPartido(${p.id})">
+                    🗑️ Eliminar
+                </button>
+
+            </div>
+
+        </div>
+
+        `;
+
+    });
+
+}
+
+
+/* =========================
+   GUARDAR RESULTADO
+========================= */
+
+async function guardarResultado(id) {
+
+    const gl =
+        document.getElementById("rl" + id).value;
+
+    const gv =
+        document.getElementById("rv" + id).value;
+
+
+    if (gl === "" || gv === "") {
+
+        alert("⚠️ Captura ambos marcadores.");
+
+        return;
+    }
+
+
+    try {
+
+        const res =
+            await fetch("/admin/resultado", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    partido_id: id,
+
+                    goles_local: parseInt(gl),
+
+                    goles_visitante: parseInt(gv)
+
+                })
+
+            });
+
+
+        const data = await res.json();
+
+
+        if (!res.ok || !data.ok) {
+
+            alert(
+                data.error ||
+                "No fue posible guardar el resultado."
+            );
+
+            return;
+        }
+
+
+        alert("✅ Resultado guardado correctamente.");
+
+        cargarPartidos();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "❌ Error de comunicación con el servidor."
+        );
+
+    }
+
+}
+
+
+/* =========================
+   ABRIR EDITAR
+========================= */
+
+function abrirEditar(id) {
+
+    const partido =
+        partidos.find(p => p.id == id);
+
+    if (!partido) return;
+
+
+    partidoEditando = id;
+
+
+    document.getElementById("editLocal").value =
+        partido.local || "";
+
+    document.getElementById("editVisitante").value =
+        partido.visitante || "";
+
+    document.getElementById("editLiga").value =
+        partido.liga || "";
+
+    document.getElementById("editLogoLocal").value =
+        partido.logo_local || "";
+
+    document.getElementById("editLogoVisitante").value =
+        partido.logo_visitante || "";
+
+    document.getElementById("editJornada").value =
+        partido.jornada || jornada;
+
+
+    if (partido.fecha) {
+
+        document.getElementById("editFecha").value =
+            partido.fecha.replace(" ", "T").substring(0,16);
+
+    } else {
+
+        document.getElementById("editFecha").value = "";
+
+    }
+
+
+    document.getElementById("modalEditar")
+        .classList.add("activo");
+
+}
+
+
+/* =========================
+   CERRAR MODAL
+========================= */
+
+function cerrarModal() {
+
+    partidoEditando = null;
+
+    document.getElementById("modalEditar")
+        .classList.remove("activo");
+
+}
+
+
+/* =========================
+   GUARDAR EDICIÓN
+========================= */
+
+async function guardarEdicion() {
+
+    if (!partidoEditando) return;
+
+
+    const local =
+        document.getElementById("editLocal").value.trim();
+
+    const visitante =
+        document.getElementById("editVisitante").value.trim();
+
+    const fecha =
+        document.getElementById("editFecha").value;
+
+    const liga =
+        document.getElementById("editLiga").value.trim();
+
+    const logo_local =
+        document.getElementById("editLogoLocal").value.trim();
+
+    const logo_visitante =
+        document.getElementById("editLogoVisitante").value.trim();
+
+    const jornadaEditar =
+        document.getElementById("editJornada").value;
+
+
+    if (!local || !visitante || !fecha) {
+
+        alert("⚠️ Completa equipo local, visitante y fecha.");
+
+        return;
+    }
+
+
+    try {
+
+        const res =
+            await fetch(
+                `/admin/partido/${partidoEditando}`,
+                {
+
+                    method: "PUT",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        local,
+                        visitante,
+                        fecha,
+                        jornada: jornadaEditar,
+                        liga,
+                        logo_local,
+                        logo_visitante
+
+                    })
+
+                }
+            );
+
+
+        const data = await res.json();
+
+
+        if (!res.ok || !data.ok) {
+
+            alert(
+                data.error ||
+                "No fue posible actualizar el partido."
+            );
+
+            return;
+        }
+
+
+        alert("✅ Partido actualizado correctamente.");
+
+        cerrarModal();
+
+        /*
+         * Si el partido fue cambiado de semana,
+         * ya no pertenece a la jornada actual.
+         */
+        if (String(jornadaEditar) !== String(jornada)) {
+
+            cargarPartidos();
+
+        } else {
+
+            cargarPartidos();
+
+        }
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "❌ Error de comunicación con el servidor."
+        );
+
+    }
+
+}
+
+
+/* =========================
+   ELIMINAR PARTIDO
+========================= */
+
+async function eliminarPartido(id) {
+
+    const confirmar =
+        confirm("⚠️ ¿Deseas eliminar este partido?");
+
+
+    if (!confirmar) return;
+
+
+    try {
+
+        const res =
+            await fetch(
+                `/admin/partido/${id}`,
+                {
+                    method: "DELETE"
+                }
+            );
+
+
+        const data =
+            await res.json();
+
+
+        if (!res.ok || !data.ok) {
+
+            alert(
+                data.error ||
+                "No fue posible eliminar el partido."
+            );
+
+            return;
+        }
+
+
+        alert("✅ Partido eliminado correctamente.");
+
+        cargarPartidos();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "❌ Error de comunicación con el servidor."
+        );
+
+    }
+
+}
+
+
+/* =========================
+   CREAR SEMANAS
+========================= */
+
+function cargarSemanas() {
+
+    const select =
+        document.getElementById("editJornada");
+
+    for (let i = 1; i <= 60; i++) {
+
+        select.innerHTML += `
+            <option value="${i}">
+                Semana ${i}
+            </option>
+        `;
+
+    }
+
+}
+
+
+cargarSemanas();
+
+cargarPartidos();
+
+</script>
+
+</body>
+</html>

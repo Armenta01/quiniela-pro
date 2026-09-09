@@ -101,7 +101,9 @@ if (sessionStorage.getItem("admin") !== "true") {
   <option value="60">Semana 60</option>
 </select>
 
-<button class="btn-verde" onclick="cargarPartidos()">Ver Jornada</button>
+<button class="btn-verde" onclick="abrirPartidos()">
+     Ver Jornada
+</button>
 
 <button class="btn-verde" onclick="crearPartido()">Crear Partido</button>
 
@@ -982,6 +984,16 @@ async function cargarEstadoJornada() {
     box.innerHTML = `🔓 Semana ${jornada} abierta`;
     box.className = "estado-jornada abierta";
   }
+}
+
+function abrirPartidos() {
+
+    const jornada =
+        document.getElementById("jornada").value;
+
+    window.location.href =
+        `/partidos.html?jornada=${jornada}`;
+
 }
 
 async function cargarPartidos() {
