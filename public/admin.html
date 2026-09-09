@@ -1043,14 +1043,40 @@ async function cargarEstadoJornada() {
   }
 }
 
-function abrirPartidos() {
+async function abrirPartidos() {
 
-    const jornada =
-        document.getElementById("jornada").value;
+    try {
 
-    window.location.href =
-        `/partidos.html?jornada=${jornada}`;
+        const res = await fetch("/admin/jornadas");
+        const data = await res.json();
 
+        if (!data.ok || !data.jornadas || data.jornadas.length === 0) {
+            mostrarToast(
+                "No hay una jornada disponible.",
+                "aviso"
+            );
+            return;
+        }
+
+        // La primera es la jornada más reciente
+        const jornadaActual = data.jornadas[0];
+
+        // Actualizar también el select del admin
+        document.getElementById("jornada").value = jornadaActual;
+
+        // Abrir automáticamente la jornada actual
+        window.location.href =
+            `/partidos.html?jornada=${jornadaActual}`;
+
+    } catch (error) {
+
+        console.error(error);
+
+        mostrarToast(
+            "Error al obtener la jornada actual.",
+            "error"
+        );
+    }
 }
 
 async function cargarPartidos() {
