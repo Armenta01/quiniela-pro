@@ -560,7 +560,49 @@
     box-shadow:
         0 8px 20px rgba(185,28,28,.30);
 }
+.selector-jornada {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 190px;
+}
 
+.selector-jornada label {
+    color: #dbeafe;
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+}
+
+.selector-jornada select {
+    height: 44px;
+    padding: 0 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(148,163,184,.25);
+    background: linear-gradient(145deg,#253b59,#182b44);
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    outline: none;
+    cursor: pointer;
+    box-shadow:
+        inset 0 1px 1px rgba(255,255,255,.04),
+        0 5px 15px rgba(0,0,0,.25);
+    transition: .25s ease;
+}
+
+.selector-jornada select:focus {
+    border-color: #2563eb;
+    box-shadow:
+        0 0 0 3px rgba(37,99,235,.15),
+        0 8px 20px rgba(0,0,0,.30);
+}
+
+.selector-jornada select option {
+    background: #182b44;
+    color: white;
+}
     </style>
 </head>
 
@@ -588,19 +630,27 @@
     </div>
 
 
-    <div class="barra">
+   <div class="barra">
 
-        <div class="semana" id="tituloSemana">
-            📅 Cargando jornada...
-        </div>
-
-        <button
-            class="btn-volver"
-            onclick="window.location.href='/admin'">
-            ← Volver al panel
-        </button>
-
+    <div class="semana" id="tituloSemana">
+        📅 Cargando jornada...
     </div>
+
+    <div class="selector-jornada">
+        <label for="selectorJornada">Buscar jornada</label>
+
+        <select id="selectorJornada" onchange="cambiarJornada()">
+            <option value="">Cargando...</option>
+        </select>
+    </div>
+
+    <button
+        class="btn-volver"
+        onclick="window.location.href='/admin'">
+        ← Volver al panel
+    </button>
+
+</div>
 
 
     <div id="listaPartidos">
@@ -751,12 +801,53 @@ let partidoEliminando = null;
 ========================= */
 
 const parametros = new URLSearchParams(window.location.search);
-
-const jornada = parametros.get("jornada") || "1";
+let jornada = parametros.get("jornada") || "1";
 
 
 document.getElementById("tituloSemana").innerText =
     `📅 Semana ${jornada}`;
+
+
+function cargarJornadas() {
+
+    const select = document.getElementById("selectorJornada");
+
+    select.innerHTML = "";
+
+    for (let i = 1; i <= 60; i++) {
+
+        const option = document.createElement("option");
+
+        option.value = i;
+        option.textContent = `Semana ${i}`;
+
+        if (String(i) === String(jornada)) {
+            option.selected = true;
+        }
+
+        select.appendChild(option);
+    }
+}
+
+
+function cambiarJornada() {
+
+    const select = document.getElementById("selectorJornada");
+
+    jornada = select.value;
+
+    document.getElementById("tituloSemana").innerText =
+        `📅 Semana ${jornada}`;
+
+    // Actualizar la URL sin recargar la página
+    const nuevaURL =
+        `/partidos.html?jornada=${jornada}`;
+
+    window.history.replaceState({}, "", nuevaURL);
+
+    // Cargar los partidos de la nueva jornada
+    cargarPartidos();
+}
 
 
 /* =========================
@@ -1340,9 +1431,8 @@ function cargarSemanas() {
 
 }
 
-
 cargarSemanas();
-
+cargarJornadas();
 cargarPartidos();
 
 </script>
