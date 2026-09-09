@@ -2692,7 +2692,7 @@ to{
 /* FORMULARIO */
 
 .admin-container .form-row {
-    gap: 14px;
+    gap: 9px;
 }
 
 
@@ -2703,9 +2703,9 @@ to{
 
     width: 100% !important;
 
-    height: 58px;
+    height: 40px;
 
-    padding: 0 20px;
+    padding: 0 14px;
 
     box-sizing: border-box;
 
@@ -2858,7 +2858,7 @@ to{
 
 .admin-container .form-row button {
 
-    height: 58px;
+    height: 48px;
 
     border-radius: 14px;
 
@@ -2928,7 +2928,7 @@ to{
 
     .admin-container .form-row button {
 
-        height: 56px;
+        height: 40px;
 
     }
 
