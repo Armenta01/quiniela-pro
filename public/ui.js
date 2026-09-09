@@ -171,11 +171,6 @@ function mostrarMensaje(titulo, mensaje, icono = "⚠️") {
     };
 
 }
-
-// ==============================
-// TOAST
-// ==============================
-
 let toastTimer = null;
 
 function mostrarToast(texto, icono = "✅") {
@@ -189,28 +184,41 @@ function mostrarToast(texto, icono = "✅") {
         return;
     }
 
-    // Detectar tipo de mensaje
     let tipo = "exito";
+    let simbolo = "✅";
 
-    if (icono === "⚠️") {
+    if (icono === "⚠️" || icono === "aviso") {
+
         tipo = "aviso";
-    } else if (icono === "❌" || icono === "🚫") {
+        simbolo = "⚠️";
+
+    } else if (
+        icono === "❌" ||
+        icono === "🚫" ||
+        icono === "error"
+    ) {
+
         tipo = "error";
+        simbolo = "❌";
+
+    } else if (
+        icono === "✅" ||
+        icono === "exito"
+    ) {
+
+        tipo = "exito";
+        simbolo = "✅";
     }
 
-    // Texto e icono
     toastTexto.textContent = texto;
-    toastIcono.textContent = icono;
+    toastIcono.textContent = simbolo;
 
-    // Aplicar color
     toast.className = "toast " + tipo;
 
-    // Mostrar
     requestAnimationFrame(() => {
         toast.classList.add("mostrar");
     });
 
-    // Reiniciar temporizador
     clearTimeout(toastTimer);
 
     toastTimer = setTimeout(() => {
