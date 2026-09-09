@@ -629,6 +629,10 @@
 
     </div>
 
+
+   <div class="barra">
+
+
     <div class="selector-jornada">
         <label for="selectorJornada">Buscar jornada</label>
 
@@ -797,8 +801,7 @@ const parametros = new URLSearchParams(window.location.search);
 let jornada = parametros.get("jornada") || "1";
 
 
-document.getElementById("tituloSemana").innerText =
-    `📅 Semana ${jornada}`;
+
 
 
 function cargarJornadas() {
@@ -828,9 +831,6 @@ function cambiarJornada() {
     const select = document.getElementById("selectorJornada");
 
     jornada = select.value;
-
-    document.getElementById("tituloSemana").innerText =
-        `📅 Semana ${jornada}`;
 
     // Actualizar la URL sin recargar la página
     const nuevaURL =
