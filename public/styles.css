@@ -3034,3 +3034,81 @@ to{
         text-align: center;
     }
 }
+
+/* =========================================
+   ENCABEZADO ADMIN - QUINIELAS EL INGE
+========================================= */
+
+.admin-header {
+    width: 100%;
+    max-width: 700px;
+    margin: 25px auto 10px;
+    padding: 25px 20px;
+
+    background: linear-gradient(
+        135deg,
+        #1F4E78,
+        #0d2742
+    );
+
+    border: 1px solid rgba(255,255,255,.15);
+    border-radius: 22px;
+
+    text-align: center;
+
+    box-shadow:
+        0 15px 40px rgba(0,0,0,.35);
+    
+    box-sizing: border-box;
+}
+
+.admin-logo {
+    width: 85px;
+    height: 85px;
+    object-fit: contain;
+    margin-bottom: 8px;
+}
+
+.admin-header h1 {
+    margin: 0;
+    color: white;
+    font-size: 34px;
+    font-weight: 900;
+    letter-spacing: 1px;
+}
+
+.admin-subtitulo {
+    margin-top: 8px;
+    color: #dbeafe;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+
+/* =========================================
+   📱 ADMIN EN CELULAR
+========================================= */
+
+@media (max-width: 600px) {
+
+    .admin-header {
+        width: calc(100% - 20px);
+        margin: 15px auto 10px;
+        padding: 20px 12px;
+        border-radius: 18px;
+    }
+
+    .admin-logo {
+        width: 70px;
+        height: 70px;
+    }
+
+    .admin-header h1 {
+        font-size: 24px;
+    }
+
+    .admin-subtitulo {
+        font-size: 15px;
+    }
+
+}
