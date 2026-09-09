@@ -2664,3 +2664,119 @@ to{
         0 0 15px #39ff14;
 
 }
+
+/* ==========================================
+   🎯 PANEL ADMIN - INPUTS PREMIUM
+   Solo afecta admin.html
+========================================== */
+
+.admin-container .form-row input,
+.admin-container .form-row select {
+    width: 100% !important;
+    height: 58px;
+
+    padding: 0 20px;
+
+    box-sizing: border-box;
+
+    background: linear-gradient(
+        145deg,
+        #ffffff,
+        #e8edf5
+    );
+
+    color: #172033;
+
+    border: 1px solid rgba(91, 135, 197, 0.25);
+    border-radius: 15px;
+
+    font-family: Arial, sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+
+    outline: none;
+
+    box-shadow:
+        0 5px 15px rgba(0, 0, 0, 0.18),
+        inset 0 1px 2px rgba(255,255,255,0.9);
+
+    transition:
+        all 0.25s ease;
+}
+
+
+/* PLACEHOLDER */
+
+.admin-container .form-row input::placeholder {
+    color: #7b8491;
+    font-weight: 500;
+}
+
+
+/* HOVER */
+
+.admin-container .form-row input:hover,
+.admin-container .form-row select:hover {
+    border-color: #5B87C5;
+
+    box-shadow:
+        0 7px 20px rgba(0, 0, 0, 0.22),
+        0 0 12px rgba(91, 135, 197, 0.15);
+}
+
+
+/* CUANDO ESCRIBES / SELECCIONAS */
+
+.admin-container .form-row input:focus,
+.admin-container .form-row select:focus {
+
+    background: #ffffff;
+
+    border-color: #5B87C5;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.25),
+        0 0 0 3px rgba(91, 135, 197, 0.18),
+        0 0 20px rgba(91, 135, 197, 0.18);
+}
+
+
+/* FECHA */
+
+.admin-container .form-row input[type="datetime-local"] {
+    font-family: Arial, sans-serif;
+    font-weight: 600;
+    color: #172033;
+}
+
+
+/* SELECT SEMANA */
+
+.admin-container .form-row select {
+    cursor: pointer;
+    font-weight: 700;
+}
+
+
+/* ESPACIADO ENTRE CAMPOS */
+
+.admin-container .form-row input,
+.admin-container .form-row select {
+    margin-bottom: 14px;
+}
+
+
+/* MÓVIL */
+
+@media (max-width: 600px) {
+
+    .admin-container .form-row input,
+    .admin-container .form-row select {
+        height: 56px;
+        font-size: 16px;
+        border-radius: 14px;
+    }
+
+}
