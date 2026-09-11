@@ -1018,20 +1018,38 @@ app.post("/admin/cambiar-nombre", async (req, res) => {
 
         const telefonoActual = usuarioActual.rows[0].telefono;
 
-        // Crear un usuario independiente para ESTA quiniela
-        const nuevoUsuario = await client.query(`
-            INSERT INTO users (
-                nombre,
-                telefono
-            )
-            VALUES ($1, $2)
-            RETURNING id
-        `, [
-            nombre.trim(),
-            telefonoActual
-        ]);
+        // Buscar si el nombre ya existe
+const usuarioExistente = await client.query(`
+    SELECT id
+    FROM users
+    WHERE nombre = $1
+    LIMIT 1
+`, [nombre.trim()]);
 
-        const nuevoUserId = nuevoUsuario.rows[0].id;
+let nuevoUserId;
+
+if (usuarioExistente.rows.length > 0) {
+
+    // El nombre ya existe → reutilizamos ese usuario
+    nuevoUserId = usuarioExistente.rows[0].id;
+
+} else {
+
+    // El nombre no existe → creamos uno nuevo
+    const nuevoUsuario = await client.query(`
+        INSERT INTO users (
+            nombre,
+            telefono
+        )
+        VALUES ($1, $2)
+        RETURNING id
+    `, [
+        nombre.trim(),
+        telefonoActual
+    ]);
+
+    nuevoUserId = nuevoUsuario.rows[0].id;
+}
 
         // Cambiar solamente ESTA quiniela
         await client.query(`
