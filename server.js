@@ -982,6 +982,7 @@ if (ahora.isSameOrAfter(fechaBD)) {
     }
 
 });
+
 app.post("/admin/cambiar-nombre", async (req, res) => {
 
     const { envio_id, nombre } = req.body;
@@ -999,11 +1000,15 @@ app.post("/admin/cambiar-nombre", async (req, res) => {
 
         await client.query("BEGIN");
 
-        // Cambia el usuario asociado SOLAMENTE a esta quiniela
+        // Obtener el usuario y teléfono actuales de ESTA quiniela
         const usuarioActual = await client.query(`
-            SELECT user_id
-            FROM predicciones
-            WHERE envio_id = $1
+            SELECT
+                pr.user_id,
+                u.telefono
+            FROM predicciones pr
+            INNER JOIN users u
+                ON u.id = pr.user_id
+            WHERE pr.envio_id = $1
             LIMIT 1
         `, [envio_id]);
 
@@ -1011,21 +1016,32 @@ app.post("/admin/cambiar-nombre", async (req, res) => {
             throw new Error("Quiniela no encontrada.");
         }
 
-        // Creamos un usuario independiente para esta quiniela
+        const telefonoActual = usuarioActual.rows[0].telefono;
+
+        // Crear un usuario independiente para ESTA quiniela
         const nuevoUsuario = await client.query(`
-            INSERT INTO users (nombre)
-            VALUES ($1)
+            INSERT INTO users (
+                nombre,
+                telefono
+            )
+            VALUES ($1, $2)
             RETURNING id
-        `, [nombre.trim()]);
+        `, [
+            nombre.trim(),
+            telefonoActual
+        ]);
 
         const nuevoUserId = nuevoUsuario.rows[0].id;
 
-        // Solamente los registros de ESTA quiniela cambian al nuevo usuario
+        // Cambiar solamente ESTA quiniela
         await client.query(`
             UPDATE predicciones
             SET user_id = $1
             WHERE envio_id = $2
-        `, [nuevoUserId, envio_id]);
+        `, [
+            nuevoUserId,
+            envio_id
+        ]);
 
         await client.query("COMMIT");
 
@@ -1038,7 +1054,7 @@ app.post("/admin/cambiar-nombre", async (req, res) => {
 
         await client.query("ROLLBACK");
 
-        console.error(err);
+        console.error("❌ ERROR CAMBIANDO NOMBRE:", err);
 
         res.status(500).json({
             ok: false,
