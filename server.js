@@ -111,14 +111,12 @@ async function jornadaBloqueada(jornada) {
 
  const limite = fechaPartido
   .clone()
-  .subtract(1, 'day')
-  .hour(22)
-  .minute(0)
-  .second(0);
+  .subtract(3, 'hours');
 
   const ahora = moment.tz("America/Mexico_City");
 
   const bloqueada = ahora.valueOf() >= limite.valueOf();
+  return bloqueada;
 }
 
 async function obtenerCampeon(jornada) {
@@ -1408,13 +1406,12 @@ app.get('/limite', async (req, res) => {
   "America/Mexico_City"
 );
 
-// Día anterior a las 22:00
+// 🔒 Cierre 3 horas antes del primer partido
 const limite = fechaPartido
   .clone()
-  .subtract(1, 'day')
-  .hour(22)
-  .minute(0)
-  .second(0);
+  .subtract(3, 'hours');
+
+  
 
     // 🔥 HORA ACTUAL MÉXICO
     const ahora = moment.tz("America/Mexico_City");
