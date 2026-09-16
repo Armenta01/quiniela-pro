@@ -558,6 +558,25 @@ const puntosPrimerLugar = puntosOrdenados[0];
 // 🥈 Puntaje del segundo lugar
 const puntosSegundoLugar = puntosOrdenados[1];
 
+// ===== NOMBRES DE PRIMER Y SEGUNDO LUGAR =====
+
+const nombresPrimerLugar = json.tabla
+    .filter(j => Number(j.puntos) === puntosPrimerLugar)
+    .map(j => j.nombre);
+
+const nombresSegundoLugar = json.tabla
+    .filter(j =>
+        puntosSegundoLugar !== undefined &&
+        Number(j.puntos) === puntosSegundoLugar
+    )
+    .map(j => j.nombre);
+
+// Verificar si ya están todos los resultados
+const todosResultadosListos = json.partidos.every(p =>
+    p.goles_local != null &&
+    p.goles_visitante != null
+);
+
     // ===== PARTICIPANTES =====
 
 json.tabla.forEach(jugador => {
@@ -704,36 +723,90 @@ tablaHTML.innerHTML += `
         gap:20px;
     ">
 
-        <span style="
-            display:inline-block;
-            background:#FFD700;
-            color:#000000;
-            font-weight:bold;
-            font-size:24px;
-            padding:10px 18px;
-            border:2px solid white;
-            border-radius:6px;
-            white-space:nowrap;
-        ">
-            🥇 1ER LUGAR
-        </span>
+        <div style="
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+">
+
+    <span style="
+        display:inline-block;
+        background:#FFD700;
+        color:#000000;
+        font-weight:bold;
+        font-size:24px;
+        padding:10px 18px;
+        border:2px solid white;
+        border-radius:6px;
+        white-space:nowrap;
+    ">
+        🥇 1ER LUGAR
+    </span>
+
+    ${
+        todosResultadosListos
+        ? `
+            <div style="
+                color:white;
+                font-size:22px;
+                font-weight:bold;
+                text-align:center;
+                max-width:300px;
+                line-height:1.3;
+            ">
+                ${nombresPrimerLugar.join("<br>")}
+            </div>
+        `
+        : ""
+    }
+
+</div>
 
 
-        <span style="
-            display:inline-block;
-            background:#C0C0C0;
-            color:#000000;
-            font-weight:bold;
-            font-size:24px;
-            padding:10px 18px;
-            border:2px solid white;
-            border-radius:6px;
-            white-space:nowrap;
-        ">
-            🥈 2DO LUGAR
-        </span>
+      <div style="
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+">
 
-    </div>
+    <span style="
+        display:inline-block;
+        background:#C0C0C0;
+        color:#000000;
+        font-weight:bold;
+        font-size:24px;
+        padding:10px 18px;
+        border:2px solid white;
+        border-radius:6px;
+        white-space:nowrap;
+    ">
+        🥈 2DO LUGAR
+    </span>
+
+    ${
+        todosResultadosListos
+        ? `
+            <div style="
+                color:white;
+                font-size:22px;
+                font-weight:bold;
+                text-align:center;
+                max-width:300px;
+                line-height:1.3;
+            ">
+                ${nombresSegundoLugar.length
+                    ? nombresSegundoLugar.join("<br>")
+                    : "—"
+                }
+            </div>
+        `
+        : ""
+    }
+
+</div>  
+</div>
 
 
     <!-- LEYENDA DE PUNTOS -->
