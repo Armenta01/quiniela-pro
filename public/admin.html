@@ -272,6 +272,11 @@ let editandoId = null;
 // 🖼️ CARGAR LOGO DESDE NUESTRO PROXY
 // ==========================================
 
+
+// ==========================================
+// 🖼️ CARGAR LOGO MEDIANTE PROXY DE IMAGEN
+// ==========================================
+
 async function logoComoDataURL(url) {
 
     if (!url) return null;
@@ -279,7 +284,12 @@ async function logoComoDataURL(url) {
     try {
 
         const proxyUrl =
-            `/proxy-logo?url=${encodeURIComponent(url)}`;
+            `https://images.weserv.nl/?url=${encodeURIComponent(url)}&output=png&w=120&h=120&fit=contain`;
+
+        console.log(
+            "🖼️ Cargando logo mediante:",
+            proxyUrl
+        );
 
         const respuesta =
             await fetch(proxyUrl);
@@ -287,7 +297,7 @@ async function logoComoDataURL(url) {
         if (!respuesta.ok) {
 
             throw new Error(
-                `Proxy respondió HTTP ${respuesta.status}`
+                `HTTP ${respuesta.status}`
             );
 
         }
@@ -298,7 +308,7 @@ async function logoComoDataURL(url) {
         if (!blob.type.startsWith("image/")) {
 
             throw new Error(
-                `El proxy no devolvió una imagen: ${blob.type}`
+                `No es una imagen: ${blob.type}`
             );
 
         }
@@ -313,7 +323,9 @@ async function logoComoDataURL(url) {
 
             lector.onerror = () => {
                 reject(
-                    new Error("No se pudo convertir el logo")
+                    new Error(
+                        "No se pudo convertir el logo"
+                    )
                 );
             };
 
@@ -324,7 +336,7 @@ async function logoComoDataURL(url) {
     } catch (error) {
 
         console.error(
-            "❌ ERROR PROXY LOGO:",
+            "❌ ERROR CARGANDO LOGO:",
             url,
             error
         );
@@ -332,6 +344,7 @@ async function logoComoDataURL(url) {
         return null;
     }
 }
+
 
 async function descargarImagenTabla() {
 
