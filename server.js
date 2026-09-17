@@ -15,6 +15,78 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// ==========================================
+// 🖼️ PROXY PARA LOGOS DE EQUIPOS
+// ==========================================
+
+app.get("/proxy-logo", async (req, res) => {
+
+    try {
+
+        const url = req.query.url;
+
+        if (!url) {
+            return res.status(400).send("Falta la URL del logo");
+        }
+
+        // Permitir URLs absolutas y rutas internas
+        const logoURL = new URL(
+            url,
+            `${req.protocol}://${req.get("host")}`
+        );
+
+        // Solo permitir HTTP / HTTPS
+        if (!["http:", "https:"].includes(logoURL.protocol)) {
+            return res.status(400).send("URL no válida");
+        }
+
+        const respuesta = await fetch(logoURL.href, {
+            headers: {
+                "User-Agent": "Mozilla/5.0"
+            }
+        });
+
+        if (!respuesta.ok) {
+            return res.status(404).send("No se pudo cargar el logo");
+        }
+
+        const contentType =
+            respuesta.headers.get("content-type") ||
+            "image/png";
+
+        const buffer = await respuesta.buffer();
+
+        res.setHeader(
+            "Content-Type",
+            contentType
+        );
+
+        res.setHeader(
+            "Cache-Control",
+            "public, max-age=86400"
+        );
+
+        res.setHeader(
+            "Access-Control-Allow-Origin",
+            "*"
+        );
+
+        res.send(buffer);
+
+    } catch (error) {
+
+        console.error(
+            "❌ Error cargando logo:",
+            error.message
+        );
+
+        res.status(500).send(
+            "Error al cargar logo"
+        );
+    }
+
+});
+
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });

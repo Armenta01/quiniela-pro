@@ -463,7 +463,7 @@ json.partidos.forEach(p => {
                 p.logo_local
                 ? `
                     <img
-                        src="${p.logo_local}"
+                        src="/proxy-logo?url=${encodeURIComponent(p.logo_local)}"
                         crossorigin="anonymous"
                         style="
                             width:42px;
@@ -568,7 +568,7 @@ json.partidos.forEach(p => {
                 p.logo_visitante
                 ? `
                     <img
-                        src="${p.logo_visitante}"
+                        src="/proxy-logo?url=${encodeURIComponent(p.logo_visitante)}"
                         crossorigin="anonymous"
                         style="
                             width:42px;
@@ -1007,16 +1007,51 @@ tablaHTML.innerHTML += `
 
     try {
 
-      await new Promise(resolve => setTimeout(resolve, 300));
-        const canvas = await html2canvas(tabla, {
+      // ==========================================
+// 🖼️ ESPERAR A QUE CARGUEN TODOS LOS LOGOS
+// ==========================================
 
-            scale: 3,
-            useCORS: true,
-            backgroundColor: "#121A33",
-            windowWidth: tabla.scrollWidth,
-            windowHeight: tabla.scrollHeight,
+const imagenes = Array.from(
+    tabla.querySelectorAll("img")
+);
+
+await Promise.all(
+    imagenes.map(img => {
+
+        if (img.complete) {
+            return Promise.resolve();
+        }
+
+        return new Promise(resolve => {
+
+            img.onload = resolve;
+            img.onerror = resolve;
 
         });
+
+    })
+);
+
+// Espera pequeña para terminar el render
+await new Promise(resolve => setTimeout(resolve, 300));
+
+const canvas = await html2canvas(tabla, {
+
+    scale: 3,
+
+    useCORS: true,
+
+    allowTaint: false,
+
+    imageTimeout: 15000,
+
+    backgroundColor: "#121A33",
+
+    windowWidth: tabla.scrollWidth,
+
+    windowHeight: tabla.scrollHeight
+
+});
 
         const imagen = canvas.toDataURL("image/png");
 
