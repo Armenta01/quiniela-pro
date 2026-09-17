@@ -268,6 +268,9 @@ let editandoId = null;
 // ==========================================
 // 🖼️ CARGAR LOGO COMO DATA URL
 // ==========================================
+// ==========================================
+// 🖼️ CARGAR LOGO DESDE NUESTRO PROXY
+// ==========================================
 
 async function logoComoDataURL(url) {
 
@@ -275,42 +278,53 @@ async function logoComoDataURL(url) {
 
     try {
 
-        const img = new Image();
+        const proxyUrl =
+            `/proxy-logo?url=${encodeURIComponent(url)}`;
 
-        img.crossOrigin = "anonymous";
+        const respuesta =
+            await fetch(proxyUrl);
 
-        img.src = url;
+        if (!respuesta.ok) {
 
-        await new Promise((resolve, reject) => {
+            throw new Error(
+                `Proxy respondió HTTP ${respuesta.status}`
+            );
 
-            img.onload = resolve;
+        }
 
-            img.onerror = () =>
+        const blob =
+            await respuesta.blob();
+
+        if (!blob.type.startsWith("image/")) {
+
+            throw new Error(
+                `El proxy no devolvió una imagen: ${blob.type}`
+            );
+
+        }
+
+        return await new Promise((resolve, reject) => {
+
+            const lector = new FileReader();
+
+            lector.onload = () => {
+                resolve(lector.result);
+            };
+
+            lector.onerror = () => {
                 reject(
-                    new Error("El navegador no pudo cargar el logo")
+                    new Error("No se pudo convertir el logo")
                 );
+            };
+
+            lector.readAsDataURL(blob);
 
         });
-
-        const canvas = document.createElement("canvas");
-
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-
-        const ctx = canvas.getContext("2d");
-
-        ctx.drawImage(
-            img,
-            0,
-            0
-        );
-
-        return canvas.toDataURL("image/png");
 
     } catch (error) {
 
         console.error(
-            "❌ ERROR DIRECTO DEL LOGO:",
+            "❌ ERROR PROXY LOGO:",
             url,
             error
         );
@@ -318,7 +332,6 @@ async function logoComoDataURL(url) {
         return null;
     }
 }
-
 
 async function descargarImagenTabla() {
 
@@ -1091,13 +1104,11 @@ tablaHTML.innerHTML += `
 // 🖼️ CONVERTIR TODOS LOS LOGOS A DATA URL
 // ==========================================
 
-
 const imagenes = Array.from(
     tabla.querySelectorAll("img[data-logo-url]")
 );
 
 await Promise.all(
-
     imagenes.map(async img => {
 
         const url =
@@ -1108,49 +1119,25 @@ await Promise.all(
         const dataURL =
             await logoComoDataURL(url);
 
-        if (!dataURL) {
+        if (dataURL) {
 
-    console.error(
-        "❌ NO SE PUDO CONVERTIR:",
-        url
-    );
+            img.src = dataURL;
 
-    alert(
-        "❌ No se pudo cargar este logo:\n\n" + url
-    );
+        } else {
 
-    return;
-}
+            console.error(
+                "❌ LOGO NO CONVERTIDO:",
+                url
+            );
 
-        // Primero asignamos el Data URL
-        img.src = dataURL;
-
-        // Esperamos específicamente este logo
-        await new Promise(resolve => {
-
-            if (img.complete && img.naturalWidth > 0) {
-
-                resolve();
-                return;
-
-            }
-
-            img.onload = resolve;
-            img.onerror = resolve;
-
-        });
+        }
 
     })
-
 );
 
-
-// Pequeña espera final
 await new Promise(resolve =>
-    setTimeout(resolve, 300)
+    setTimeout(resolve, 500)
 );
-
-
 
 const canvas = await html2canvas(tabla, {
 
@@ -1169,6 +1156,7 @@ const canvas = await html2canvas(tabla, {
     windowHeight: tabla.scrollHeight
 
 });
+
 
         const imagen = canvas.toDataURL("image/png");
 
