@@ -356,6 +356,24 @@ const tablaImagen = document.getElementById("tablaImagenExcel");
 // Obtener los datos del servidor
 const respuesta = await fetch(`/tabla-imagen?jornada=${jornada}`);
 const json = await respuesta.json();
+console.log("🖼️ PARTIDOS RECIBIDOS:", json.partidos);
+
+json.partidos.forEach(p => {
+
+    console.log(
+        p.local,
+        "LOGO LOCAL:",
+        p.logo_local
+    );
+
+    console.log(
+        p.visitante,
+        "LOGO VISITANTE:",
+        p.logo_visitante
+    );
+
+});
+
 tablaImagen.innerHTML = `
 <div style="
     background:#000;
@@ -1118,13 +1136,17 @@ await Promise.all(
 
         if (!dataURL) {
 
-            console.error(
-                "❌ NO SE PUDO CONVERTIR:",
-                url
-            );
+    console.error(
+        "❌ NO SE PUDO CONVERTIR:",
+        url
+    );
 
-            return;
-        }
+    alert(
+        "❌ No se pudo cargar este logo:\n\n" + url
+    );
+
+    return;
+}
 
         // Primero asignamos el Data URL
         img.src = dataURL;
