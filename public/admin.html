@@ -265,6 +265,10 @@ let editandoId = null;
 // 🖼️ CARGAR LOGO COMO DATA URL
 // ==========================================
 
+// ==========================================
+// 🖼️ CARGAR LOGO COMO DATA URL
+// ==========================================
+
 async function logoComoDataURL(url) {
 
     if (!url) return null;
@@ -276,30 +280,71 @@ async function logoComoDataURL(url) {
         );
 
         if (!respuesta.ok) {
-            throw new Error("No se pudo cargar el logo");
+            throw new Error(
+                `HTTP ${respuesta.status}`
+            );
         }
 
         const blob = await respuesta.blob();
 
+        // Verificar que realmente sea una imagen
+        if (!blob.type.startsWith("image/")) {
+
+            throw new Error(
+                `El servidor devolvió: ${blob.type}`
+            );
+
+        }
+
         return await new Promise((resolve, reject) => {
 
-            const lector = new FileReader();
+            const img = new Image();
 
-            lector.onload = () => resolve(lector.result);
-            lector.onerror = reject;
+            img.onload = () => {
 
-            lector.readAsDataURL(blob);
+                const canvas = document.createElement("canvas");
+
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+
+                const ctx = canvas.getContext("2d");
+
+                ctx.drawImage(
+                    img,
+                    0,
+                    0
+                );
+
+                resolve(
+                    canvas.toDataURL("image/png")
+                );
+
+            };
+
+            img.onerror = () => {
+
+                reject(
+                    new Error("El logo no pudo ser interpretado como imagen")
+                );
+
+            };
+
+            img.src =
+                URL.createObjectURL(blob);
 
         });
 
     } catch (error) {
 
-        console.error("❌ Error cargando logo:", url, error);
+        console.error(
+            "❌ ERROR REAL DEL LOGO:",
+            url,
+            error
+        );
 
         return null;
     }
 }
-
 
 async function descargarImagenTabla() {
 
@@ -1054,41 +1099,45 @@ tablaHTML.innerHTML += `
 // 🖼️ CONVERTIR TODOS LOS LOGOS A DATA URL
 // ==========================================
 
+
 const imagenes = Array.from(
     tabla.querySelectorAll("img[data-logo-url]")
 );
 
 await Promise.all(
+
     imagenes.map(async img => {
 
-        const url = img.getAttribute("data-logo-url");
+        const url =
+            img.getAttribute("data-logo-url");
 
         if (!url) return;
 
-        const dataURL = await logoComoDataURL(url);
+        const dataURL =
+            await logoComoDataURL(url);
 
-        if (dataURL) {
+        if (!dataURL) {
 
-            img.src = dataURL;
+            console.error(
+                "❌ NO SE PUDO CONVERTIR:",
+                url
+            );
 
+            return;
         }
 
-    })
-);
+        // Primero asignamos el Data URL
+        img.src = dataURL;
 
+        // Esperamos específicamente este logo
+        await new Promise(resolve => {
 
-// ==========================================
-// ⏳ ESPERAR A QUE LOS LOGOS ESTÉN LISTOS
-// ==========================================
+            if (img.complete && img.naturalWidth > 0) {
 
-await Promise.all(
-    imagenes.map(img => {
+                resolve();
+                return;
 
-        if (img.complete) {
-            return Promise.resolve();
-        }
-
-        return new Promise(resolve => {
+            }
 
             img.onload = resolve;
             img.onerror = resolve;
@@ -1096,6 +1145,7 @@ await Promise.all(
         });
 
     })
+
 );
 
 
@@ -1103,7 +1153,7 @@ await Promise.all(
 await new Promise(resolve =>
     setTimeout(resolve, 300)
 );
-  
+
 
 
 const canvas = await html2canvas(tabla, {
