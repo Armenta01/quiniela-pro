@@ -29,36 +29,133 @@ app.get("/proxy-logo", async (req, res) => {
             return res.status(400).send("Falta la URL del logo");
         }
 
-        // Permitir URLs absolutas y rutas internas
-        const logoURL = new URL(
-            url,
-            `${req.protocol}://${req.get("host")}`
-        );
+        const originalURL = new URL(url);
 
-        // Solo permitir HTTP / HTTPS
-        if (!["http:", "https:"].includes(logoURL.protocol)) {
+        if (!["http:", "https:"].includes(originalURL.protocol)) {
             return res.status(400).send("URL no válida");
         }
 
-        const respuesta = await fetch(logoURL.href, {
-            headers: {
-                "User-Agent": "Mozilla/5.0"
-            }
-        });
+        // ==================================================
+        // 1️⃣ URL original
+        // 2️⃣ Fallback usando www.thesportsdb.com
+        // ==================================================
 
-        if (!respuesta.ok) {
-            return res.status(404).send("No se pudo cargar el logo");
+        const urlsIntentar = [
+            originalURL.href
+        ];
+
+        if (
+            originalURL.hostname === "r2.thesportsdb.com"
+        ) {
+
+            const alternativa =
+                new URL(originalURL.href);
+
+            alternativa.hostname =
+                "www.thesportsdb.com";
+
+            urlsIntentar.push(
+                alternativa.href
+            );
         }
 
-        const contentType =
-            respuesta.headers.get("content-type") ||
-            "image/png";
+        let respuesta = null;
+        let ultimoError = null;
 
-        const buffer = await respuesta.buffer();
+        for (const logoURL of urlsIntentar) {
+
+            try {
+
+                console.log(
+                    "🖼️ Intentando logo:",
+                    logoURL
+                );
+
+                const r = await fetch(
+                    logoURL,
+                    {
+                        headers: {
+                            "User-Agent":
+                                "Mozilla/5.0",
+                            "Accept":
+                                "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
+                        },
+                        redirect: "follow",
+                        timeout: 15000
+                    }
+                );
+
+                if (r.ok) {
+
+                    respuesta = r;
+
+                    console.log(
+                        "✅ Logo cargado:",
+                        logoURL
+                    );
+
+                    break;
+                }
+
+                ultimoError =
+                    new Error(
+                        `HTTP ${r.status} ${r.statusText}`
+                    );
+
+                console.log(
+                    "⚠️ Respuesta:",
+                    r.status,
+                    logoURL
+                );
+
+            } catch (error) {
+
+                ultimoError = error;
+
+                console.log(
+                    "⚠️ Falló:",
+                    logoURL,
+                    error.message
+                );
+            }
+        }
+
+        // ==================================================
+        // ❌ No se pudo cargar
+        // ==================================================
+
+        if (!respuesta) {
+
+            console.error(
+                "❌ TODOS LOS INTENTOS FALLARON:",
+                ultimoError?.message
+            );
+
+            return res.status(502).send(
+                "No se pudo descargar el logo"
+            );
+        }
+
+        // ==================================================
+        // 📦 Enviar imagen
+        // ==================================================
+
+        const contentType =
+            respuesta.headers.get(
+                "content-type"
+            ) || "image/png";
+
+        const buffer =
+            await respuesta.buffer();
 
         res.setHeader(
             "Content-Type",
             contentType
+        );
+
+        res.setHeader(
+            "Content-Length",
+            buffer.length
         );
 
         res.setHeader(
@@ -71,21 +168,27 @@ app.get("/proxy-logo", async (req, res) => {
             "*"
         );
 
+        res.setHeader(
+            "Access-Control-Allow-Methods",
+            "GET, OPTIONS"
+        );
+
         res.send(buffer);
 
     } catch (error) {
 
         console.error(
-            "❌ Error cargando logo:",
-            error.message
+            "❌ ERROR CRÍTICO PROXY LOGO:",
+            error
         );
 
         res.status(500).send(
-            "Error al cargar logo"
+            "Error interno del proxy de logos"
         );
     }
 
 });
+
 
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
