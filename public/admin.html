@@ -275,69 +275,42 @@ async function logoComoDataURL(url) {
 
     try {
 
-        const respuesta = await fetch(
-            `/proxy-logo?url=${encodeURIComponent(url)}`
-        );
+        const img = new Image();
 
-        if (!respuesta.ok) {
-            throw new Error(
-                `HTTP ${respuesta.status}`
-            );
-        }
+        img.crossOrigin = "anonymous";
 
-        const blob = await respuesta.blob();
+        img.src = url;
 
-        // Verificar que realmente sea una imagen
-        if (!blob.type.startsWith("image/")) {
+        await new Promise((resolve, reject) => {
 
-            throw new Error(
-                `El servidor devolvió: ${blob.type}`
-            );
+            img.onload = resolve;
 
-        }
-
-        return await new Promise((resolve, reject) => {
-
-            const img = new Image();
-
-            img.onload = () => {
-
-                const canvas = document.createElement("canvas");
-
-                canvas.width = img.naturalWidth;
-                canvas.height = img.naturalHeight;
-
-                const ctx = canvas.getContext("2d");
-
-                ctx.drawImage(
-                    img,
-                    0,
-                    0
-                );
-
-                resolve(
-                    canvas.toDataURL("image/png")
-                );
-
-            };
-
-            img.onerror = () => {
-
+            img.onerror = () =>
                 reject(
-                    new Error("El logo no pudo ser interpretado como imagen")
+                    new Error("El navegador no pudo cargar el logo")
                 );
-
-            };
-
-            img.src =
-                URL.createObjectURL(blob);
 
         });
+
+        const canvas = document.createElement("canvas");
+
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+
+        const ctx = canvas.getContext("2d");
+
+        ctx.drawImage(
+            img,
+            0,
+            0
+        );
+
+        return canvas.toDataURL("image/png");
 
     } catch (error) {
 
         console.error(
-            "❌ ERROR REAL DEL LOGO:",
+            "❌ ERROR DIRECTO DEL LOGO:",
             url,
             error
         );
@@ -345,6 +318,7 @@ async function logoComoDataURL(url) {
         return null;
     }
 }
+
 
 async function descargarImagenTabla() {
 
