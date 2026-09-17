@@ -450,7 +450,38 @@ json.partidos.forEach(p => {
         padding:6px;
         font-size:20px;
     ">
-        ${p.local}
+
+        <div style="
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            gap:4px;
+        ">
+
+            ${
+                p.logo_local
+                ? `
+                    <img
+                        src="${p.logo_local}"
+                        crossorigin="anonymous"
+                        style="
+                            width:42px;
+                            height:42px;
+                            object-fit:contain;
+                            display:block;
+                        "
+                    >
+                `
+                : ""
+            }
+
+            <span>
+                ${p.local}
+            </span>
+
+        </div>
+
     </td>
     `;
 
@@ -511,7 +542,7 @@ let filaVisitante = "<tr>";
 
 filaVisitante += `<td style="background:#2F5597;border:1px solid black;"></td>`;
 
-json.partidos.forEach(p=>{
+json.partidos.forEach(p => {
 
     filaVisitante += `
     <td style="
@@ -524,7 +555,38 @@ json.partidos.forEach(p=>{
         padding:6px;
         font-size:18px;
     ">
-        ${p.visitante}
+
+        <div style="
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:center;
+            gap:4px;
+        ">
+
+            ${
+                p.logo_visitante
+                ? `
+                    <img
+                        src="${p.logo_visitante}"
+                        crossorigin="anonymous"
+                        style="
+                            width:42px;
+                            height:42px;
+                            object-fit:contain;
+                            display:block;
+                        "
+                    >
+                `
+                : ""
+            }
+
+            <span>
+                ${p.visitante}
+            </span>
+
+        </div>
+
     </td>
     `;
 
