@@ -123,6 +123,44 @@ function getEstadoPartido(fechaStr) {
     icono: "📅"
   };
 }
+// ==========================================
+// 🎨 COLORES DINÁMICOS POR EQUIPO
+// ==========================================
+
+function obtenerColorEquipo(nombre) {
+
+  const colores = {
+
+    "PUEBLA": "#5B9BE6",
+    "ATLANTE": "#D32F2F",
+    "TIJUANA": "#E53935",
+    "QUERÉTARO": "#60A5FA",
+
+    "TOLUCA": "#D62828",
+    "ATLAS": "#E53935",
+
+    "MONTERREY": "#38BDF8",
+    "TIGRES": "#F5B700",
+
+    "CRUZ AZUL": "#2F80ED",
+    "AMERICA": "#D4A017",
+
+    "SANTOS LAGUNA": "#7CB342",
+    "JUÁREZ": "#4CAF50",
+
+    "CHIVAS": "#E53935",
+    "PUMAS UNAM": "#D4A017",
+
+    "NECAXA": "#E53935",
+    "LEÓN": "#8BC34A"
+
+  };
+
+  return colores[
+    (nombre || "").toUpperCase()
+  ] || "#2F80ED";
+}
+
 
 // 🔥 PARTIDOS
 async function cargarPartidos() {
@@ -135,6 +173,8 @@ async function cargarPartidos() {
   data.forEach((p, index) => {
 
     const estado = getEstadoPartido(p.fecha);
+    const colorLocal = obtenerColorEquipo(p.local);
+const colorVisitante = obtenerColorEquipo(p.visitante);
 
    const fechaTexto = p.fecha;
 
@@ -152,23 +192,23 @@ const fechaFormateada = `${dia}-${meses[parseInt(mes)-1]}`;
 const horaFormateada = horaParte;
 
     cont.innerHTML += `
-      <div class="card">
+      <div class="card partido-card">
 
-        <div class="estado ${estado.clase}">
-          ${estado.icono} ${estado.texto}
+    <div class="estado ${estado.clase}">
+        ${estado.icono} ${estado.texto}
+    </div>
+
+    <div class="match">
+
+        <div class="team left">
+
+            <img src="${p.logo_local || ''}">
+
+            <div class="nombre-abajo">
+                ${p.local}
+            </div>
+
         </div>
-
-        <div class="match">
-
-          <div class="team left">
-
-  <img src="${p.logo_local || ''}">
-
-  <div class="nombre-abajo">
-    ${p.local}
-  </div>
-
-</div>
 
 <div class="score">
 

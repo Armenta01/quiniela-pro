@@ -3112,3 +3112,571 @@ to{
     }
 
 }
+
+/* =========================================================
+   🏆 PARTIDOS - DISEÑO PREMIUM QUINIELAS EL INGE
+   ========================================================= */
+
+.partido-card {
+
+    position: relative;
+
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at 8% 50%,
+            color-mix(
+                in srgb,
+                var(--color-local) 16%,
+                transparent
+            ),
+            transparent 28%
+        ),
+
+        radial-gradient(
+            circle at 92% 50%,
+            color-mix(
+                in srgb,
+                var(--color-visitante) 16%,
+                transparent
+            ),
+            transparent 28%
+        ),
+
+        linear-gradient(
+            145deg,
+            #17263d,
+            #0d192b
+        );
+
+    border-radius: 20px;
+
+    border: 1px solid rgba(255,255,255,.10);
+
+    padding: 18px;
+
+    margin: 12px 8px;
+
+    box-shadow:
+        0 12px 30px rgba(0,0,0,.35),
+        inset 0 1px 0 rgba(255,255,255,.04);
+
+    transition:
+        transform .25s ease,
+        box-shadow .25s ease,
+        border-color .25s ease;
+
+}
+
+
+/* =========================================================
+   ✨ BORDE DINÁMICO
+   ========================================================= */
+
+.partido-card::before {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    border-radius: 20px;
+
+    padding: 2px;
+
+    background:
+        linear-gradient(
+            90deg,
+            var(--color-local),
+            transparent 42%,
+            transparent 58%,
+            var(--color-visitante)
+        );
+
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
+
+    -webkit-mask-composite: xor;
+
+    mask-composite: exclude;
+
+    opacity: .9;
+
+    pointer-events: none;
+
+}
+
+
+/* =========================================================
+   🌟 BRILLO LOCAL
+   ========================================================= */
+
+.partido-card::after {
+
+    content: "";
+
+    position: absolute;
+
+    left: -90px;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    width: 230px;
+
+    height: 230px;
+
+    border-radius: 50%;
+
+    background: var(--color-local);
+
+    opacity: .08;
+
+    filter: blur(55px);
+
+    pointer-events: none;
+
+}
+
+
+/* =========================================================
+   ESTADO
+   ========================================================= */
+
+.partido-card .estado {
+
+    position: relative;
+
+    z-index: 2;
+
+    width: fit-content;
+
+    margin: 0 auto 18px;
+
+    padding: 7px 22px;
+
+    border-radius: 30px;
+
+    font-size: 17px;
+
+    font-weight: 900;
+
+    letter-spacing: .3px;
+
+    background: rgba(255,255,255,.05);
+
+    border: 1px solid rgba(255,255,255,.12);
+
+    backdrop-filter: blur(10px);
+
+}
+
+
+/* EN VIVO */
+
+.partido-card .estado.envivo {
+
+    color: #ffffff;
+
+    background: rgba(239,68,68,.12);
+
+    border-color: #ef4444;
+
+    box-shadow:
+        0 0 12px rgba(239,68,68,.25);
+}
+
+
+/* PRÓXIMO */
+
+.partido-card .estado.futuro {
+
+    color: #ffffff;
+
+    border-color: rgba(96,165,250,.55);
+
+    background: rgba(37,99,235,.10);
+
+}
+
+
+/* FINALIZADO */
+
+.partido-card .estado.finalizado {
+
+    color: #ffffff;
+
+    border-color: rgba(34,197,94,.55);
+
+    background: rgba(34,197,94,.10);
+
+}
+
+
+/* =========================================================
+   EQUIPOS
+   ========================================================= */
+
+.partido-card .match {
+
+    position: relative;
+
+    z-index: 2;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0,1fr)
+        130px
+        minmax(0,1fr);
+
+    align-items: center;
+
+    gap: 16px;
+
+    width: 100%;
+
+}
+
+
+/* =========================================================
+   EQUIPO
+   ========================================================= */
+
+.partido-card .team {
+
+    position: relative;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    width: 100%;
+
+    max-width: none;
+
+    padding: 8px;
+
+}
+
+
+/* =========================================================
+   LOGOS
+   ========================================================= */
+
+.partido-card .team img {
+
+    width: 72px;
+
+    height: 72px;
+
+    object-fit: contain;
+
+    filter:
+        drop-shadow(
+            0 5px 10px rgba(0,0,0,.35)
+        );
+
+    transition:
+        transform .25s ease,
+        filter .25s ease;
+
+}
+
+
+/* pequeño efecto visual */
+
+.partido-card:hover .team img {
+
+    transform: scale(1.06);
+
+    filter:
+        drop-shadow(
+            0 0 12px
+            var(--color-local)
+        );
+
+}
+
+
+/* =========================================================
+   NOMBRE EQUIPO
+   ========================================================= */
+
+.partido-card .nombre-abajo {
+
+    color: white;
+
+    font-size: 17px;
+
+    line-height: 1.15;
+
+    font-weight: 900;
+
+    text-align: center;
+
+    max-width: 150px;
+
+    letter-spacing: .2px;
+
+}
+
+
+/* =========================================================
+   MARCADOR
+   ========================================================= */
+
+.partido-card .score {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 9px;
+
+}
+
+
+/* CUADROS */
+
+.partido-card .score input {
+
+    width: 52px;
+
+    height: 52px;
+
+    border-radius: 14px;
+
+    border:
+        2px solid
+        rgba(255,255,255,.18);
+
+    background:
+        rgba(255,255,255,.97);
+
+    color: #111827;
+
+    text-align: center;
+
+    font-size: 25px;
+
+    font-weight: 900;
+
+    box-shadow:
+        0 5px 15px rgba(0,0,0,.25);
+
+}
+
+
+/* ENFOQUE */
+
+.partido-card .score input:focus {
+
+    border-color:
+        var(--color-local);
+
+    outline: none;
+
+    box-shadow:
+        0 0 0 3px rgba(255,255,255,.06),
+        0 0 15px var(--color-local);
+
+    transform: scale(1.04);
+
+}
+
+
+/* GUION */
+
+.partido-card .score span {
+
+    color: #dbeafe;
+
+    font-size: 24px;
+
+    font-weight: 900;
+
+}
+
+
+/* =========================================================
+   INFORMACIÓN INFERIOR
+   ========================================================= */
+
+.partido-card .meta {
+
+    position: relative;
+
+    z-index: 2;
+
+    margin-top: 20px;
+
+    padding: 12px 15px;
+
+    border-radius: 14px;
+
+    background:
+        rgba(7,18,32,.65);
+
+    border:
+        1px solid rgba(255,255,255,.08);
+
+    text-align: center;
+
+    backdrop-filter: blur(8px);
+
+}
+
+
+/* HORA */
+
+.partido-card .hora {
+
+    color: #f1f5f9;
+
+    font-size: 16px;
+
+    font-weight: 800;
+
+}
+
+
+/* LIGA */
+
+.partido-card .liga {
+
+    margin-top: 5px;
+
+    color: #94a3b8;
+
+    font-size: 13px;
+
+}
+
+
+/* =========================================================
+   MOVIMIENTO
+   ========================================================= */
+
+.partido-card:hover {
+
+    transform: translateY(-3px);
+
+    border-color:
+        rgba(255,255,255,.20);
+
+    box-shadow:
+        0 16px 40px rgba(0,0,0,.42);
+
+}
+
+
+/* =========================================================
+   📱 MÓVIL
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .partido-card {
+
+        padding: 15px;
+
+        border-radius: 18px;
+
+        margin: 10px 5px;
+
+    }
+
+
+    .partido-card .match {
+
+        grid-template-columns:
+            minmax(0,1fr)
+            105px
+            minmax(0,1fr);
+
+        gap: 8px;
+
+    }
+
+
+    .partido-card .team img {
+
+        width: 62px;
+
+        height: 62px;
+
+    }
+
+
+    .partido-card .nombre-abajo {
+
+        font-size: 14px;
+
+        max-width: 110px;
+
+    }
+
+
+    .partido-card .score {
+
+        gap: 5px;
+
+    }
+
+
+    .partido-card .score input {
+
+        width: 43px;
+
+        height: 46px;
+
+        font-size: 22px;
+
+        border-radius: 12px;
+
+    }
+
+
+    .partido-card .score span {
+
+        font-size: 20px;
+
+    }
+
+
+    .partido-card .meta {
+
+        margin-top: 15px;
+
+        padding: 10px;
+
+    }
+
+
+    .partido-card .hora {
+
+        font-size: 14px;
+
+    }
+
+
+    .partido-card .liga {
+
+        font-size: 12px;
+
+    }
+
+}
