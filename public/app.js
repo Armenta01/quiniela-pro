@@ -176,7 +176,7 @@ async function cargarPartidos() {
     const colorLocal = obtenerColorEquipo(p.local);
 const colorVisitante = obtenerColorEquipo(p.visitante);
 
-   const fechaTexto = p.fecha;
+const fechaTexto = p.fecha;
 
 const [fechaParte, horaParte] = fechaTexto.split(' ');
 
@@ -187,72 +187,82 @@ const meses = [
   'jul','ago','sep','oct','nov','dic'
 ];
 
-const fechaFormateada = `${dia}-${meses[parseInt(mes)-1]}`;
+const fechaFormateada =
+  `${dia}-${meses[parseInt(mes)-1]}`;
 
 const horaFormateada = horaParte;
 
-    cont.innerHTML += `
-      <div class="card partido-card">
+cont.innerHTML += `
+    <div
+      class="card partido-card"
+      style="
+        --color-local:${colorLocal};
+        --color-visitante:${colorVisitante};
+      "
+    >
 
-    <div class="estado ${estado.clase}">
+      <div class="estado ${estado.clase}">
         ${estado.icono} ${estado.texto}
-    </div>
+      </div>
 
-    <div class="match">
+      <div class="match">
 
         <div class="team left">
 
-            <img src="${p.logo_local || ''}">
+          <img src="${p.logo_local || ''}">
 
-            <div class="nombre-abajo">
-                ${p.local}
-            </div>
+          <div class="nombre-abajo">
+            ${p.local}
+          </div>
 
         </div>
 
-<div class="score">
+        <div class="score">
 
-  <input
-    type="text"
-    inputmode="numeric"
-    pattern="[0-9]*"
-    maxlength="2"
-    id="l${p.id}">
+          <input
+            type="text"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            maxlength="2"
+            id="l${p.id}">
 
-  <span>-</span>
+          <span>-</span>
 
-  <input
-    type="text"
-    inputmode="numeric"
-    pattern="[0-9]*"
-    maxlength="2"
-    id="v${p.id}">
+          <input
+            type="text"
+            inputmode="numeric"
+            pattern="[0-9]*"
+            maxlength="2"
+            id="v${p.id}">
 
-</div>
+        </div>
 
-<div class="team right">
+        <div class="team right">
 
-  <img src="${p.logo_visitante || ''}">
+          <img src="${p.logo_visitante || ''}">
 
-  <div class="nombre-abajo">
-    ${p.visitante}
-  </div>
-
-</div>
-</div>
-
-        <div class="meta">
-          <div class="hora">
-            ⏰ ${fechaFormateada} · ${horaFormateada}
+          <div class="nombre-abajo">
+            ${p.visitante}
           </div>
 
-          <div class="liga">
-            🏆 ${p.liga || "Liga MX"}
-          </div>
         </div>
 
       </div>
-    `;
+
+      <div class="meta">
+
+        <div class="hora">
+          ⏰ ${fechaFormateada} · ${horaFormateada}
+        </div>
+
+        <div class="liga">
+          🏆 ${p.liga || "Liga MX"}
+        </div>
+
+      </div>
+
+    </div>
+`;
 
   });
 }
