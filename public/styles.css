@@ -3151,6 +3151,9 @@ to{
 /* ==========================================================
    ✨ BRILLO SUPERIOR
    ========================================================== */
+/* ==========================================================
+   🌈 BORDE DINÁMICO SEGÚN LOS EQUIPOS
+   ========================================================== */
 
 #partidos .partido-card::before {
 
@@ -3158,26 +3161,42 @@ to{
 
     position: absolute;
 
-    left: 0;
-    right: 0;
-    top: 0;
+    inset: 0;
 
-    height: 3px;
+    border-radius: 20px;
+
+    padding: 2px;
 
     background:
         linear-gradient(
             90deg,
-            #2563eb,
-            #60a5fa,
-            #2563eb
+            var(--color-local),
+            color-mix(
+                in srgb,
+                var(--color-local) 35%,
+                var(--color-visitante)
+            ),
+            var(--color-visitante)
         );
 
-    opacity: .95;
-}
+    -webkit-mask:
+        linear-gradient(#fff 0 0) content-box,
+        linear-gradient(#fff 0 0);
 
+    -webkit-mask-composite: xor;
+
+    mask-composite: exclude;
+
+    pointer-events: none;
+
+    z-index: 5;
+}
 
 /* ==========================================================
    🌟 BRILLO LATERAL
+   ========================================================== */
+/* ==========================================================
+   ✨ BRILLOS DE LOS DOS EQUIPOS
    ========================================================== */
 
 #partidos .partido-card::after {
@@ -3186,21 +3205,26 @@ to{
 
     position: absolute;
 
-    right: -80px;
-    top: 30px;
+    inset: 0;
 
-    width: 180px;
-    height: 180px;
+    background:
+        radial-gradient(
+            circle at 5% 50%,
+            var(--color-local),
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 95% 50%,
+            var(--color-visitante),
+            transparent 28%
+        );
 
-    border-radius: 50%;
-
-    background: rgba(37,99,235,.08);
-
-    filter: blur(50px);
+    opacity: .10;
 
     pointer-events: none;
-}
 
+    z-index: 0;
+}
 
 /* ==========================================================
    ESTADO DEL PARTIDO
