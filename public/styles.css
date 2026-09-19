@@ -3677,3 +3677,27 @@ mask-composite: exclude;
     }
 
 }
+
+/* ==========================================================
+   🎨 BORDE REAL DE LOS EQUIPOS
+   ========================================================== */
+
+#partidos .partido-card {
+    position: relative;
+    overflow: hidden;
+    border: 2px solid transparent;
+
+    background:
+        linear-gradient(
+            #17263d,
+            #0f1b2d
+        ) padding-box,
+
+        linear-gradient(
+            90deg,
+            var(--color-local),
+            var(--color-local) 50%,
+            var(--color-visitante) 50%,
+            var(--color-visitante)
+        ) border-box;
+}
