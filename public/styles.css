@@ -3113,243 +3113,215 @@ to{
 
 }
 
-/* =========================================================
-   🏆 PARTIDOS - DISEÑO PREMIUM QUINIELAS EL INGE
-   ========================================================= */
+/* ==========================================================
+   🏆 NUEVO DISEÑO ELEGANTE - QUINIELAS EL INGE
+   Solo afecta las tarjetas de partidos
+   ========================================================== */
 
-.partido-card {
-
+#partidos .partido-card {
     position: relative;
-
     overflow: hidden;
 
-    background:
-        radial-gradient(
-            circle at 8% 50%,
-            color-mix(
-                in srgb,
-                var(--color-local) 16%,
-                transparent
-            ),
-            transparent 28%
-        ),
-
-        radial-gradient(
-            circle at 92% 50%,
-            color-mix(
-                in srgb,
-                var(--color-visitante) 16%,
-                transparent
-            ),
-            transparent 28%
-        ),
-
-        linear-gradient(
-            145deg,
-            #17263d,
-            #0d192b
-        );
+    margin: 14px 8px;
+    padding: 18px;
 
     border-radius: 20px;
 
+    background:
+        linear-gradient(
+            145deg,
+            #1b2a40 0%,
+            #132137 45%,
+            #0f1b2d 100%
+        );
+
     border: 1px solid rgba(255,255,255,.10);
 
-    padding: 18px;
-
-    margin: 12px 8px;
-
     box-shadow:
-        0 12px 30px rgba(0,0,0,.35),
+        0 12px 28px rgba(0,0,0,.35),
         inset 0 1px 0 rgba(255,255,255,.04);
 
     transition:
         transform .25s ease,
         box-shadow .25s ease,
         border-color .25s ease;
-
 }
 
 
-/* =========================================================
-   ✨ BORDE DINÁMICO
-   ========================================================= */
+/* ==========================================================
+   ✨ BRILLO SUPERIOR
+   ========================================================== */
 
-.partido-card::before {
+#partidos .partido-card::before {
 
     content: "";
 
     position: absolute;
 
-    inset: 0;
+    left: 0;
+    right: 0;
+    top: 0;
 
-    border-radius: 20px;
-
-    padding: 2px;
+    height: 3px;
 
     background:
         linear-gradient(
             90deg,
-            var(--color-local),
-            transparent 42%,
-            transparent 58%,
-            var(--color-visitante)
+            #2563eb,
+            #60a5fa,
+            #2563eb
         );
 
-    -webkit-mask:
-        linear-gradient(#fff 0 0) content-box,
-        linear-gradient(#fff 0 0);
-
-    -webkit-mask-composite: xor;
-
-    mask-composite: exclude;
-
-    opacity: .9;
-
-    pointer-events: none;
-
+    opacity: .95;
 }
 
 
-/* =========================================================
-   🌟 BRILLO LOCAL
-   ========================================================= */
+/* ==========================================================
+   🌟 BRILLO LATERAL
+   ========================================================== */
 
-.partido-card::after {
+#partidos .partido-card::after {
 
     content: "";
 
     position: absolute;
 
-    left: -90px;
+    right: -80px;
+    top: 30px;
 
-    top: 50%;
-
-    transform: translateY(-50%);
-
-    width: 230px;
-
-    height: 230px;
+    width: 180px;
+    height: 180px;
 
     border-radius: 50%;
 
-    background: var(--color-local);
+    background: rgba(37,99,235,.08);
 
-    opacity: .08;
-
-    filter: blur(55px);
+    filter: blur(50px);
 
     pointer-events: none;
-
 }
 
 
-/* =========================================================
-   ESTADO
-   ========================================================= */
+/* ==========================================================
+   ESTADO DEL PARTIDO
+   ========================================================== */
 
-.partido-card .estado {
+#partidos .partido-card .estado {
 
     position: relative;
-
     z-index: 2;
 
     width: fit-content;
 
-    margin: 0 auto 18px;
+    margin: 2px auto 18px;
 
-    padding: 7px 22px;
+    padding: 7px 20px;
 
-    border-radius: 30px;
+    border-radius: 999px;
 
-    font-size: 17px;
-
+    font-size: 16px;
     font-weight: 900;
 
     letter-spacing: .3px;
 
     background: rgba(255,255,255,.05);
 
-    border: 1px solid rgba(255,255,255,.12);
-
-    backdrop-filter: blur(10px);
-
-}
-
-
-/* EN VIVO */
-
-.partido-card .estado.envivo {
-
-    color: #ffffff;
-
-    background: rgba(239,68,68,.12);
-
-    border-color: #ef4444;
+    border: 1px solid rgba(255,255,255,.10);
 
     box-shadow:
-        0 0 12px rgba(239,68,68,.25);
+        0 4px 12px rgba(0,0,0,.20);
 }
 
 
-/* PRÓXIMO */
+/* ==========================================================
+   🔴 EN VIVO
+   ========================================================== */
 
-.partido-card .estado.futuro {
+#partidos .partido-card .estado.envivo {
 
     color: #ffffff;
 
-    border-color: rgba(96,165,250,.55);
+    background:
+        linear-gradient(
+            90deg,
+            rgba(239,68,68,.15),
+            rgba(185,28,28,.08)
+        );
 
-    background: rgba(37,99,235,.10);
+    border-color: rgba(239,68,68,.65);
 
+    box-shadow:
+        0 0 18px rgba(239,68,68,.20);
 }
 
 
-/* FINALIZADO */
+/* ==========================================================
+   📅 PRÓXIMO
+   ========================================================== */
 
-.partido-card .estado.finalizado {
+#partidos .partido-card .estado.futuro {
 
     color: #ffffff;
 
-    border-color: rgba(34,197,94,.55);
+    background:
+        linear-gradient(
+            90deg,
+            rgba(37,99,235,.14),
+            rgba(59,130,246,.06)
+        );
 
-    background: rgba(34,197,94,.10);
-
+    border-color: rgba(96,165,250,.45);
 }
 
 
-/* =========================================================
-   EQUIPOS
-   ========================================================= */
+/* ==========================================================
+   🔒 FINALIZADO
+   ========================================================== */
 
-.partido-card .match {
+#partidos .partido-card .estado.finalizado {
+
+    color: #ffffff;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(34,197,94,.12),
+            rgba(22,163,74,.06)
+        );
+
+    border-color: rgba(34,197,94,.40);
+}
+
+
+/* ==========================================================
+   ⚽ ZONA DE EQUIPOS
+   ========================================================== */
+
+#partidos .partido-card .match {
 
     position: relative;
-
     z-index: 2;
 
     display: grid;
 
     grid-template-columns:
         minmax(0,1fr)
-        130px
+        120px
         minmax(0,1fr);
 
     align-items: center;
 
-    gap: 16px;
+    gap: 14px;
 
     width: 100%;
-
 }
 
 
-/* =========================================================
-   EQUIPO
-   ========================================================= */
+/* ==========================================================
+   ESCUDOS
+   ========================================================== */
 
-.partido-card .team {
-
-    position: relative;
+#partidos .partido-card .team {
 
     display: flex;
 
@@ -3363,167 +3335,156 @@ to{
 
     width: 100%;
 
-    max-width: none;
+    min-width: 0;
 
-    padding: 8px;
-
+    padding: 5px;
 }
 
 
-/* =========================================================
+/* ==========================================================
    LOGOS
-   ========================================================= */
+   ========================================================== */
 
-.partido-card .team img {
+#partidos .partido-card .team img {
 
-    width: 72px;
-
-    height: 72px;
+    width: 76px;
+    height: 76px;
 
     object-fit: contain;
 
     filter:
         drop-shadow(
-            0 5px 10px rgba(0,0,0,.35)
+            0 6px 10px rgba(0,0,0,.35)
         );
 
     transition:
         transform .25s ease,
         filter .25s ease;
-
 }
 
 
-/* pequeño efecto visual */
+/* ==========================================================
+   NOMBRE DEL EQUIPO
+   ========================================================== */
 
-.partido-card:hover .team img {
+#partidos .partido-card .nombre-abajo {
 
-    transform: scale(1.06);
+    width: 100%;
+    max-width: 145px;
 
-    filter:
-        drop-shadow(
-            0 0 12px
-            var(--color-local)
-        );
+    color: #ffffff;
 
-}
+    text-align: center;
 
-
-/* =========================================================
-   NOMBRE EQUIPO
-   ========================================================= */
-
-.partido-card .nombre-abajo {
-
-    color: white;
-
-    font-size: 17px;
+    font-size: 16px;
 
     line-height: 1.15;
 
     font-weight: 900;
 
-    text-align: center;
-
-    max-width: 150px;
-
     letter-spacing: .2px;
 
+    overflow-wrap: break-word;
 }
 
 
-/* =========================================================
-   MARCADOR
-   ========================================================= */
+/* ==========================================================
+   🎯 ZONA DEL MARCADOR
+   ========================================================== */
 
-.partido-card .score {
+#partidos .partido-card .score {
 
     display: flex;
 
-    justify-content: center;
-
     align-items: center;
 
-    gap: 9px;
+    justify-content: center;
 
+    gap: 8px;
 }
 
 
-/* CUADROS */
+/* ==========================================================
+   CUADROS DE MARCADOR
+   ========================================================== */
 
-.partido-card .score input {
+#partidos .partido-card .score input {
 
-    width: 52px;
-
-    height: 52px;
+    width: 50px;
+    height: 50px;
 
     border-radius: 14px;
 
-    border:
-        2px solid
-        rgba(255,255,255,.18);
+    border: 2px solid rgba(255,255,255,.20);
 
     background:
-        rgba(255,255,255,.97);
+        linear-gradient(
+            180deg,
+            #ffffff,
+            #f1f5f9
+        );
 
     color: #111827;
 
     text-align: center;
 
-    font-size: 25px;
+    font-size: 24px;
 
     font-weight: 900;
-
-    box-shadow:
-        0 5px 15px rgba(0,0,0,.25);
-
-}
-
-
-/* ENFOQUE */
-
-.partido-card .score input:focus {
-
-    border-color:
-        var(--color-local);
 
     outline: none;
 
     box-shadow:
-        0 0 0 3px rgba(255,255,255,.06),
-        0 0 15px var(--color-local);
+        0 5px 14px rgba(0,0,0,.28);
 
-    transform: scale(1.04);
-
+    transition:
+        .20s ease;
 }
 
 
-/* GUION */
+/* ==========================================================
+   ENFOQUE DEL MARCADOR
+   ========================================================== */
 
-.partido-card .score span {
+#partidos .partido-card .score input:focus {
+
+    transform: scale(1.05);
+
+    border-color: #60a5fa;
+
+    box-shadow:
+        0 0 0 3px rgba(96,165,250,.10),
+        0 0 18px rgba(96,165,250,.35);
+}
+
+
+/* ==========================================================
+   GUION
+   ========================================================== */
+
+#partidos .partido-card .score span {
 
     color: #dbeafe;
 
     font-size: 24px;
 
     font-weight: 900;
-
 }
 
 
-/* =========================================================
-   INFORMACIÓN INFERIOR
-   ========================================================= */
+/* ==========================================================
+   🕒 INFORMACIÓN INFERIOR
+   ========================================================== */
 
-.partido-card .meta {
+#partidos .partido-card .meta {
 
     position: relative;
 
     z-index: 2;
 
-    margin-top: 20px;
+    margin-top: 18px;
 
-    padding: 12px 15px;
+    padding: 11px 14px;
 
     border-radius: 14px;
 
@@ -3531,151 +3492,160 @@ to{
         rgba(7,18,32,.65);
 
     border:
-        1px solid rgba(255,255,255,.08);
+        1px solid rgba(255,255,255,.07);
 
     text-align: center;
 
-    backdrop-filter: blur(8px);
-
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.03);
 }
 
 
-/* HORA */
+/* ==========================================================
+   HORA
+   ========================================================== */
 
-.partido-card .hora {
+#partidos .partido-card .hora {
 
-    color: #f1f5f9;
+    color: #e2e8f0;
 
-    font-size: 16px;
+    font-size: 15px;
 
     font-weight: 800;
-
 }
 
 
-/* LIGA */
+/* ==========================================================
+   LIGA
+   ========================================================== */
 
-.partido-card .liga {
+#partidos .partido-card .liga {
 
     margin-top: 5px;
 
     color: #94a3b8;
 
-    font-size: 13px;
+    font-size: 12px;
 
+    font-weight: 600;
 }
 
 
-/* =========================================================
-   MOVIMIENTO
-   ========================================================= */
+/* ==========================================================
+   ✨ EFECTO AL PASAR EL MOUSE
+   ========================================================== */
 
-.partido-card:hover {
+#partidos .partido-card:hover {
 
     transform: translateY(-3px);
 
     border-color:
-        rgba(255,255,255,.20);
+        rgba(96,165,250,.28);
 
     box-shadow:
-        0 16px 40px rgba(0,0,0,.42);
+        0 18px 38px rgba(0,0,0,.42),
+        0 0 18px rgba(37,99,235,.08);
+}
+
+
+#partidos .partido-card:hover .team img {
+
+    transform: scale(1.05);
 
 }
 
 
-/* =========================================================
-   📱 MÓVIL
-   ========================================================= */
+/* ==========================================================
+   📱 CELULAR
+   ========================================================== */
 
 @media (max-width: 600px) {
 
-    .partido-card {
+    #partidos .partido-card {
+
+        margin: 10px 4px;
 
         padding: 15px;
 
         border-radius: 18px;
 
-        margin: 10px 5px;
-
     }
 
 
-    .partido-card .match {
+    #partidos .partido-card .match {
 
         grid-template-columns:
             minmax(0,1fr)
-            105px
+            100px
             minmax(0,1fr);
 
-        gap: 8px;
+        gap: 7px;
 
     }
 
 
-    .partido-card .team img {
+    #partidos .partido-card .team img {
 
         width: 62px;
-
         height: 62px;
 
     }
 
 
-    .partido-card .nombre-abajo {
+    #partidos .partido-card .nombre-abajo {
 
         font-size: 14px;
 
-        max-width: 110px;
+        max-width: 105px;
 
     }
 
 
-    .partido-card .score {
+    #partidos .partido-card .score {
 
         gap: 5px;
 
     }
 
 
-    .partido-card .score input {
+    #partidos .partido-card .score input {
 
         width: 43px;
-
-        height: 46px;
-
-        font-size: 22px;
+        height: 45px;
 
         border-radius: 12px;
+
+        font-size: 21px;
 
     }
 
 
-    .partido-card .score span {
+    #partidos .partido-card .score span {
 
         font-size: 20px;
 
     }
 
 
-    .partido-card .meta {
+    #partidos .partido-card .meta {
 
-        margin-top: 15px;
+        margin-top: 14px;
 
         padding: 10px;
 
     }
 
 
-    .partido-card .hora {
+    #partidos .partido-card .hora {
 
         font-size: 14px;
 
     }
 
 
-    .partido-card .liga {
+    #partidos .partido-card .liga {
 
-        font-size: 12px;
+        font-size: 11px;
 
     }
 
