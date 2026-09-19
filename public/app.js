@@ -135,6 +135,10 @@ function obtenerColorEquipo(nombre) {
     "ATLANTE": "#D32F2F",
     "TIJUANA": "#E53935",
     "QUERÉTARO": "#60A5FA",
+    "ATL SAN LUIS": "#e9ebee",
+    "ATLÉTICO DE SAN LUIS": "#e9ebee",
+    "PACHUCA": "#e9ebee",
+  
 
     "TOLUCA": "#D62828",
     "ATLAS": "#E53935",
@@ -143,15 +147,19 @@ function obtenerColorEquipo(nombre) {
     "TIGRES": "#F5B700",
 
     "CRUZ AZUL": "#2F80ED",
+    "AMÉRICA": "#D4A017",
     "AMERICA": "#D4A017",
 
     "SANTOS LAGUNA": "#7CB342",
+    "SANTOS": "#7CB342",
     "JUÁREZ": "#4CAF50",
 
     "CHIVAS": "#E53935",
     "PUMAS UNAM": "#D4A017",
+    "PUMAS": "#D4A017",
 
     "NECAXA": "#E53935",
+    "LEON": "#8BC34A",
     "LEÓN": "#8BC34A"
 
   };
