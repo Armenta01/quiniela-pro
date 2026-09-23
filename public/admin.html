@@ -330,6 +330,11 @@ async function abrirCapturaAdmin() {
 
     bloque.style.display = "block";
 
+bloque.scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+});
+
     const jornada = document.getElementById("jornada").value;
 
     if (!jornada) {
