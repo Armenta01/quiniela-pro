@@ -582,6 +582,378 @@ VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)
 }
 });
 
+// ==========================================================
+// 🔓 CAPTURA ADMINISTRATIVA DE QUINIELAS
+// Permite registrar después del cierre público
+// pero SOLO hasta que comience el primer partido.
+// ==========================================================
+
+app.post('/admin/guardar-quiniela', async (req, res) => {
+
+  const {
+    password,
+    nombre,
+    telefono,
+    jornada,
+    pronosticos
+  } = req.body;
+
+  try {
+
+    // 🔐 VALIDAR CONTRASEÑA ADMIN
+    if (password !== process.env.ADMIN_PASSWORD) {
+
+      return res.status(403).json({
+        ok: false,
+        error: "Contraseña de administrador incorrecta."
+      });
+
+    }
+
+    // 👤 VALIDAR NOMBRE
+    if (!nombre || nombre.trim().length < 2) {
+
+      return res.status(400).json({
+        ok: false,
+        error: "Escribe un nombre válido."
+      });
+
+    }
+
+    // 📅 VALIDAR JORNADA
+    if (!jornada) {
+
+      return res.status(400).json({
+        ok: false,
+        error: "Jornada requerida."
+      });
+
+    }
+
+    // 📝 VALIDAR PRONÓSTICOS
+    if (!Array.isArray(pronosticos) || pronosticos.length === 0) {
+
+      return res.status(400).json({
+        ok: false,
+        error: "No hay pronósticos para guardar."
+      });
+
+    }
+
+    // ⚽ OBTENER PARTIDOS DE LA JORNADA
+    const partidosResult = await pool.query(`
+      SELECT
+        id,
+        fecha
+      FROM partidos
+      WHERE jornada = $1
+      ORDER BY fecha ASC
+    `, [jornada]);
+
+    if (partidosResult.rows.length === 0) {
+
+      return res.status(400).json({
+        ok: false,
+        error: "La jornada no tiene partidos."
+      });
+
+    }
+
+    // ⏰ PRIMER PARTIDO
+    const primerPartido = moment.tz(
+      partidosResult.rows[0].fecha,
+      "YYYY-MM-DD HH:mm:ss",
+      "America/Mexico_City"
+    );
+
+    const ahora = moment.tz(
+      "America/Mexico_City"
+    );
+
+    // 🔒 CERRAR EXACTAMENTE CUANDO COMIENZA
+    if (ahora.isSameOrAfter(primerPartido)) {
+
+      return res.status(403).json({
+
+        ok: false,
+
+        error:
+          "Ya comenzó el primer partido. " +
+          "La captura administrativa está cerrada.",
+
+        fechaPrimerPartido:
+          primerPartido.format("YYYY-MM-DD HH:mm:ss")
+
+      });
+
+    }
+
+    // ✅ IDS DE PARTIDOS VÁLIDOS
+    const idsValidos = new Set(
+      partidosResult.rows.map(
+        p => Number(p.id)
+      )
+    );
+
+    // ✅ DEBE HABER UN PRONÓSTICO POR PARTIDO
+    if (pronosticos.length !== partidosResult.rows.length) {
+
+      return res.status(400).json({
+
+        ok: false,
+
+        error:
+          "Debes capturar el marcador de todos los partidos."
+
+      });
+
+    }
+
+    // 🔍 VALIDAR CADA PRONÓSTICO
+    const idsUsados = new Set();
+
+    for (const p of pronosticos) {
+
+      const partidoId =
+        Number(p.partido_id);
+
+      if (!idsValidos.has(partidoId)) {
+
+        return res.status(400).json({
+
+          ok: false,
+
+          error:
+            "Uno de los partidos no pertenece a esta jornada."
+
+        });
+
+      }
+
+      if (idsUsados.has(partidoId)) {
+
+        return res.status(400).json({
+
+          ok: false,
+
+          error:
+            "Hay un partido repetido en los pronósticos."
+
+        });
+
+      }
+
+      idsUsados.add(partidoId);
+
+      if (
+        p.goles_local === "" ||
+        p.goles_visitante === "" ||
+        p.goles_local == null ||
+        p.goles_visitante == null
+      ) {
+
+        return res.status(400).json({
+
+          ok: false,
+
+          error:
+            "Debes capturar todos los marcadores."
+
+        });
+
+      }
+
+      if (
+        !Number.isInteger(
+          Number(p.goles_local)
+        ) ||
+        !Number.isInteger(
+          Number(p.goles_visitante)
+        )
+      ) {
+
+        return res.status(400).json({
+
+          ok: false,
+
+          error:
+            "Los marcadores deben ser números."
+
+        });
+
+      }
+
+    }
+
+    const nombreLimpio =
+      nombre.trim();
+
+    const telefonoLimpio =
+      telefono
+        ? telefono.trim()
+        : null;
+
+    // 👤 BUSCAR O CREAR USUARIO
+    let user =
+      await pool.query(
+        `
+        SELECT id
+        FROM users
+        WHERE nombre = $1
+        LIMIT 1
+        `,
+        [nombreLimpio]
+      );
+
+    let userId;
+
+    if (user.rows.length === 0) {
+
+      const nuevoUsuario =
+        await pool.query(
+          `
+          INSERT INTO users
+          (
+            nombre,
+            telefono
+          )
+          VALUES
+          ($1,$2)
+          RETURNING id
+          `,
+          [
+            nombreLimpio,
+            telefonoLimpio
+          ]
+        );
+
+      userId =
+        nuevoUsuario.rows[0].id;
+
+    } else {
+
+      userId =
+        user.rows[0].id;
+
+    }
+
+    // 🆔 ID ÚNICO DE LA QUINIELA
+    const envioId =
+      Date.now().toString() +
+      "_ADMIN_" +
+      Math.random()
+        .toString(36)
+        .substring(2, 8);
+
+    // 📅 FECHA DE REGISTRO
+    const fechaEnvio =
+      moment
+        .tz("America/Mexico_City")
+        .format("YYYY-MM-DD HH:mm:ss");
+
+    // 🔥 TRANSACCIÓN
+    const client =
+      await pool.connect();
+
+    try {
+
+      await client.query("BEGIN");
+
+      for (const p of pronosticos) {
+
+        const golesLocal =
+          parseInt(
+            p.goles_local,
+            10
+          );
+
+        const golesVisitante =
+          parseInt(
+            p.goles_visitante,
+            10
+          );
+
+        await client.query(
+          `
+          INSERT INTO predicciones
+          (
+            user_id,
+            partido_id,
+            goles_local,
+            goles_visitante,
+            jornada,
+            envio_id,
+            telefono,
+            estado_pago,
+            fecha_envio
+          )
+          VALUES
+          ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+          `,
+          [
+            userId,
+            Number(p.partido_id),
+            golesLocal,
+            golesVisitante,
+            jornada,
+            envioId,
+            telefonoLimpio,
+            "Pendiente",
+            fechaEnvio
+          ]
+        );
+
+      }
+
+      await client.query("COMMIT");
+
+      return res.json({
+
+        ok: true,
+
+        envio_id: envioId,
+
+        fechaEnvio,
+
+        fechaPrimerPartido:
+          primerPartido.format(
+            "YYYY-MM-DD HH:mm:ss"
+          )
+
+      });
+
+    } catch (error) {
+
+      await client.query("ROLLBACK");
+
+      throw error;
+
+    } finally {
+
+      client.release();
+
+    }
+
+  } catch (err) {
+
+    console.error(
+      "❌ ERROR CAPTURA ADMIN:",
+      err
+    );
+
+    return res.status(500).json({
+
+      ok: false,
+
+      error:
+        "Error interno al registrar la quiniela."
+
+    });
+
+  }
+
+});
+
 app.post('/admin/resultado', async (req, res) => {
   try {
     const { partido_id, goles_local, goles_visitante } = req.body;

@@ -135,6 +135,12 @@ if (sessionStorage.getItem("admin") !== "true") {
 </button>
 
 <button
+    class="btn-verde"
+    onclick="abrirCapturaAdmin()">
+    🔓 Captura Admin
+</button>
+
+<button
   class="btn-verde"
   onclick="window.location.href='participantes.html?jornada=' + document.getElementById('jornada').value">
   👥 Participantes
@@ -239,8 +245,525 @@ if (sessionStorage.getItem("admin") !== "true") {
 
 </div>
 
+<!-- =====================================================
+     🔓 CAPTURA ADMINISTRATIVA
+     ===================================================== -->
+
+<div
+  id="capturaAdmin"
+  style="
+    display:none;
+    margin-top:25px;
+  "
+>
+
+  <h2>🔓 Captura Administrativa</h2>
+
+  <div
+    id="estadoCapturaAdmin"
+    style="
+      margin:15px 0;
+      padding:14px;
+      border-radius:10px;
+      text-align:center;
+      font-weight:bold;
+    "
+  >
+    ⏳ Consultando disponibilidad...
+  </div>
+
+  <div class="form-row">
+
+    <input
+      type="text"
+      id="adminNombre"
+      maxlength="50"
+      placeholder="👤 Nombre del participante"
+    >
+
+    <input
+      type="text"
+      id="adminTelefono"
+      maxlength="10"
+      inputmode="numeric"
+      placeholder="📱 WhatsApp"
+    >
+
+  </div>
+
+  <div
+    id="listaCapturaAdmin"
+    class="lista"
+  ></div>
+
+  <br>
+
+  <button
+    id="btnGuardarCapturaAdmin"
+    class="btn-verde"
+    onclick="guardarCapturaAdmin()"
+  >
+    🔐 Registrar Quiniela
+  </button>
+
+</div>
+
+
 <script>
+
 let editandoId = null;
+
+// =====================================================
+// 🔓 CAPTURA ADMINISTRATIVA
+// =====================================================
+
+let partidosCapturaAdmin = [];
+
+async function abrirCapturaAdmin() {
+
+    const bloque = document.getElementById("capturaAdmin");
+
+    if (!bloque) {
+        alert("No se encontró la pantalla de captura administrativa.");
+        return;
+    }
+
+    bloque.style.display = "block";
+
+    const jornada = document.getElementById("jornada").value;
+
+    if (!jornada) {
+        document.getElementById("estadoCapturaAdmin").innerHTML =
+            "⚠️ Selecciona una jornada.";
+        return;
+    }
+
+    document.getElementById("estadoCapturaAdmin").innerHTML =
+        "⏳ Cargando partidos...";
+
+    try {
+
+        const respuesta =
+            await fetch(`/partidos?jornada=${jornada}`);
+
+        if (!respuesta.ok) {
+            throw new Error("No se pudieron cargar los partidos.");
+        }
+
+        const partidos = await respuesta.json();
+
+        partidosCapturaAdmin = partidos
+            .slice()
+            .sort((a, b) =>
+                new Date(a.fecha.replace(" ", "T")) -
+                new Date(b.fecha.replace(" ", "T"))
+            );
+
+        const lista =
+            document.getElementById("listaCapturaAdmin");
+
+        lista.innerHTML = "";
+
+        if (!partidosCapturaAdmin.length) {
+
+            document.getElementById("estadoCapturaAdmin").innerHTML =
+                "⚠️ Esta jornada no tiene partidos.";
+
+            return;
+        }
+
+        partidosCapturaAdmin.forEach((p, index) => {
+
+            const fecha =
+                p.fecha
+                    ? new Date(p.fecha.replace(" ", "T"))
+                        .toLocaleString("es-MX", {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: false
+                        })
+                    : "Fecha pendiente";
+
+            lista.innerHTML += `
+
+                <div class="partido-card"
+                     style="margin-bottom:18px;">
+
+                    <div class="liga">
+                        ${p.liga || "Partido"}
+                    </div>
+
+                    <div class="fecha">
+                        📅 ${fecha}
+                    </div>
+
+                    <div class="equipos">
+
+                        <div class="equipo">
+
+                            ${
+                                p.logo_local
+                                ? `
+                                    <img
+                                        src="${p.logo_local}"
+                                        onerror="this.style.display='none'"
+                                    >
+                                  `
+                                : ""
+                            }
+
+                            <div class="nombre-equipo">
+                                ${p.local}
+                            </div>
+
+                        </div>
+
+                        <div class="vs">
+                            VS
+                        </div>
+
+                        <div class="equipo">
+
+                            ${
+                                p.logo_visitante
+                                ? `
+                                    <img
+                                        src="${p.logo_visitante}"
+                                        onerror="this.style.display='none'"
+                                    >
+                                  `
+                                : ""
+                            }
+
+                            <div class="nombre-equipo">
+                                ${p.visitante}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="resultado-titulo">
+                        MARCADOR DEL PARTICIPANTE
+                    </div>
+
+                    <div
+                        class="resultado"
+                        style="
+                            display:flex;
+                            justify-content:center;
+                            align-items:center;
+                            gap:12px;
+                        "
+                    >
+
+                        <input
+                            type="number"
+                            min="0"
+                            max="30"
+                            inputmode="numeric"
+                            id="adminGl${p.id}"
+                            placeholder="0"
+                            style="
+                                width:70px;
+                                text-align:center;
+                                font-size:22px;
+                                font-weight:bold;
+                            "
+                        >
+
+                        <span
+                            class="guion"
+                            style="font-size:24px;">
+                            -
+                        </span>
+
+                        <input
+                            type="number"
+                            min="0"
+                            max="30"
+                            inputmode="numeric"
+                            id="adminGv${p.id}"
+                            placeholder="0"
+                            style="
+                                width:70px;
+                                text-align:center;
+                                font-size:22px;
+                                font-weight:bold;
+                            "
+                        >
+
+                    </div>
+
+                </div>
+
+            `;
+
+        });
+
+        actualizarEstadoCapturaAdmin();
+
+    } catch (error) {
+
+        console.error(error);
+
+        document.getElementById("estadoCapturaAdmin").innerHTML =
+            "❌ Error al cargar los partidos.";
+
+    }
+}
+
+
+// =====================================================
+// ⏰ ESTADO DE LA CAPTURA
+// =====================================================
+
+function actualizarEstadoCapturaAdmin() {
+
+    const estado =
+        document.getElementById("estadoCapturaAdmin");
+
+    const boton =
+        document.getElementById("btnGuardarCapturaAdmin");
+
+    if (!partidosCapturaAdmin.length) return;
+
+    const primerPartido =
+        new Date(
+            partidosCapturaAdmin[0].fecha.replace(" ", "T")
+        );
+
+    const ahora = new Date();
+
+    if (ahora >= primerPartido) {
+
+        estado.innerHTML =
+            "🔴 CAPTURA CERRADA — YA COMENZÓ EL PRIMER PARTIDO.";
+
+        estado.style.background = "#FEE2E2";
+        estado.style.color = "#991B1B";
+
+        if (boton) {
+            boton.disabled = true;
+            boton.style.opacity = "0.5";
+            boton.style.cursor = "not-allowed";
+        }
+
+        return;
+    }
+
+    estado.innerHTML =
+        "🟢 CAPTURA ADMINISTRATIVA DISPONIBLE HASTA EL INICIO DEL PRIMER PARTIDO.";
+
+    estado.style.background = "#DCFCE7";
+    estado.style.color = "#166534";
+
+    if (boton) {
+        boton.disabled = false;
+        boton.style.opacity = "1";
+        boton.style.cursor = "pointer";
+    }
+}
+
+
+// =====================================================
+// 💾 REGISTRAR QUINIELA ADMINISTRATIVA
+// =====================================================
+
+async function guardarCapturaAdmin() {
+
+    if (!partidosCapturaAdmin.length) {
+        alert("No hay partidos para registrar.");
+        return;
+    }
+
+    const nombre =
+        document.getElementById("adminNombre").value.trim();
+
+    const telefono =
+        document.getElementById("adminTelefono").value.trim();
+
+    const jornada =
+        document.getElementById("jornada").value;
+
+    if (!nombre || nombre.length < 2) {
+        alert("Escribe el nombre del participante.");
+        return;
+    }
+
+    if (telefono && !/^\d{10}$/.test(telefono)) {
+        alert("El WhatsApp debe tener 10 dígitos.");
+        return;
+    }
+
+    const ahora = new Date();
+
+    const primerPartido =
+        new Date(
+            partidosCapturaAdmin[0].fecha.replace(" ", "T")
+        );
+
+    if (ahora >= primerPartido) {
+
+        actualizarEstadoCapturaAdmin();
+
+        alert(
+            "❌ Ya comenzó el primer partido. " +
+            "La captura administrativa está cerrada."
+        );
+
+        return;
+    }
+
+    const pronosticos = [];
+
+    for (const p of partidosCapturaAdmin) {
+
+        const inputLocal =
+            document.getElementById("adminGl" + p.id);
+
+        const inputVisitante =
+            document.getElementById("adminGv" + p.id);
+
+        const golesLocal =
+            inputLocal.value.trim();
+
+        const golesVisitante =
+            inputVisitante.value.trim();
+
+        if (golesLocal === "" || golesVisitante === "") {
+
+            alert(
+                `⚠️ Falta capturar el marcador de:\n\n` +
+                `${p.local} vs ${p.visitante}`
+            );
+
+            return;
+        }
+
+        if (
+            !Number.isInteger(Number(golesLocal)) ||
+            !Number.isInteger(Number(golesVisitante))
+        ) {
+
+            alert(
+                `⚠️ Marcador inválido en:\n\n` +
+                `${p.local} vs ${p.visitante}`
+            );
+
+            return;
+        }
+
+        pronosticos.push({
+
+            partido_id: Number(p.id),
+
+            goles_local: Number(golesLocal),
+
+            goles_visitante: Number(golesVisitante)
+
+        });
+
+    }
+
+    const password =
+        prompt("🔐 Escribe la contraseña de administrador:");
+
+    if (!password) {
+        return;
+    }
+
+    const boton =
+        document.getElementById("btnGuardarCapturaAdmin");
+
+    boton.disabled = true;
+    boton.innerText = "⏳ Registrando...";
+
+    try {
+
+        const respuesta =
+            await fetch("/admin/guardar-quiniela", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    password,
+
+                    nombre,
+
+                    telefono,
+
+                    jornada,
+
+                    pronosticos
+
+                })
+
+            });
+
+        const data =
+            await respuesta.json();
+
+        if (!respuesta.ok || !data.ok) {
+
+            alert(
+                "❌ " +
+                (
+                    data.error ||
+                    "No fue posible registrar la quiniela."
+                )
+            );
+
+            return;
+        }
+
+        alert(
+            "✅ Quiniela registrada correctamente.\n\n" +
+            "Participante: " + nombre
+        );
+
+        document.getElementById("adminNombre").value = "";
+        document.getElementById("adminTelefono").value = "";
+
+        partidosCapturaAdmin.forEach(p => {
+
+            document.getElementById("adminGl" + p.id).value = "";
+            document.getElementById("adminGv" + p.id).value = "";
+
+        });
+
+        document.getElementById("capturaAdmin").style.display = "none";
+
+        if (typeof cargarDashboard === "function") {
+            cargarDashboard();
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            "❌ Error de comunicación con el servidor."
+        );
+
+    } finally {
+
+        boton.disabled = false;
+        boton.innerText = "🔐 Registrar Quiniela";
+
+        actualizarEstadoCapturaAdmin();
+
+    }
+}
+
  function logout() {
   sessionStorage.removeItem("admin");
   window.location.href = "login.html";
