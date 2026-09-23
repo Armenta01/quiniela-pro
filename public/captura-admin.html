@@ -44,57 +44,6 @@
       .equipo img{width:52px!important;height:52px!important;max-width:52px!important;max-height:52px!important}
       .nombre-equipo{font-size:16px}
     }
-
-    /* ===== MENSAJES PERSONALIZADOS ===== */
-    .modal-overlay{
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.68);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      z-index:99999;
-      padding:20px;
-      box-sizing:border-box;
-    }
-    .modal-overlay.activo{display:flex}
-    .modal-box{
-      width:100%;
-      max-width:430px;
-      background:#162844;
-      border:2px solid #facc15;
-      border-radius:20px;
-      padding:24px;
-      box-sizing:border-box;
-      text-align:center;
-      box-shadow:0 15px 40px rgba(0,0,0,.45);
-    }
-    .modal-icono{font-size:46px;margin-bottom:10px}
-    .modal-titulo{margin:0 0 10px;color:#facc15;font-size:24px}
-    .modal-mensaje{margin:0 0 20px;color:#fff;font-size:17px;line-height:1.45;white-space:pre-line}
-    .modal-input{
-      width:100%;
-      box-sizing:border-box;
-      padding:14px;
-      border-radius:12px;
-      border:1px solid #51678d;
-      background:#fff;
-      color:#111;
-      font-size:17px;
-      margin-bottom:16px;
-    }
-    .modal-botones{display:flex;gap:10px;justify-content:center}
-    .modal-btn{
-      flex:1;
-      border:0;
-      border-radius:12px;
-      padding:13px 16px;
-      font-size:16px;
-      font-weight:bold;
-      cursor:pointer;
-    }
-    .modal-cancelar{background:#475569;color:#fff}
-    .modal-aceptar{background:#22c55e;color:#fff}
   </style>
 </head>
 <body>
@@ -120,18 +69,6 @@
 
     <div class="acciones">
       <button id="btnGuardar" class="btn-guardar" onclick="guardarCapturaAdmin()">🔐 Registrar Quiniela</button>
-    </div>
-  </div>
-
-  <div id="modalMensaje" class="modal-overlay" onclick="cerrarModalMensaje(event)">
-    <div class="modal-box" onclick="event.stopPropagation()">
-      <div id="modalIcono" class="modal-icono">⚠️</div>
-      <h2 id="modalTitulo" class="modal-titulo">Aviso</h2>
-      <p id="modalTexto" class="modal-mensaje"></p>
-      <div class="modal-botones">
-        <button id="modalCancelar" class="modal-btn modal-cancelar" onclick="cerrarModalMensaje()" style="display:none">Cancelar</button>
-        <button id="modalAceptar" class="modal-btn modal-aceptar" onclick="resolverModal()">Aceptar</button>
-      </div>
     </div>
   </div>
 
@@ -244,82 +181,32 @@ async function cargarPartidos(){
   }
 }
 
-let modalResolver = null;
-
-function mostrarModal(titulo, mensaje, icono="⚠️", opciones={}){
-  const overlay=document.getElementById("modalMensaje");
-  const input=document.getElementById("modalInput");
-  const cancelar=document.getElementById("modalCancelar");
-  document.getElementById("modalTitulo").textContent=titulo;
-  document.getElementById("modalTexto").textContent=mensaje;
-  document.getElementById("modalIcono").textContent=icono;
-  cancelar.style.display=opciones.password ? "block" : "none";
-  document.getElementById("modalAceptar").textContent=opciones.password ? "Entrar" : "Aceptar";
-  if(input) input.remove();
-  if(opciones.password){
-    const nuevo=document.createElement("input");
-    nuevo.id="modalInput";
-    nuevo.type="password";
-    nuevo.className="modal-input";
-    nuevo.placeholder="Contraseña de administrador";
-    nuevo.autocomplete="current-password";
-    document.querySelector("#modalTexto").after(nuevo);
-    setTimeout(()=>nuevo.focus(),50);
-  }
-  overlay.classList.add("activo");
-}
-
-function cerrarModalMensaje(event){
-  if(event && event.target!==event.currentTarget) return;
-  const overlay=document.getElementById("modalMensaje");
-  overlay.classList.remove("activo");
-  if(modalResolver){ const r=modalResolver; modalResolver=null; r(null); }
-}
-
-function resolverModal(){
-  const input=document.getElementById("modalInput");
-  const valor=input ? input.value : true;
-  document.getElementById("modalMensaje").classList.remove("activo");
-  if(modalResolver){ const r=modalResolver; modalResolver=null; r(valor); }
-}
-
-function mensaje(titulo,mensaje,icono="⚠️"){
-  mostrarModal(titulo,mensaje,icono);
-}
-
-function pedirPassword(){
-  return new Promise(resolve=>{
-    modalResolver=resolve;
-    mostrarModal("Administrador","Escribe la contraseña de administrador:","🔐",{password:true});
-  });
-}
-
 async function guardarCapturaAdmin(){
-  if(!partidos.length){ mensaje("Sin partidos","No hay partidos para registrar.","⚠️"); return; }
+  if(!partidos.length){ alert("No hay partidos para registrar."); return; }
   const nombre=document.getElementById("adminNombre").value.trim();
   const telefono=document.getElementById("adminTelefono").value.trim();
   const jornada=document.getElementById("jornada").value;
-  if(!nombre || nombre.length<2){ mensaje("Datos incompletos","Escribe el nombre del participante.","👤"); return; }
-  if(telefono && !/^\d{10}$/.test(telefono)){ mensaje("WhatsApp inválido","El WhatsApp debe tener 10 dígitos.","📱"); return; }
+  if(!nombre || nombre.length<2){ alert("Escribe el nombre del participante."); return; }
+  if(telefono && !/^\d{10}$/.test(telefono)){ alert("El WhatsApp debe tener 10 dígitos."); return; }
   const primero=primerPartidoLocal();
-  if(new Date()>=primero){ actualizarEstado(); mensaje("Captura cerrada","Ya comenzó el primer partido. La captura administrativa está cerrada.","🔒"); return; }
+  if(new Date()>=primero){ actualizarEstado(); alert("❌ Ya comenzó el primer partido. La captura administrativa está cerrada."); return; }
 
   const pronosticos=[];
   for(const p of partidos){
     const gl=document.getElementById("adminGl"+p.id)?.value.trim();
     const gv=document.getElementById("adminGv"+p.id)?.value.trim();
     if(gl==="" || gv===""){
-      mensaje("Marcador incompleto",`Falta capturar el marcador de:\n\n${p.local} vs ${p.visitante}`,"⚠️");
+      alert(`⚠️ Falta capturar el marcador de:\n\n${p.local} vs ${p.visitante}`);
       return;
     }
     if(!Number.isInteger(Number(gl)) || !Number.isInteger(Number(gv))){
-      mensaje("Marcador inválido",`Marcador inválido en:\n\n${p.local} vs ${p.visitante}`,"🚫");
+      alert(`⚠️ Marcador inválido en:\n\n${p.local} vs ${p.visitante}`);
       return;
     }
     pronosticos.push({partido_id:Number(p.id),goles_local:Number(gl),goles_visitante:Number(gv)});
   }
 
-  const password=await pedirPassword();
+  const password=prompt("🔐 Escribe la contraseña de administrador:");
   if(!password) return;
   const boton=document.getElementById("btnGuardar");
   boton.disabled=true;
@@ -333,10 +220,10 @@ async function guardarCapturaAdmin(){
     });
     const data=await res.json();
     if(!res.ok || !data.ok){
-      mensaje("No fue posible registrar",data.error || "No fue posible registrar la quiniela.","❌");
+      alert("❌ "+(data.error || "No fue posible registrar la quiniela."));
       return;
     }
-    mensaje("Quiniela registrada", "Quiniela registrada correctamente.\n\nParticipante: "+nombre, "✅");
+    alert("✅ Quiniela registrada correctamente.\n\nParticipante: "+nombre);
     document.getElementById("adminNombre").value="";
     document.getElementById("adminTelefono").value="";
     partidos.forEach(p=>{
@@ -347,7 +234,7 @@ async function guardarCapturaAdmin(){
     });
   }catch(err){
     console.error(err);
-    mensaje("Error de comunicación","No fue posible comunicarse con el servidor.","❌");
+    alert("❌ Error de comunicación con el servidor.");
   }finally{
     boton.disabled=false;
     boton.textContent="🔐 Registrar Quiniela";
