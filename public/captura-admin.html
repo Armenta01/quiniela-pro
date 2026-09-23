@@ -182,32 +182,80 @@ async function cargarPartidos(){
 }
 
 async function guardarCapturaAdmin(){
-  if(!partidos.length){ alert("No hay partidos para registrar."); return; }
+
+  if(!partidos.length){
+    mostrarMensaje(
+        "Sin partidos",
+        "No hay partidos para registrar.",
+        "⚠️"
+    );
+    return;
+}
+
   const nombre=document.getElementById("adminNombre").value.trim();
   const telefono=document.getElementById("adminTelefono").value.trim();
   const jornada=document.getElementById("jornada").value;
-  if(!nombre || nombre.length<2){ alert("Escribe el nombre del participante."); return; }
-  if(telefono && !/^\d{10}$/.test(telefono)){ alert("El WhatsApp debe tener 10 dígitos."); return; }
+  if(!nombre || nombre.length<2){
+    mostrarMensaje(
+        "Participante",
+        "Escribe el nombre del participante.",
+        "⚠️"
+    );
+    return;
+}
+
+if(telefono && !/^\d{10}$/.test(telefono)){
+    mostrarMensaje(
+        "WhatsApp",
+        "El WhatsApp debe tener 10 dígitos.",
+        "⚠️"
+    );
+    return;
+}
   const primero=primerPartidoLocal();
-  if(new Date()>=primero){ actualizarEstado(); alert("❌ Ya comenzó el primer partido. La captura administrativa está cerrada."); return; }
+ 
+  if(new Date()>=primero){
+    actualizarEstado();
+
+    mostrarMensaje(
+        "Captura cerrada",
+        "Ya comenzó el primer partido. La captura administrativa está cerrada.",
+        "❌"
+    );
+
+    return;
+}
 
   const pronosticos=[];
   for(const p of partidos){
     const gl=document.getElementById("adminGl"+p.id)?.value.trim();
     const gv=document.getElementById("adminGv"+p.id)?.value.trim();
     if(gl==="" || gv===""){
-      alert(`⚠️ Falta capturar el marcador de:\n\n${p.local} vs ${p.visitante}`);
+     mostrarMensaje(
+    "Marcador incompleto",
+    `Falta capturar el marcador de:<br><br><b>${p.local} vs ${p.visitante}</b>`,
+    "⚠️"
+);
       return;
     }
     if(!Number.isInteger(Number(gl)) || !Number.isInteger(Number(gv))){
-      alert(`⚠️ Marcador inválido en:\n\n${p.local} vs ${p.visitante}`);
+      mostrarMensaje(
+    "Marcador inválido",
+    `Marcador inválido en:<br><br><b>${p.local} vs ${p.visitante}</b>`,
+    "❌"
+);
       return;
     }
     pronosticos.push({partido_id:Number(p.id),goles_local:Number(gl),goles_visitante:Number(gv)});
   }
 
-  const password=prompt("🔐 Escribe la contraseña de administrador:");
-  if(!password) return;
+  const password = await mostrarPassword(
+    "Contraseña de administrador",
+    "Escribe la contraseña para registrar la quiniela."
+);
+
+if (!password) return;
+
   const boton=document.getElementById("btnGuardar");
   boton.disabled=true;
   boton.textContent="⏳ Registrando...";
@@ -220,10 +268,21 @@ async function guardarCapturaAdmin(){
     });
     const data=await res.json();
     if(!res.ok || !data.ok){
-      alert("❌ "+(data.error || "No fue posible registrar la quiniela."));
+     mostrarMensaje(
+    "No fue posible registrar",
+    data.error || "No fue posible registrar la quiniela.",
+    "❌"
+);
       return;
     }
-    alert("✅ Quiniela registrada correctamente.\n\nParticipante: "+nombre);
+    
+    
+    mostrarMensaje(
+    "Quiniela registrada",
+    `✅ Quiniela registrada correctamente.<br><br>Participante: <b>${nombre}</b>`,
+    "✅"
+);
+
     document.getElementById("adminNombre").value="";
     document.getElementById("adminTelefono").value="";
     partidos.forEach(p=>{
@@ -234,7 +293,12 @@ async function guardarCapturaAdmin(){
     });
   }catch(err){
     console.error(err);
-    alert("❌ Error de comunicación con el servidor.");
+    
+    mostrarMensaje(
+    "Error de comunicación",
+    "No fue posible comunicarse con el servidor.",
+    "❌"
+);
   }finally{
     boton.disabled=false;
     boton.textContent="🔐 Registrar Quiniela";
@@ -245,5 +309,54 @@ async function guardarCapturaAdmin(){
 cargarSemanas();
 cargarPartidos();
 </script>
+
+<div id="modalPersonalizado" class="modal-overlay">
+
+  <div class="modal">
+
+      <div id="modalIcono" class="modal-icono">⚠️</div>
+
+      <h2 id="modalTitulo">Título</h2>
+
+      <p id="modalMensaje">Mensaje</p>
+
+      <input
+          id="modalInput"
+          type="password"
+          class="modal-input"
+          placeholder="Contraseña..."
+          style="display:none;"
+      >
+
+      <div class="modal-botones">
+
+          <button
+              id="btnCancelar"
+              class="btn-modal cancelar">
+              Cancelar
+          </button>
+
+          <button
+              id="btnAceptar"
+              class="btn-modal aceptar">
+              Aceptar
+          </button>
+
+      </div>
+
+  </div>
+
+</div>
+
+<div id="toast" class="toast">
+
+    <span id="toastIcono">✅</span>
+
+    <span id="toastTexto">Mensaje</span>
+
+</div>
+
+
+<script src="ui.js"></script>
 </body>
 </html>
