@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Captura Admin - Quinielas El Inge</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body{background:#0f1d33;color:white;margin:0;font-family:Arial,sans-serif}
+    .captura-wrap{width:92%;max-width:900px;margin:25px auto 50px}
+    .captura-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+    .captura-head h1{margin:0;font-size:32px}
+    .btn-volver{background:#334155;color:#fff;border:0;border-radius:12px;padding:11px 18px;font-weight:bold;cursor:pointer}
+    .selector{background:#1d2d49;border:1px solid #3b4e6e;border-radius:16px;padding:15px;margin-bottom:18px}
+    .selector label{display:block;margin-bottom:8px;font-weight:bold}
+    .selector select{width:100%;padding:13px;border-radius:10px;border:0;font-size:17px;background:#253754;color:#fff}
+    .estado{padding:15px;border-radius:12px;text-align:center;font-weight:bold;margin:15px 0 20px}
+    .estado.ok{background:#dcfce7;color:#166534}
+    .estado.error{background:#fee2e2;color:#991b1b}
+    .estado.info{background:#dbeafe;color:#1e3a8a}
+    .datos{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+    .datos input{width:100%;box-sizing:border-box;padding:15px;border-radius:12px;border:1px solid #435675;background:#1d2d49;color:#fff;font-size:17px}
+    .lista-partidos{display:flex;flex-direction:column;gap:16px}
+    .partido-card{background:#162844;border:1px solid #334b70;border-radius:18px;padding:18px;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+    .liga{font-weight:bold;color:#facc15;font-size:16px;margin-bottom:5px}
+    .fecha{font-size:16px;color:#dbeafe;margin-bottom:14px}
+    .equipos{display:grid;grid-template-columns:1fr 70px 1fr;align-items:center;gap:10px}
+    .equipo{text-align:center;font-weight:bold;min-width:0}
+    .equipo img{display:block!important;width:58px!important;height:58px!important;max-width:58px!important;max-height:58px!important;object-fit:contain!important;margin:0 auto 7px!important}
+    .nombre-equipo{font-size:18px;line-height:1.15;word-break:break-word}
+    .vs{text-align:center;font-weight:900;color:#facc15;font-size:18px}
+    .resultado-titulo{text-align:center;margin:16px 0 8px;font-size:14px;font-weight:bold;color:#cbd5e1}
+    .resultado{display:flex;justify-content:center;align-items:center;gap:10px}
+    .resultado input{width:70px!important;height:52px!important;box-sizing:border-box;text-align:center;font-size:24px!important;font-weight:bold!important;border-radius:10px;border:1px solid #51678d;background:#fff;color:#111}
+    .guion{font-size:24px;font-weight:bold}
+    .acciones{margin-top:20px}
+    .btn-guardar{width:100%;padding:15px;border:0;border-radius:12px;background:#22c55e;color:#fff;font-size:18px;font-weight:bold;cursor:pointer}
+    .btn-guardar:disabled{opacity:.5;cursor:not-allowed}
+    @media(max-width:700px){
+      .datos{grid-template-columns:1fr}
+      .captura-wrap{width:94%}
+      .captura-head h1{font-size:27px}
+      .equipos{grid-template-columns:1fr 48px 1fr}
+      .equipo img{width:52px!important;height:52px!important;max-width:52px!important;max-height:52px!important}
+      .nombre-equipo{font-size:16px}
+    }
+  </style>
+</head>
+<body>
+  <div class="captura-wrap">
+    <div class="captura-head">
+      <h1>🔓 Captura Administrativa</h1>
+      <button class="btn-volver" onclick="window.location.href='admin.html'">← Volver al Admin</button>
+    </div>
+
+    <div class="selector">
+      <label for="jornada">Semana</label>
+      <select id="jornada"></select>
+    </div>
+
+    <div id="estado" class="estado info">⏳ Cargando partidos...</div>
+
+    <div class="datos">
+      <input type="text" id="adminNombre" maxlength="50" placeholder="👤 Nombre del participante">
+      <input type="text" id="adminTelefono" maxlength="10" inputmode="numeric" placeholder="📱 WhatsApp">
+    </div>
+
+    <div id="listaPartidos" class="lista-partidos"></div>
+
+    <div class="acciones">
+      <button id="btnGuardar" class="btn-guardar" onclick="guardarCapturaAdmin()">🔐 Registrar Quiniela</button>
+    </div>
+  </div>
+
+<script>
+if (sessionStorage.getItem("admin") !== "true") {
+  window.location.href = "login.html";
+}
+
+let partidos = [];
+const params = new URLSearchParams(window.location.search);
+const jornadaInicial = params.get("jornada");
+
+function cargarSemanas(){
+  const select = document.getElementById("jornada");
+  for(let i=1;i<=60;i++){
+    const option=document.createElement("option");
+    option.value=i;
+    option.textContent=`Semana ${i}`;
+    if(String(i)===String(jornadaInicial)) option.selected=true;
+    select.appendChild(option);
+  }
+  select.addEventListener("change", cargarPartidos);
+}
+
+function fechaLocal(fecha){
+  if(!fecha) return "Fecha pendiente";
+  const d = new Date(fecha.replace(" ","T"));
+  if(Number.isNaN(d.getTime())) return fecha;
+  return d.toLocaleString("es-MX",{
+    day:"2-digit",month:"2-digit",year:"numeric",
+    hour:"2-digit",minute:"2-digit",hour12:false
+  });
+}
+
+function primerPartidoLocal(){
+  if(!partidos.length) return null;
+  return new Date(partidos[0].fecha.replace(" ","T"));
+}
+
+function actualizarEstado(){
+  const estado=document.getElementById("estado");
+  const boton=document.getElementById("btnGuardar");
+  const primero=primerPartidoLocal();
+  if(!primero){
+    estado.className="estado error";
+    estado.textContent="⚠️ Esta jornada no tiene partidos.";
+    boton.disabled=true;
+    return;
+  }
+  if(new Date()>=primero){
+    estado.className="estado error";
+    estado.textContent="🔴 CAPTURA CERRADA — YA COMENZÓ EL PRIMER PARTIDO.";
+    boton.disabled=true;
+    return;
+  }
+  estado.className="estado ok";
+  estado.textContent="🟢 CAPTURA ADMINISTRATIVA DISPONIBLE HASTA EL INICIO DEL PRIMER PARTIDO.";
+  boton.disabled=false;
+}
+
+async function cargarPartidos(){
+  const jornada=document.getElementById("jornada").value;
+  const estado=document.getElementById("estado");
+  const lista=document.getElementById("listaPartidos");
+  estado.className="estado info";
+  estado.textContent="⏳ Cargando partidos...";
+  lista.innerHTML="";
+  try{
+    const res=await fetch(`/partidos?jornada=${encodeURIComponent(jornada)}`);
+    if(!res.ok) throw new Error("No se pudieron cargar los partidos.");
+    const data=await res.json();
+    partidos=(Array.isArray(data)?data:[]).slice().sort((a,b)=>{
+      return new Date(a.fecha.replace(" ","T"))-new Date(b.fecha.replace(" ","T"));
+    });
+    if(!partidos.length){
+      actualizarEstado();
+      return;
+    }
+    for(const p of partidos){
+      lista.insertAdjacentHTML("beforeend", `
+        <div class="partido-card">
+          <div class="liga">${p.liga || "Partido"}</div>
+          <div class="fecha">📅 ${fechaLocal(p.fecha)}</div>
+          <div class="equipos">
+            <div class="equipo">
+              ${p.logo_local ? `<img src="${p.logo_local}" alt="" onerror="this.style.display='none'">` : ""}
+              <div class="nombre-equipo">${p.local || "Local"}</div>
+            </div>
+            <div class="vs">VS</div>
+            <div class="equipo">
+              ${p.logo_visitante ? `<img src="${p.logo_visitante}" alt="" onerror="this.style.display='none'">` : ""}
+              <div class="nombre-equipo">${p.visitante || "Visitante"}</div>
+            </div>
+          </div>
+          <div class="resultado-titulo">MARCADOR DEL PARTICIPANTE</div>
+          <div class="resultado">
+            <input type="number" min="0" max="30" inputmode="numeric" id="adminGl${p.id}" placeholder="0">
+            <span class="guion">-</span>
+            <input type="number" min="0" max="30" inputmode="numeric" id="adminGv${p.id}" placeholder="0">
+          </div>
+        </div>
+      `);
+    }
+    actualizarEstado();
+  }catch(err){
+    console.error(err);
+    estado.className="estado error";
+    estado.textContent="❌ Error al cargar los partidos.";
+    document.getElementById("btnGuardar").disabled=true;
+  }
+}
+
+async function guardarCapturaAdmin(){
+  if(!partidos.length){ alert("No hay partidos para registrar."); return; }
+  const nombre=document.getElementById("adminNombre").value.trim();
+  const telefono=document.getElementById("adminTelefono").value.trim();
+  const jornada=document.getElementById("jornada").value;
+  if(!nombre || nombre.length<2){ alert("Escribe el nombre del participante."); return; }
+  if(telefono && !/^\d{10}$/.test(telefono)){ alert("El WhatsApp debe tener 10 dígitos."); return; }
+  const primero=primerPartidoLocal();
+  if(new Date()>=primero){ actualizarEstado(); alert("❌ Ya comenzó el primer partido. La captura administrativa está cerrada."); return; }
+
+  const pronosticos=[];
+  for(const p of partidos){
+    const gl=document.getElementById("adminGl"+p.id)?.value.trim();
+    const gv=document.getElementById("adminGv"+p.id)?.value.trim();
+    if(gl==="" || gv===""){
+      alert(`⚠️ Falta capturar el marcador de:\n\n${p.local} vs ${p.visitante}`);
+      return;
+    }
+    if(!Number.isInteger(Number(gl)) || !Number.isInteger(Number(gv))){
+      alert(`⚠️ Marcador inválido en:\n\n${p.local} vs ${p.visitante}`);
+      return;
+    }
+    pronosticos.push({partido_id:Number(p.id),goles_local:Number(gl),goles_visitante:Number(gv)});
+  }
+
+  const password=prompt("🔐 Escribe la contraseña de administrador:");
+  if(!password) return;
+  const boton=document.getElementById("btnGuardar");
+  boton.disabled=true;
+  boton.textContent="⏳ Registrando...";
+
+  try{
+    const res=await fetch("/admin/guardar-quiniela",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({password,nombre,telefono,jornada,pronosticos})
+    });
+    const data=await res.json();
+    if(!res.ok || !data.ok){
+      alert("❌ "+(data.error || "No fue posible registrar la quiniela."));
+      return;
+    }
+    alert("✅ Quiniela registrada correctamente.\n\nParticipante: "+nombre);
+    document.getElementById("adminNombre").value="";
+    document.getElementById("adminTelefono").value="";
+    partidos.forEach(p=>{
+      const gl=document.getElementById("adminGl"+p.id);
+      const gv=document.getElementById("adminGv"+p.id);
+      if(gl) gl.value="";
+      if(gv) gv.value="";
+    });
+  }catch(err){
+    console.error(err);
+    alert("❌ Error de comunicación con el servidor.");
+  }finally{
+    boton.disabled=false;
+    boton.textContent="🔐 Registrar Quiniela";
+    actualizarEstado();
+  }
+}
+
+cargarSemanas();
+cargarPartidos();
+</script>
+</body>
+</html>

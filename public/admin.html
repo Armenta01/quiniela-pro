@@ -136,7 +136,7 @@ if (sessionStorage.getItem("admin") !== "true") {
 
 <button
     class="btn-verde"
-    onclick="abrirCapturaAdmin()">
+    onclick="window.location.href='captura-admin.html?jornada=' + document.getElementById('jornada').value">
     🔓 Captura Admin
 </button>
 
