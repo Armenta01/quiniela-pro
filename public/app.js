@@ -799,49 +799,89 @@ async function cargarCampeon() {
 }
 
 // 🔥 TOP 4 (SOLO UNA)
+// 🔥 TOP 4 PREMIUM
 async function cargarTop4() {
-  const res = await fetch(`/top4?jornada=${jornadaActual}`);
-  const data = await res.json();
 
-  let cont = document.getElementById("top4");
-  if (!cont) return;
+    const res = await fetch(`/top4?jornada=${jornadaActual}`);
+    const data = await res.json();
 
-  cont.innerHTML = "<h3>🔝 TOP 4</h3>";
+    const cont = document.getElementById("top4");
 
-  data.forEach((u,i)=>{
+    if (!cont) return;
 
-    let medal = ["🥇","🥈","🥉","🏅"][i] || "";
-
-    let detallesHTML = u.detalles.map(d => {
-      let color = {
-        verde: "#22c55e",
-        amarillo: "#eab308",
-        rojo: "#ef4444",
-        gris: "#9ca3af"
-      }[d];
-
-      return `<span style="
-        display:inline-block;
-        width:10px;
-        height:10px;
-        border-radius:50%;
-        background:${color};
-        margin:2px;
-      "></span>`;
-    }).join("");
-
-    cont.innerHTML += `
-      <div style="
-        background:#132a4f;
-        margin:10px;
-        padding:10px;
-        border-radius:10px;
-      ">
-        ${medal} ${u.nombre} - ${u.puntos} pts
-        <div>${detallesHTML}</div>
-      </div>
+    cont.innerHTML = `
+        <h3>🏆 TOP 4</h3>
     `;
-  });
+
+    data.forEach((u, i) => {
+
+        const posicion = i + 1;
+
+        const clases = [
+            "top1",
+            "top2",
+            "top3",
+            "top4"
+        ];
+
+        const clasePosicion = clases[i] || "top4";
+
+        const medallas = [
+            "🥇",
+            "🥈",
+            "🥉",
+            "🏅"
+        ];
+
+        const medal = medallas[i] || "🏅";
+
+        let detallesHTML = "";
+
+        if (Array.isArray(u.detalles)) {
+
+            detallesHTML = u.detalles.map(d => {
+
+                return `
+                    <span
+                        class="top4-dot ${d}"
+                        title="${d}">
+                    </span>
+                `;
+
+            }).join("");
+
+        }
+
+        cont.innerHTML += `
+
+            <div class="top4-card ${clasePosicion}">
+
+                <div class="top4-posicion">
+                    ${medal}
+                </div>
+
+                <div class="top4-info">
+
+                    <div class="top4-nombre">
+                        ${u.nombre}
+                    </div>
+
+                    <div class="top4-puntos">
+                        ${u.puntos} pts
+                    </div>
+
+                </div>
+
+                <div class="top4-detalles">
+                    ${detallesHTML}
+                </div>
+
+            </div>
+
+        `;
+
+    });
+
 }
 
 // 🔒 BLOQUEO

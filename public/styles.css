@@ -3924,3 +3924,454 @@ to{
     }
 
 }
+
+/* =========================================================
+   🎨 DISEÑO PREMIUM — BOTONES QUINIELA
+   ========================================================= */
+
+.btn-main,
+.btn-limpiar,
+.btn-random {
+    position: relative;
+    border: 1px solid rgba(255,255,255,.10);
+    color: #ffffff !important;
+    font-weight: 800;
+    letter-spacing: .2px;
+    cursor: pointer;
+    overflow: hidden;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        filter .2s ease;
+}
+
+/* Brillo interno */
+.btn-main::before,
+.btn-limpiar::before,
+.btn-random::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 80%;
+    height: 100%;
+
+    background: linear-gradient(
+        100deg,
+        transparent,
+        rgba(255,255,255,.18),
+        transparent
+    );
+
+    transform: skewX(-20deg);
+    transition: left .55s ease;
+}
+
+.btn-main:hover::before,
+.btn-limpiar:hover::before,
+.btn-random:hover::before {
+    left: 130%;
+}
+
+/* =========================
+   GUARDAR QUINIELA
+   ========================= */
+
+.btn-main {
+    background: linear-gradient(
+        135deg,
+        #16a34a,
+        #22c55e
+    ) !important;
+
+    box-shadow:
+        0 8px 22px rgba(34,197,94,.22),
+        inset 0 1px 0 rgba(255,255,255,.15);
+
+    min-height: 54px;
+    border-radius: 14px !important;
+}
+
+.btn-main:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+
+    box-shadow:
+        0 12px 28px rgba(34,197,94,.30),
+        inset 0 1px 0 rgba(255,255,255,.20);
+}
+
+/* =========================
+   CONTENEDOR BOTONES
+   ========================= */
+
+.acciones-quiniela {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 14px;
+
+    margin-top: 16px;
+}
+
+/* =========================
+   LIMPIAR
+   ========================= */
+
+.acciones-quiniela .btn-limpiar {
+    background: linear-gradient(
+        135deg,
+        #b91c1c,
+        #ef4444
+    ) !important;
+
+    color: white !important;
+
+    box-shadow:
+        0 7px 18px rgba(239,68,68,.18),
+        inset 0 1px 0 rgba(255,255,255,.12);
+
+    min-height: 50px;
+    border-radius: 13px !important;
+
+    padding: 10px 24px !important;
+}
+
+.acciones-quiniela .btn-limpiar:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+
+    box-shadow:
+        0 10px 24px rgba(239,68,68,.28);
+}
+
+/* =========================
+   ALEATORIO
+   ========================= */
+
+.acciones-quiniela .btn-random {
+    background: linear-gradient(
+        135deg,
+        #2563eb,
+        #7c3aed
+    ) !important;
+
+    color: white !important;
+
+    box-shadow:
+        0 7px 18px rgba(79,70,229,.20),
+        inset 0 1px 0 rgba(255,255,255,.12);
+
+    min-height: 50px;
+    border-radius: 13px !important;
+
+    padding: 10px 24px !important;
+}
+
+.acciones-quiniela .btn-random:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+
+    box-shadow:
+        0 10px 25px rgba(79,70,229,.30);
+}
+
+/* =========================
+   EFECTO AL PRESIONAR
+   ========================= */
+
+.btn-main:active,
+.btn-limpiar:active,
+.btn-random:active {
+    transform: translateY(1px) scale(.98);
+}
+
+/* =========================================================
+   🏆 TOP 4 PREMIUM
+   ========================================================= */
+
+#top4 {
+    width: 94%;
+    max-width: 900px;
+    margin: 32px auto 20px;
+}
+
+/* Título */
+
+#top4 h3 {
+    margin: 0 0 18px;
+
+    text-align: left;
+
+    color: #ffffff;
+
+    font-size: 25px;
+    font-weight: 900;
+
+    letter-spacing: .5px;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Tarjeta */
+
+.top4-card {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    min-height: 76px;
+
+    margin: 12px 0;
+    padding: 12px 18px;
+
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(30,52,88,.98),
+            rgba(19,42,79,.98)
+        );
+
+    border: 1px solid rgba(255,255,255,.07);
+
+    box-shadow:
+        0 8px 22px rgba(0,0,0,.18),
+        inset 0 1px 0 rgba(255,255,255,.04);
+
+    overflow: hidden;
+
+    transition:
+        transform .22s ease,
+        box-shadow .22s ease,
+        border-color .22s ease;
+}
+
+.top4-card:hover {
+    transform: translateY(-3px);
+
+    border-color: rgba(255,255,255,.15);
+
+    box-shadow:
+        0 13px 30px rgba(0,0,0,.28);
+}
+
+/* Línea lateral */
+
+.top4-card::before {
+    content: "";
+
+    position: absolute;
+    left: 0;
+    top: 10px;
+    bottom: 10px;
+
+    width: 4px;
+
+    border-radius: 0 5px 5px 0;
+
+    background: #3b82f6;
+}
+
+/* Posición */
+
+.top4-posicion {
+    width: 54px;
+    min-width: 54px;
+
+    font-size: 28px;
+
+    text-align: center;
+}
+
+/* Información */
+
+.top4-info {
+    flex: 1;
+
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+/* Nombre */
+
+.top4-nombre {
+    color: #ffffff;
+
+    font-size: 18px;
+    font-weight: 800;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Puntos */
+
+.top4-puntos {
+    color: #94a3b8;
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+/* Indicadores */
+
+.top4-detalles {
+    display: flex;
+    align-items: center;
+
+    gap: 5px;
+
+    margin-left: 12px;
+}
+
+.top4-dot {
+    width: 9px;
+    height: 9px;
+
+    border-radius: 50%;
+
+    box-shadow:
+        0 0 5px rgba(255,255,255,.08);
+}
+
+/* Colores */
+
+.top4-dot.verde {
+    background: #22c55e;
+}
+
+.top4-dot.amarillo {
+    background: #eab308;
+}
+
+.top4-dot.rojo {
+    background: #ef4444;
+}
+
+.top4-dot.gris {
+    background: #64748b;
+}
+
+/* =========================================================
+   🥇 PRIMER LUGAR
+   ========================================================= */
+
+.top4-card.top1 {
+    background:
+        linear-gradient(
+            135deg,
+            rgba(79,61,15,.92),
+            rgba(31,42,55,.98)
+        );
+
+    border-color: rgba(250,204,21,.28);
+}
+
+.top4-card.top1::before {
+    background: linear-gradient(
+        180deg,
+        #fde047,
+        #eab308
+    );
+}
+
+.top4-card.top1 .top4-puntos {
+    color: #facc15;
+}
+
+/* =========================================================
+   🥈 SEGUNDO
+   ========================================================= */
+
+.top4-card.top2 {
+    border-color: rgba(203,213,225,.18);
+}
+
+.top4-card.top2::before {
+    background: #cbd5e1;
+}
+
+/* =========================================================
+   🥉 TERCERO
+   ========================================================= */
+
+.top4-card.top3 {
+    border-color: rgba(180,83,9,.20);
+}
+
+.top4-card.top3::before {
+    background: #d97706;
+}
+
+/* =========================================================
+   4° LUGAR
+   ========================================================= */
+
+.top4-card.top4::before {
+    background: #3b82f6;
+}
+
+/* =========================
+   MÓVIL
+   ========================= */
+
+@media (max-width: 600px) {
+
+    .acciones-quiniela {
+        gap: 10px;
+    }
+
+    .acciones-quiniela .btn-limpiar,
+    .acciones-quiniela .btn-random {
+        padding: 9px 17px !important;
+        font-size: 14px;
+    }
+
+    #top4 {
+        width: 92%;
+    }
+
+    #top4 h3 {
+        font-size: 21px;
+    }
+
+    .top4-card {
+        min-height: 68px;
+        padding: 10px 12px;
+    }
+
+    .top4-posicion {
+        width: 44px;
+        min-width: 44px;
+        font-size: 23px;
+    }
+
+    .top4-nombre {
+        font-size: 16px;
+    }
+
+    .top4-puntos {
+        font-size: 13px;
+    }
+
+    .top4-detalles {
+        gap: 4px;
+        margin-left: 8px;
+    }
+
+    .top4-dot {
+        width: 8px;
+        height: 8px;
+    }
+}
