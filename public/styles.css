@@ -3878,47 +3878,48 @@ to{
 
 .admin-container .form-row > button {
     width: 92% !important;
-    margin: 7px auto !important;
+    min-height: 36px !important;
 
-    min-height: 46px;
-    padding: 10px 16px !important;
+    padding: 6px 14px !important;
 
-    font-size: 15px;
+    margin: 4px auto !important;
+
+    font-size: 14px;
+    line-height: 1.1;
+
+    border-radius: 12px;
     font-weight: 700;
-
-    border-radius: 14px;
-
-    letter-spacing: .2px;
 }
 
-/* Efecto hover */
+/* Hover */
 .admin-container .form-row > button:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
 }
 
-/* Efecto al presionar */
+/* Al presionar */
 .admin-container .form-row > button:active {
     transform: scale(.98);
 }
 
-/* En computadora */
+/* Computadora */
 @media (min-width: 769px) {
 
     .admin-container .form-row > button {
-        width: 88% !important;
-        min-height: 44px;
-        padding: 9px 14px !important;
+        width: 92% !important;
+        min-height: 36px !important;
+        padding: 6px 14px !important;
         font-size: 14px;
     }
 
 }
 
-/* En celular */
+/* Celular */
 @media (max-width: 768px) {
 
     .admin-container .form-row > button {
         width: 94% !important;
-        min-height: 44px;
+        min-height: 38px !important;
+        padding: 7px 14px !important;
         font-size: 14px;
     }
 
