@@ -695,7 +695,8 @@ button:active {
 .social-float{
   position: fixed;
   right: 15px;
- 
+  top: 50%;
+  transform: translateY(-50%);
 
   display: flex;
   flex-direction: column;
@@ -4319,6 +4320,28 @@ to{
 
 .top4-card.top4::before {
     background: #3b82f6;
+}
+
+/* Línea central fija del primer lugar */
+.top4-card.top1::after {
+    content: "";
+
+    position: absolute;
+
+    top: 18px;
+    bottom: 0;
+
+    left: 50%;
+
+    width: 6px;
+
+    background: #facc15;
+
+    border-radius: 0 0 3px 3px;
+
+    transform: translateX(-50%);
+
+    pointer-events: none;
 }
 
 /* =========================
