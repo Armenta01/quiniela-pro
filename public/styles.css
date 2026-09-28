@@ -4388,3 +4388,34 @@ to{
         height: 8px;
     }
 }
+
+/* =========================================================
+   🥇 CORRECCIÓN LÍNEA DEL PRIMER LUGAR
+   Misma posición que las demás tarjetas
+   ========================================================= */
+
+#top4 .top4-card.top1::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 10px;
+    bottom: 10px;
+
+    width: 4px;
+
+    border-radius: 0 5px 5px 0;
+
+    background: #facc15 !important;
+
+    box-shadow: none;
+
+    z-index: 2;
+}
+
+/* Eliminar cualquier segunda línea que pudiera estar apareciendo */
+#top4 .top4-card.top1::after {
+    content: none !important;
+    display: none !important;
+}
