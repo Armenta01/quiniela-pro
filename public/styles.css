@@ -4278,15 +4278,6 @@ to{
     border-color: rgba(250,204,21,.28);
 }
 
-.top4-card.top1::before {
-    background: #fde047;
-    left: 0;
-    top: 10px;
-    bottom: 10px;
-    width: 4px;
-    position: absolute;
-}
-
 .top4-card.top1 .top4-puntos {
     color: #facc15;
 }
