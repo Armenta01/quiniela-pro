@@ -4262,12 +4262,13 @@ to{
 .top4-dot.gris {
     background: #64748b;
 }
-
 /* =========================================================
    🥇 PRIMER LUGAR
    ========================================================= */
 
 .top4-card.top1 {
+    position: relative;
+
     background:
         linear-gradient(
             135deg,
@@ -4276,6 +4277,26 @@ to{
         );
 
     border-color: rgba(250,204,21,.28);
+}
+
+.top4-card.top1::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0 !important;
+    right: auto !important;
+
+    top: 10px;
+    bottom: 10px;
+
+    width: 4px;
+
+    transform: none !important;
+
+    border-radius: 0 5px 5px 0;
+
+    background: #fde047;
 }
 
 .top4-card.top1 .top4-puntos {
