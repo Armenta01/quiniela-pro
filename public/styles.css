@@ -4411,7 +4411,7 @@ to{
 
     box-shadow: none;
 
-    z-index: -2;
+    z-index: 2;
 }
 
 /* Eliminar cualquier segunda línea que pudiera estar apareciendo */
