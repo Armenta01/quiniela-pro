@@ -217,7 +217,7 @@ button {
   margin-top:8px;
 }
 
-/* 🔥 celdas de la tabla */
+/* ðŸ”¥ celdas de la tabla */
 .celda {
   border-radius: 6px;
 }
@@ -248,7 +248,7 @@ button {
 }
 
 
-/* 🔥 colores de resultados */
+/* ðŸ”¥ colores de resultados */
 .verde {
   background: #22c55e;
   color: #ffffff;
@@ -264,13 +264,13 @@ button {
   color: #ffffff;
 }
 
-/* 🔥 ESTE ES EL QUE TE ESTÁ FALLANDO */
-/* 🔥 fondo para gris */
+/* ðŸ”¥ ESTE ES EL QUE TE ESTÃ FALLANDO */
+/* ðŸ”¥ fondo para gris */
 .gris {
   background: #1e293b !important;
   color: #94a3b8 !important;
 }
-/* 🏆 TOP 3 */
+/* ðŸ† TOP 3 */
 
 .top1 {
   background: linear-gradient(90deg, #ffd700, #facc15);
@@ -290,10 +290,10 @@ button {
   font-weight: bold;
 }
 .fila {
-  background: transparent; /* 🔥 evita bloque gris */
+  background: transparent; /* ðŸ”¥ evita bloque gris */
 }
 
-/* ✨ efecto suave */
+/* âœ¨ efecto suave */
 .fila {
   display: flex;
   align-items: center;
@@ -314,7 +314,7 @@ button {
   transform: scale(1.02);
 }
 
-/* 🥇 BRILLO CAMPEÓN */
+/* ðŸ¥‡ BRILLO CAMPEÃ“N */
 
 .top1 {
   background: linear-gradient(90deg, #ffd700, #facc15);
@@ -324,7 +324,7 @@ button {
   overflow: hidden;
 }
 
-/* ✨ efecto glow */
+/* âœ¨ efecto glow */
 .top1::before {
   content: "";
   position: absolute;
@@ -336,7 +336,7 @@ button {
   animation: brillo 2.5s infinite;
 }
 
-/* 🔥 animación */
+/* ðŸ”¥ animaciÃ³n */
 @keyframes brillo {
   0% { left: -100%; }
   100% { left: 100%; }
@@ -346,7 +346,7 @@ button {
   box-shadow: 0 0 15px #ffd700, 0 0 30px #facc15;
 }
 
-/* 🥇 CAMPEÓN BRILLO PRO */
+/* ðŸ¥‡ CAMPEÃ“N BRILLO PRO */
 .top1 {
   background: linear-gradient(90deg, #ffd700, #facc15);
   color: black;
@@ -355,7 +355,7 @@ button {
   overflow: hidden;
 }
 
-/* ✨ efecto brillo animado */
+/* âœ¨ efecto brillo animado */
 .top1::before {
   content: "";
   position: absolute;
@@ -372,13 +372,13 @@ button {
   animation: brillo 2.5s infinite;
 }
 
-/* animación */
+/* animaciÃ³n */
 @keyframes brillo {
   0% { left: -100%; }
   100% { left: 100%; }
 }
 
-/* 💥 glow extra */
+/* ðŸ’¥ glow extra */
 .top1 {
   box-shadow: 0 0 15px #ffd700, 0 0 30px #facc15;
 }
@@ -432,7 +432,7 @@ button {
   transform: scale(1.02);
 }
 
-/* 🔥 SOLUCIÓN FINAL VISUAL TABLA */
+/* ðŸ”¥ SOLUCIÃ“N FINAL VISUAL TABLA */
 
 .celda {
     width: 80px;
@@ -442,19 +442,19 @@ button {
   text-align: center;
   font-weight: bold;
 
-  background: #0f172a; /* 🔥 fondo oscuro base */
+  background: #0f172a; /* ðŸ”¥ fondo oscuro base */
   color: #ffffff;
 }
 
-/* 🔥 asegura que el contenido se vea */
+/* ðŸ”¥ asegura que el contenido se vea */
 .celda span {
-  background: #1e293b !important; /* 🔥 oscuro */
+  background: #1e293b !important; /* ðŸ”¥ oscuro */
   color: #ffffff !important;
   padding: 4px 8px;
   border-radius: 6px;
 }
 
-/* 🔥 COLORES REALES */
+/* ðŸ”¥ COLORES REALES */
 .verde span {
   background: #22c55e;
   color: #fff;
@@ -471,7 +471,7 @@ button {
 }
 
 .gris span {
-  background: #334155; /* 🔥 gris oscuro visible */
+  background: #334155; /* ðŸ”¥ gris oscuro visible */
   color: #cbd5f5;
 }
 
@@ -490,7 +490,7 @@ button {
   flex: 0 0 auto;
 }
 
-/* 🔥 FORZAR COLORES TOP COMPLETOS */
+/* ðŸ”¥ FORZAR COLORES TOP COMPLETOS */
 .fila.top1 .celda {
   background: linear-gradient(90deg, #ffd700, #facc15) !important;
   color: black !important;
@@ -506,18 +506,18 @@ button {
   color: black !important;
 }
 
-/* 🔥 espacio entre columnas */
+/* ðŸ”¥ espacio entre columnas */
 .celda {
   margin: 4px;
   border-radius: 10px;
 }
 
-/* 🔥 espacio entre filas */
+/* ðŸ”¥ espacio entre filas */
 .fila {
   margin-bottom: 8px;
 }
 
-/* contenedor más ordenado */
+/* contenedor mÃ¡s ordenado */
 #tabla {
   padding: 10px;
 }
@@ -626,7 +626,7 @@ button {
 }
 
 button:hover {
-  background: #16a34a !important; /* verde más oscuro */
+  background: #16a34a !important; /* verde mÃ¡s oscuro */
 }
 
 
@@ -636,7 +636,7 @@ button:not([onclick="resetearTodo()"]):not([onclick="logout()"]) {
   color: white;
 }
 
-/* 🟢 BOTONES VERDES */
+/* ðŸŸ¢ BOTONES VERDES */
 .btn-verde {
   background: #22c55e;
   color: white;
@@ -652,7 +652,7 @@ button:not([onclick="resetearTodo()"]):not([onclick="logout()"]) {
   background: #16a34a;
 }
 
-/* 🔴 CERRAR SESIÓN */
+/* ðŸ”´ CERRAR SESIÃ“N */
 .btn-rojo {
   background: #ef4444;
   color: white;
@@ -667,7 +667,7 @@ button:not([onclick="resetearTodo()"]):not([onclick="logout()"]) {
   background: #dc2626;
 }
 
-/* 🔥 RESET */
+/* ðŸ”¥ RESET */
 .btn-reset {
   background: #ff0000;
   color: white;
@@ -1256,7 +1256,7 @@ body h1{
   font-weight:bold;
 }
 
-/* 🏅 SALON DE LA FAMA */
+/* ðŸ… SALON DE LA FAMA */
 
 .fama-card{
 
@@ -1310,7 +1310,7 @@ body h1{
   color:white;
 }
 
-/* móvil */
+/* mÃ³vil */
 @media(max-width:768px){
 
   .fama-card{
@@ -1529,7 +1529,7 @@ body h1{
   font-size:18px;
 }
 
-/* móvil */
+/* mÃ³vil */
 @media(max-width:768px){
 
   .tabla-historial th{
@@ -1626,7 +1626,7 @@ body h1{
 
 }
 
-/* 📱 RESPONSIVE TABLA */
+/* ðŸ“± RESPONSIVE TABLA */
 
 .tabla-scroll{
   width:100%;
@@ -2002,7 +2002,7 @@ body h1{
 }
 
 /* ===========================
-   APARICIÓN SUAVE DEL CONTENIDO
+   APARICIÃ“N SUAVE DEL CONTENIDO
 =========================== */
 
 #contenido{
@@ -2666,8 +2666,8 @@ to{
 }
 
 /* =====================================================
-   ⚽ QUINIELAS EL INGE
-   PANEL ADMINISTRATIVO - DISEÑO PREMIUM
+   âš½ QUINIELAS EL INGE
+   PANEL ADMINISTRATIVO - DISEÃ‘O PREMIUM
 ===================================================== */
 
 /* CONTENEDOR DEL FORMULARIO */
@@ -2912,7 +2912,7 @@ to{
 
 
 /* ==========================================
-   📱 CELULAR
+   ðŸ“± CELULAR
 ========================================== */
 @media (max-width: 600px) {
 
@@ -2964,7 +2964,7 @@ to{
 }
 
 /* =========================================
-   TOAST ADMIN - MISMO DISEÑO QUE PARTIDOS
+   TOAST ADMIN - MISMO DISEÃ‘O QUE PARTIDOS
 ========================================= */
 
 .toast {
@@ -3086,7 +3086,7 @@ to{
 
 
 /* =========================================
-   📱 ADMIN EN CELULAR
+   ðŸ“± ADMIN EN CELULAR
 ========================================= */
 
 @media (max-width: 600px) {
@@ -3114,7 +3114,7 @@ to{
 }
 
 /* ==========================================================
-   🏆 NUEVO DISEÑO ELEGANTE - QUINIELAS EL INGE
+   ðŸ† NUEVO DISEÃ‘O ELEGANTE - QUINIELAS EL INGE
    Solo afecta las tarjetas de partidos
    ========================================================== */
 
@@ -3153,10 +3153,10 @@ to{
 
 
 /* ==========================================================
-   ✨ BRILLO SUPERIOR
+   âœ¨ BRILLO SUPERIOR
    ========================================================== */
 /* ==========================================================
-   🌈 BORDE DINÁMICO SEGÚN LOS EQUIPOS
+   ðŸŒˆ BORDE DINÃMICO SEGÃšN LOS EQUIPOS
    ========================================================== */
 #partidos .partido-card::before {
 
@@ -3186,10 +3186,10 @@ to{
     pointer-events: none;
 }
 /* ==========================================================
-   🌟 BRILLO LATERAL
+   ðŸŒŸ BRILLO LATERAL
    ========================================================== */
 /* ==========================================================
-   ✨ BRILLOS DE LOS DOS EQUIPOS
+   âœ¨ BRILLOS DE LOS DOS EQUIPOS
    ========================================================== */
 
 #partidos .partido-card::after {
@@ -3251,7 +3251,7 @@ to{
 
 
 /* ==========================================================
-   🔴 EN VIVO
+   ðŸ”´ EN VIVO
    ========================================================== */
 
 #partidos .partido-card .estado.envivo {
@@ -3273,7 +3273,7 @@ to{
 
 
 /* ==========================================================
-   📅 PRÓXIMO
+   ðŸ“… PRÃ“XIMO
    ========================================================== */
 
 #partidos .partido-card .estado.futuro {
@@ -3292,7 +3292,7 @@ to{
 
 
 /* ==========================================================
-   🔒 FINALIZADO
+   ðŸ”’ FINALIZADO
    ========================================================== */
 
 #partidos .partido-card .estado.finalizado {
@@ -3311,7 +3311,7 @@ to{
 
 
 /* ==========================================================
-   ⚽ ZONA DE EQUIPOS
+   âš½ ZONA DE EQUIPOS
    ========================================================== */
 
 #partidos .partido-card .match {
@@ -3406,7 +3406,7 @@ to{
 
 
 /* ==========================================================
-   🎯 ZONA DEL MARCADOR
+   ðŸŽ¯ ZONA DEL MARCADOR
    ========================================================== */
 
 #partidos .partido-card .score {
@@ -3490,7 +3490,7 @@ to{
 
 
 /* ==========================================================
-   🕒 INFORMACIÓN INFERIOR
+   ðŸ•’ INFORMACIÃ“N INFERIOR
    ========================================================== */
 
 #partidos .partido-card .meta {
@@ -3549,7 +3549,7 @@ to{
 
 
 /* ==========================================================
-   ✨ EFECTO AL PASAR EL MOUSE
+   âœ¨ EFECTO AL PASAR EL MOUSE
    ========================================================== */
 
 #partidos .partido-card:hover {
@@ -3573,7 +3573,7 @@ to{
 
 
 /* ==========================================================
-   📱 CELULAR
+   ðŸ“± CELULAR
    ========================================================== */
 
 @media (max-width: 600px) {
@@ -3669,7 +3669,7 @@ to{
 }
 
 /* ==========================================================
-   🎨 BORDE REAL DE LOS EQUIPOS
+   ðŸŽ¨ BORDE REAL DE LOS EQUIPOS
    ========================================================== */
 
 #partidos .partido-card {
@@ -3690,4 +3690,184 @@ to{
             var(--color-visitante) 50%,
             var(--color-visitante)
         ) border-box;
+}
+/* =========================================================
+   ðŸŽ¨ PANEL ADMIN â€” BOTONES PRO
+   Solo apariencia. No modifica funciones ni estructura.
+   ========================================================= */
+
+.admin-container > .card > .form-row > button {
+  position: relative;
+  overflow: hidden;
+  min-height: 58px;
+  padding: 14px 18px !important;
+  margin-top: 10px !important;
+  margin-bottom: 10px !important;
+  border: 1px solid rgba(255,255,255,.12) !important;
+  border-radius: 15px !important;
+  color: #fff !important;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  cursor: pointer;
+  box-shadow:
+    0 8px 18px rgba(0,0,0,.22),
+    inset 0 1px 0 rgba(255,255,255,.12);
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    filter .18s ease;
+}
+
+.admin-container > .card > .form-row > button:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+  box-shadow:
+    0 12px 24px rgba(0,0,0,.30),
+    inset 0 1px 0 rgba(255,255,255,.16);
+}
+
+.admin-container > .card > .form-row > button:active {
+  transform: translateY(0) scale(.985);
+}
+
+/* Brillo superior */
+.admin-container > .card > .form-row > button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 80%;
+  height: 100%;
+  background: linear-gradient(
+    105deg,
+    transparent,
+    rgba(255,255,255,.18),
+    transparent
+  );
+  transform: skewX(-20deg);
+  transition: left .55s ease;
+  pointer-events: none;
+}
+
+.admin-container > .card > .form-row > button:hover::before {
+  left: 135%;
+}
+
+/* ðŸ“… Ver Jornada */
+.admin-container > .card > .form-row > button[onclick="abrirPartidos()"] {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  border-color: rgba(96,165,250,.45) !important;
+  box-shadow:
+    0 8px 18px rgba(37,99,235,.25),
+    inset 0 1px 0 rgba(255,255,255,.15);
+}
+
+/* âš½ Crear Partido */
+.admin-container > .card > .form-row > button[onclick="crearPartido()"] {
+  background: linear-gradient(135deg, #0891b2, #0e7490) !important;
+  border-color: rgba(34,211,238,.40) !important;
+  box-shadow:
+    0 8px 18px rgba(8,145,178,.24),
+    inset 0 1px 0 rgba(255,255,255,.15);
+}
+
+/* ðŸ“¥ Excel */
+.admin-container > .card > .form-row > button[onclick="descargarExcelAdmin()"] {
+  background: linear-gradient(135deg, #7c3aed, #5b21b6) !important;
+  border-color: rgba(167,139,250,.42) !important;
+  box-shadow:
+    0 8px 18px rgba(124,58,237,.24),
+    inset 0 1px 0 rgba(255,255,255,.15);
+}
+
+/* ðŸ“· Imagen */
+.admin-container > .card > .form-row > button[onclick="descargarImagenTabla()"] {
+  background: linear-gradient(135deg, #9333ea, #6b21a8) !important;
+  border-color: rgba(192,132,252,.42) !important;
+  box-shadow:
+    0 8px 18px rgba(147,51,234,.24),
+    inset 0 1px 0 rgba(255,255,255,.15);
+}
+
+/* ðŸ“ Editar Quiniela */
+.admin-container > .card > .form-row > button[onclick*="editar-quiniela.html"] {
+  background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  border-color: rgba(253,186,116,.45) !important;
+  color: #111827 !important;
+  box-shadow:
+    0 8px 18px rgba(245,158,11,.23),
+    inset 0 1px 0 rgba(255,255,255,.20);
+}
+
+/* ðŸ” Captura Admin */
+.admin-container > .card > .form-row > button[onclick*="captura-admin.html"] {
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9) !important;
+  border-color: rgba(196,181,253,.48) !important;
+  box-shadow:
+    0 8px 22px rgba(139,92,246,.28),
+    inset 0 1px 0 rgba(255,255,255,.16);
+}
+
+/* ðŸ‘¥ Participantes */
+.admin-container > .card > .form-row > button[onclick*="participantes.html"] {
+  background: linear-gradient(135deg, #0f766e, #115e59) !important;
+  border-color: rgba(45,212,191,.38) !important;
+  box-shadow:
+    0 8px 18px rgba(15,118,110,.24),
+    inset 0 1px 0 rgba(255,255,255,.14);
+}
+
+/* ðŸ’³ Control de Pagos */
+.admin-container > .card > .form-row > button[onclick*="estado-quiniela.html"] {
+  background: linear-gradient(135deg, #16a34a, #15803d) !important;
+  border-color: rgba(74,222,128,.40) !important;
+  box-shadow:
+    0 8px 18px rgba(22,163,74,.24),
+    inset 0 1px 0 rgba(255,255,255,.14);
+}
+
+/* ðŸ“² Recordatorios */
+.admin-container > .card > .form-row > button[onclick*="recordatorios.html"] {
+  background: linear-gradient(135deg, #0284c7, #0369a1) !important;
+  border-color: rgba(56,189,248,.42) !important;
+  box-shadow:
+    0 8px 18px rgba(2,132,199,.24),
+    inset 0 1px 0 rgba(255,255,255,.14);
+}
+
+/* ðŸšª Cerrar sesiÃ³n */
+.admin-container > .card > .form-row > button.btn-rojo[onclick="logout()"] {
+  background: linear-gradient(135deg, #ef4444, #b91c1c) !important;
+  border-color: rgba(252,165,165,.38) !important;
+  box-shadow:
+    0 8px 18px rgba(239,68,68,.24),
+    inset 0 1px 0 rgba(255,255,255,.14);
+}
+
+/* âš ï¸ Reset */
+.admin-container > .card > .form-row > button.btn-reset[onclick="resetearTodo()"] {
+  background: linear-gradient(135deg, #991b1b, #450a0a) !important;
+  border-color: rgba(248,113,113,.36) !important;
+  box-shadow:
+    0 8px 20px rgba(127,29,29,.34),
+    inset 0 1px 0 rgba(255,255,255,.10);
+}
+
+/* Brillo especial de Captura Admin */
+.admin-container > .card > .form-row > button[onclick*="captura-admin.html"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+  pointer-events: none;
+}
+
+@media (max-width: 600px) {
+  .admin-container > .card > .form-row > button {
+    min-height: 54px;
+    font-size: 16px;
+    border-radius: 14px !important;
+  }
 }
