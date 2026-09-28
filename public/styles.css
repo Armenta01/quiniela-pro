@@ -4279,11 +4279,12 @@ to{
 }
 
 .top4-card.top1::before {
-    background: linear-gradient(
-        180deg,
-        #fde047,
-        #eab308
-    );
+    background: #fde047;
+    left: 0;
+    top: 10px;
+    bottom: 10px;
+    width: 4px;
+    position: absolute;
 }
 
 .top4-card.top1 .top4-puntos {
