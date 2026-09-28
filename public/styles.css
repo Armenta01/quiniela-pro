@@ -4403,7 +4403,7 @@ to{
     top: 10px;
     bottom: 10px;
 
-    width: 2px;
+    width: 4px;
 
     border-radius: 0 5px 5px 0;
 
@@ -4411,7 +4411,7 @@ to{
 
     box-shadow: none;
 
-    z-index: 2;
+    z-index: -2;
 }
 
 /* Eliminar cualquier segunda línea que pudiera estar apareciendo */
