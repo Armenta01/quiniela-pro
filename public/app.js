@@ -160,7 +160,39 @@ function obtenerColorEquipo(nombre) {
 
     "NECAXA": "#E53935",
     "LEON": "#8BC34A",
-    "LEÓN": "#8BC34A"
+    "LEÓN": "#8BC34A",
+
+
+
+
+    "BÉLGICA": "#a78c04",
+    "TURQUÍA": "#D62828",
+
+    "FRANCIA": "#022f72",
+    "ITALIA": "#246f94",
+
+    "COLOMBIA": "#f6f202",
+    "PARAGUAY": "#ea0808",
+
+
+    "CROACIA": "#ea0808",
+    "INGLATERRA": "#1a5c9f",
+
+    "CANADÁ": "#9f1919",
+    "PERÚ": "#ea0808",
+
+    "ESPAÑA": "#ea0808",
+    "REP. CHEQUIA": "#9f1919",
+
+    "ESTADOS UNIDOS": "#ffffff",
+    "MÉXICO": "#084b15",
+
+     "PORTUGAL": "#b80d0d",
+    "NORUEGA": "#9e9236",
+
+    "GRECIA": "#16689f",
+    "ALEMANIA": "#9e9236"
+
 
   };
 
