@@ -4726,3 +4726,332 @@ body {
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
 }
 
+/* =========================================
+   TABLA GENERAL - VISTA COMPACTA
+   ========================================= */
+
+#tabla {
+  width: 100%;
+  max-width: 100%;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+/* Encabezado de partidos */
+.fila.header {
+  margin-bottom: 25px !important;
+  min-height: 0 !important;
+  height: auto !important;
+  padding: 0 !important;
+  gap: 4px !important;
+}
+
+/* Columnas generales */
+.posicion {
+  width: 65px !important;
+  min-width: 65px !important;
+}
+
+.jugador {
+  width: 120px !important;
+  min-width: 120px !important;
+}
+
+.puntos {
+  width: 60px !important;
+  min-width: 60px !important;
+}
+
+/* Partidos */
+.partido-header {
+  width: 75px !important;
+  min-width: 75px !important;
+  min-height: 105px !important;
+  height: 105px !important;
+
+  gap: 2px !important;
+  padding: 5px !important;
+}
+
+/* Logos */
+.logo-equipo {
+  width: 24px !important;
+  height: 24px !important;
+}
+
+/* Nombres de equipos */
+.nombre-equipo {
+  font-size: 10px !important;
+  line-height: 1 !important;
+}
+
+/* Marcador */
+.resultado-header {
+  font-size: 15px !important;
+  line-height: 1 !important;
+}
+
+/* Pos / jugador / puntos */
+.header .posicion,
+.header .jugador,
+.header .puntos {
+  padding-top: 0 !important;
+  height: 105px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Filas de jugadores */
+#tabla .fila:not(.header) {
+  margin-top: 5px !important;
+  margin-bottom: 5px !important;
+}
+
+/* Celdas */
+.celda {
+  min-width: 70px !important;
+  padding: 8px 5px !important;
+  margin: 2px !important;
+  border-radius: 8px !important;
+}
+
+/* Posición */
+.fila .posicion {
+  font-size: 16px !important;
+}
+
+/* Nombre jugador */
+.fila .jugador {
+  font-size: 14px !important;
+}
+
+/* Puntos */
+.fila .puntos {
+  font-size: 15px !important;
+}
+
+/* En computadora */
+@media (min-width: 769px) {
+
+  .tabla-scroll {
+    overflow-x: hidden !important;
+  }
+
+  #tabla {
+    transform: scale(0.92);
+    transform-origin: top center;
+    width: 108.7%;
+    margin-left: -4.35%;
+  }
+
+}
+
+/* =========================================
+   TABLA GENERAL - CELULAR SIN SCROLL LATERAL
+   ========================================= */
+
+@media (max-width: 768px) {
+
+  html,
+  body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden !important;
+  }
+
+  .tabla-scroll {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+  }
+
+  #tabla {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 4px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  /* =========================
+     FILA PRINCIPAL
+     ========================= */
+
+  #tabla .fila {
+    width: 100% !important;
+    max-width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      38px
+      minmax(75px, 1fr)
+      repeat(5, minmax(38px, 1fr))
+      42px;
+
+    gap: 3px !important;
+
+    box-sizing: border-box !important;
+  }
+
+  /* =========================
+     CELDAS
+     ========================= */
+
+  #tabla .celda {
+    min-width: 0 !important;
+    width: 100% !important;
+
+    margin: 0 !important;
+    padding: 7px 2px !important;
+
+    box-sizing: border-box !important;
+
+    border-radius: 7px !important;
+
+    overflow: hidden !important;
+  }
+
+  /* =========================
+     POSICIÓN
+     ========================= */
+
+  #tabla .posicion {
+    width: 38px !important;
+    min-width: 0 !important;
+
+    font-size: 13px !important;
+  }
+
+  /* =========================
+     JUGADOR
+     ========================= */
+
+  #tabla .jugador {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    font-size: 12px !important;
+
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  /* =========================
+     PUNTOS
+     ========================= */
+
+  #tabla .puntos {
+    width: 42px !important;
+    min-width: 0 !important;
+
+    font-size: 13px !important;
+  }
+
+  /* =========================
+     ENCABEZADO
+     ========================= */
+
+  #tabla .fila.header {
+
+    margin-bottom: 8px !important;
+
+    min-height: 0 !important;
+    height: auto !important;
+
+    padding: 0 !important;
+
+    gap: 3px !important;
+  }
+
+  /* =========================
+     PARTIDOS
+     ========================= */
+
+  #tabla .partido-header {
+
+    width: 100% !important;
+    min-width: 0 !important;
+
+    min-height: 75px !important;
+    height: 75px !important;
+
+    padding: 3px 1px !important;
+
+    gap: 2px !important;
+
+    box-sizing: border-box !important;
+  }
+
+  /* =========================
+     OCULTAR NOMBRES
+     ========================= */
+
+  #tabla .nombre-equipo {
+    display: none !important;
+  }
+
+  /* =========================
+     LOGOS
+     ========================= */
+
+  #tabla .logo-equipo {
+
+    width: 25px !important;
+    height: 25px !important;
+
+    object-fit: contain !important;
+
+    margin: 2px auto !important;
+  }
+
+  /* =========================
+     MARCADOR
+     ========================= */
+
+  #tabla .resultado-header {
+
+    font-size: 13px !important;
+    line-height: 1 !important;
+
+    height: 18px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* =========================
+     POS / JUGADOR / PUNTOS
+     ========================= */
+
+  #tabla .header .posicion,
+  #tabla .header .jugador,
+  #tabla .header .puntos {
+
+    padding-top: 0 !important;
+
+    height: 75px !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* =========================
+     FILAS DE JUGADORES
+     ========================= */
+
+  #tabla .fila:not(.header) {
+
+    margin-top: 4px !important;
+    margin-bottom: 4px !important;
+  }
+
+}
