@@ -5725,42 +5725,54 @@ body {
 
 }
 
+
 /* =========================================================
-   MENU + TABLA + JORNADA
+   BARRA SUPERIOR
+   MENU A LA IZQUIERDA
+   TABLA + JORNADA CENTRADOS
    ========================================================= */
 
 .top-bar {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 20px;
-  flex-wrap: wrap;
+  width: 100%;
 }
 
+/* MENU */
 .top-bar .menu-btn {
-  position: static !important;
-  margin: 0;
-  flex-shrink: 0;
+  position: absolute !important;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%) !important;
+
+  margin: 0 !important;
+  z-index: 20;
 }
 
 /* CELULAR */
 @media (max-width: 600px) {
 
   .top-bar {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    flex-wrap: nowrap;
     width: 100%;
   }
 
   .top-bar .menu-btn {
-    position: static !important;
-    top: auto !important;
-    left: auto !important;
+    position: absolute !important;
+
+    left: 10px !important;
     right: auto !important;
-    transform: none !important;
+    top: 50% !important;
+
+    transform: translateY(-50%) !important;
+
     margin: 0 !important;
   }
 
