@@ -1401,59 +1401,41 @@ document.addEventListener("input", function (e) {
 /* =========================================================
    VER MI POSICIÓN
    ========================================================= */
-
 function verMiPosicion() {
 
-  // Primero intenta recuperar el nombre guardado
-  let nombre = localStorage.getItem("miNombre");
+  // SOLO toma el nombre guardado en ESTE dispositivo
+  const nombreGuardado =
+    localStorage.getItem("miNombre");
 
-  // Si no existe, intenta usar lo que está escrito
-  // en el buscador
-  if (!nombre || !nombre.trim()) {
-
-    const buscador =
-      document.getElementById("buscarJugador");
-
-    if (buscador && buscador.value.trim()) {
-      nombre = buscador.value.trim();
-    }
-
-  }
-
-  // Si todavía no tenemos nombre
-  if (!nombre || !nombre.trim()) {
+  if (!nombreGuardado || !nombreGuardado.trim()) {
 
     mostrarMensaje(
       "Nombre no encontrado",
-      "Primero escribe tu nombre en el buscador o guarda una quiniela.",
+      "En este dispositivo todavía no hay una quiniela guardada.",
       "👤"
     );
 
     return;
   }
 
-  nombre = nombre
-    .trim()
-    .toLowerCase();
+  const nombre =
+    nombreGuardado
+      .trim()
+      .toLowerCase();
 
-  const filas = document.querySelectorAll(
-    "#tabla .fila"
-  );
+  const filas =
+    document.querySelectorAll(
+      "#tabla .fila:not(.header)"
+    );
 
   let encontrada = null;
 
   filas.forEach(function (fila) {
 
-    if (fila.classList.contains("header")) {
-      return;
-    }
-
     const jugador =
       fila.querySelector(".jugador");
 
-    if (!jugador) {
-      return;
-    }
+    if (!jugador) return;
 
     const nombreJugador =
       jugador.textContent
@@ -1469,48 +1451,31 @@ function verMiPosicion() {
 
   });
 
-  // No encontró al jugador
   if (!encontrada) {
 
     mostrarMensaje(
-      "Sin resultados",
-      "No encontramos ese nombre en la tabla de esta jornada.",
+      "Participante no encontrado",
+      "Tu nombre está guardado en este dispositivo, pero no aparece en la tabla de esta jornada.",
       "🔎"
     );
 
     return;
   }
 
-  // Mostrar nuevamente todas las filas
-  filas.forEach(function (fila) {
-
-    if (!fila.classList.contains("header")) {
-      fila.style.removeProperty("display");
-    }
-
-  });
-
-  // Limpiar buscador
-  const buscador =
-    document.getElementById("buscarJugador");
-
-  if (buscador) {
-    buscador.value = "";
-  }
-
-  // Llevar al jugador al centro de la pantalla
+  // Llevar directamente a MI participante
   encontrada.scrollIntoView({
     behavior: "smooth",
     block: "center"
   });
 
-  // Resaltar
+  // Borde verde
   encontrada.style.boxShadow =
-    "0 0 25px #22c55e";
+    "0 0 0 3px #22c55e, 0 0 20px #22c55e";
 
   encontrada.style.transition =
     "box-shadow 0.3s ease";
 
+  // Quitar resaltado después de 4 segundos
   setTimeout(function () {
 
     encontrada.style.boxShadow = "";
