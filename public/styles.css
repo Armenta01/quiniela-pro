@@ -4633,11 +4633,7 @@ to{
     z-index: 0;
 }
 
-/* Todo el contenido queda encima */
-#contenido > *:not(.fondo-logos) {
-    position: relative;
-    z-index: 1;
-}
+
 
 /* =====================================================
    FONDO DE LOGOS - VERSIÓN FINAL
