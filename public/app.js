@@ -1350,13 +1350,12 @@ function toggleMenu() {
 
 /* =========================================================
    BUSCADOR DE PARTICIPANTES
+   FUNCIONA EN PC Y CELULAR
    ========================================================= */
 
 document.addEventListener("input", function (e) {
 
-  if (e.target.id !== "buscarJugador") {
-    return;
-  }
+  if (e.target.id !== "buscarJugador") return;
 
   const texto = e.target.value
     .trim()
@@ -1366,7 +1365,7 @@ document.addEventListener("input", function (e) {
     "#tabla .fila:not(.header)"
   );
 
-  filas.forEach(function (fila) {
+  filas.forEach(fila => {
 
     const jugador = fila.querySelector(".jugador");
 
@@ -1376,10 +1375,15 @@ document.addEventListener("input", function (e) {
       .trim()
       .toLowerCase();
 
-    fila.style.display =
-      texto === "" || nombre.includes(texto)
-        ? ""
-        : "none";
+    if (texto === "" || nombre.includes(texto)) {
+
+      fila.classList.remove("fila-oculta");
+
+    } else {
+
+      fila.classList.add("fila-oculta");
+
+    }
 
   });
 
@@ -1387,7 +1391,8 @@ document.addEventListener("input", function (e) {
 
 function verMiPosicion() {
 
-  const nombreGuardado = localStorage.getItem("miNombre");
+  const nombreGuardado =
+    localStorage.getItem("miNombre");
 
   if (!nombreGuardado || !nombreGuardado.trim()) {
 
@@ -1400,25 +1405,29 @@ function verMiPosicion() {
     return;
   }
 
-  const nombre = nombreGuardado
-    .trim()
-    .toLowerCase();
+  const nombre =
+    nombreGuardado
+      .trim()
+      .toLowerCase();
 
-  const filas = document.querySelectorAll(
-    "#tabla .fila:not(.header)"
-  );
+  const filas =
+    document.querySelectorAll(
+      "#tabla .fila:not(.header)"
+    );
 
   let encontrada = null;
 
   filas.forEach(function(fila) {
 
-    const jugador = fila.querySelector(".jugador");
+    const jugador =
+      fila.querySelector(".jugador");
 
     if (!jugador) return;
 
-    const nombreJugador = jugador.textContent
-      .trim()
-      .toLowerCase();
+    const nombreJugador =
+      jugador.textContent
+        .trim()
+        .toLowerCase();
 
     if (nombreJugador === nombre) {
       encontrada = fila;
@@ -1437,16 +1446,43 @@ function verMiPosicion() {
     return;
   }
 
-  /* Quitar resaltado anterior */
-  document.querySelectorAll(".mi-posicion-activa")
+  /* =========================================
+     MOSTRAR TODAS LAS FILAS
+     ========================================= */
+
+  filas.forEach(function(fila) {
+    fila.classList.remove("fila-oculta");
+  });
+
+
+  /* =========================================
+     QUITAR RESALTADO ANTERIOR
+     ========================================= */
+
+  document
+    .querySelectorAll(".mi-posicion-activa")
     .forEach(function(fila) {
-      fila.classList.remove("mi-posicion-activa");
+
+      fila.classList.remove(
+        "mi-posicion-activa"
+      );
+
     });
 
-  /* Resaltar */
-  encontrada.classList.add("mi-posicion-activa");
 
-  /* Llevar al jugador al centro */
+  /* =========================================
+     RESALTAR MI FILA
+     ========================================= */
+
+  encontrada.classList.add(
+    "mi-posicion-activa"
+  );
+
+
+  /* =========================================
+     IR A MI POSICIÓN
+     ========================================= */
+
   setTimeout(function() {
 
     encontrada.scrollIntoView({
@@ -1457,10 +1493,16 @@ function verMiPosicion() {
 
   }, 100);
 
-  /* Quitar resaltado después de 5 segundos */
+
+  /* =========================================
+     QUITAR RESALTADO
+     ========================================= */
+
   setTimeout(function() {
 
-    encontrada.classList.remove("mi-posicion-activa");
+    encontrada.classList.remove(
+      "mi-posicion-activa"
+    );
 
   }, 5000);
 
