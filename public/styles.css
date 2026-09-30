@@ -307,9 +307,8 @@ button {
 .header {
   background: #1e3a5f;
   color: white;
-   position: sticky;
-  top: 0;
-  z-index: 100;
+  position: static;
+  z-index: 1;
 }
 
 
@@ -1436,21 +1435,20 @@ body h1{
 }
 }
 
-/* ========================= */
-/* ENCABEZADO DE PARTIDOS */
-/* ========================= */
+/* =========================
+   ENCABEZADO DE PARTIDOS
+   ========================= */
 
 .fila.header{
-
-  position: sticky;
+  position: static !important;
+  z-index: auto !important;
 
   align-items:flex-start;
-  z-index: 9999;
-  margin-bottom:130px !important;
 
-  background:transparent;
-  align-items:flex-start;
+  /* Sin espacio artificial debajo */
+  margin-bottom: 8px !important;
 
+  background: transparent;
 }
 
 .partido-header{
@@ -5398,6 +5396,25 @@ body {
     line-height: 1 !important;
 
     white-space: nowrap !important;
+  }
+
+}
+
+/* ==========================================
+   📱 TABLA MÓVIL
+   LA CABECERA NO SE QUEDA FIJA
+   ========================================== */
+
+@media (max-width: 768px) {
+
+  #tabla .encabezado,
+  #tabla .tabla-header,
+  #tabla .fila-header,
+  #tabla .partido-header {
+    position: static !important;
+    top: auto !important;
+    bottom: auto !important;
+    z-index: auto !important;
   }
 
 }
