@@ -1348,7 +1348,6 @@ function toggleMenu() {
     .toggle("activo");
 }
 
-
 /* =========================================================
    BUSCADOR DE PARTICIPANTES
    ========================================================= */
@@ -1364,34 +1363,23 @@ document.addEventListener("input", function (e) {
     .toLowerCase();
 
   const filas = document.querySelectorAll(
-    "#tabla .fila"
+    "#tabla .fila:not(.header)"
   );
 
   filas.forEach(function (fila) {
 
-    // Nunca ocultar el encabezado
-    if (fila.classList.contains("header")) {
-      return;
-    }
-
     const jugador = fila.querySelector(".jugador");
 
-    if (!jugador) {
-      return;
-    }
+    if (!jugador) return;
 
     const nombre = jugador.textContent
       .trim()
       .toLowerCase();
 
-    if (
-      texto === "" ||
-      nombre.includes(texto)
-    ) {
-      fila.style.removeProperty("display");
-    } else {
-      fila.style.display = "none";
-    }
+    fila.style.display =
+      texto === "" || nombre.includes(texto)
+        ? ""
+        : "none";
 
   });
 
@@ -1401,9 +1389,9 @@ document.addEventListener("input", function (e) {
 /* =========================================================
    VER MI POSICIÓN
    ========================================================= */
+
 function verMiPosicion() {
 
-  // SOLO toma el nombre guardado en ESTE dispositivo
   const nombreGuardado =
     localStorage.getItem("miNombre");
 
@@ -1419,9 +1407,7 @@ function verMiPosicion() {
   }
 
   const nombre =
-    nombreGuardado
-      .trim()
-      .toLowerCase();
+    nombreGuardado.trim().toLowerCase();
 
   const filas =
     document.querySelectorAll(
@@ -1462,24 +1448,19 @@ function verMiPosicion() {
     return;
   }
 
-  // Llevar directamente a MI participante
   encontrada.scrollIntoView({
     behavior: "smooth",
     block: "center"
   });
 
-  // Borde verde
   encontrada.style.boxShadow =
     "0 0 0 3px #22c55e, 0 0 20px #22c55e";
 
   encontrada.style.transition =
     "box-shadow 0.3s ease";
 
-  // Quitar resaltado después de 4 segundos
   setTimeout(function () {
-
     encontrada.style.boxShadow = "";
-
   }, 4000);
 
 }
