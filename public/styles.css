@@ -4590,3 +4590,41 @@ to{
     }
 
 }
+
+/* =====================================================
+   FONDO DE LOGOS - QUINIELAS EL INGE
+   ===================================================== */
+
+body {
+    position: relative;
+    background: #0b162d;
+}
+
+/* Patrón de logos */
+body::before {
+    content: "";
+
+    position: fixed;
+    inset: 0;
+
+    z-index: -1;
+
+    background-color: #0b162d;
+
+    background-image: url("quinielasinge.png");
+
+    background-repeat: repeat;
+
+    background-size: 190px auto;
+
+    background-position: center center;
+
+    opacity: 0.055;
+
+    pointer-events: none;
+}
+
+#contenido {
+    position: relative;
+    z-index: 1;
+}
