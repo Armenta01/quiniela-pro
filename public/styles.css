@@ -4601,21 +4601,29 @@ to{
     isolation: isolate;
 }
 
-/* Patrón de logos detrás de todo el contenido */
-#contenido::before {
-    content: "";
 
-    position: absolute;
-    inset: 0;
+/* =====================================================
+   FONDO DE LOGOS - QUINIELAS EL INGE
+   ===================================================== */
 
-    background-image: url("quinielasinge.png");
-    background-repeat: repeat;
-    background-size: 190px auto;
-    background-position: center top;
+#contenido {
+    background-color: #0b162d !important;
 
-    opacity: 0.10;
+    background-image: url("quinielasinge.png") !important;
 
-    pointer-events: none;
+    background-repeat: repeat !important;
 
-    z-index: -1;
+    background-size: 190px auto !important;
+
+    background-position: center top !important;
+
+    background-attachment: scroll !important;
+}
+
+#contenido {
+    background-color: #0b162d !important;
+    background-image: url("quinielasinge.png") !important;
+    background-repeat: repeat !important;
+    background-size: 190px auto !important;
+    background-position: center top !important;
 }
