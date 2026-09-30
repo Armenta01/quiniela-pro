@@ -159,16 +159,18 @@
      onclick="toggleMenu()">
 </div>
 
-<header class="header">
-<div class="menu-btn" onclick="toggleMenu()">
-  ☰
-</div>
-</header>
-
 <div class="top-bar">
-  <button onclick="irTabla()">📊 Ver Tabla</button>
+
+  <div class="menu-btn" onclick="toggleMenu()">
+    ☰
+  </div>
+
+  <button onclick="irTabla()">
+    📊 Ver Tabla
+  </button>
 
   <select id="jornadaSelect" onchange="cambiarJornada()"></select>
+
 </div>
 
 <div id="estadoQuiniela" class="estado"></div>
