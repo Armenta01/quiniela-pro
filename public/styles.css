@@ -4595,19 +4595,19 @@ to{
    FONDO DE LOGOS - QUINIELAS EL INGE
    ===================================================== */
 
+html,
 body {
-    position: relative;
+    margin: 0;
+    min-height: 100%;
     background: #0b162d;
 }
 
-/* Patrón de logos detrás de todo el contenido */
+/* Capa de logos */
 body::before {
     content: "";
 
     position: fixed;
     inset: 0;
-
-    z-index: 0;
 
     background-color: #0b162d;
     background-image: url("quinielasinge.png");
@@ -4616,13 +4616,15 @@ body::before {
     background-size: 190px auto;
     background-position: center center;
 
-    opacity: 0.055;
+    opacity: 0.15;
 
     pointer-events: none;
+
+    z-index: 0;
 }
 
-/* Todo el contenido queda por encima */
-#contenido {
+/* Todo lo de la página encima del patrón */
+body > * {
     position: relative;
     z-index: 1;
 }
