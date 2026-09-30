@@ -4429,3 +4429,99 @@ to{
     content: none !important;
     display: none !important;
 }
+
+/* ==========================================
+   LOGOS LATERALES ANIMADOS
+   QUINIELAS EL INGE
+   ========================================== */
+
+.logos-lateral {
+    position: fixed;
+
+    /* LADO IZQUIERDO */
+    left: 8px;
+    top: 0;
+
+    width: 75px;
+    height: 100vh;
+
+    overflow: hidden;
+
+    /* Por encima del fondo,
+       pero debajo de elementos importantes */
+    z-index: 10;
+
+    pointer-events: none;
+}
+
+
+/* CADA LOGO */
+.logos-lateral img {
+    position: absolute;
+
+    width: 105px;
+    height: auto;
+
+    left: -17px;
+
+    /*
+      Giramos el logo como
+      en tu imagen de referencia
+    */
+    transform: rotate(90deg);
+
+    animation-name: bajarLogo;
+    animation-duration: 14s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+
+/* ==========================================
+   SEPARACIÓN ENTRE LOS LOGOS
+   ========================================== */
+
+.logos-lateral img:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.logos-lateral img:nth-child(2) {
+    animation-delay: -2s;
+}
+
+.logos-lateral img:nth-child(3) {
+    animation-delay: -4s;
+}
+
+.logos-lateral img:nth-child(4) {
+    animation-delay: -6s;
+}
+
+.logos-lateral img:nth-child(5) {
+    animation-delay: -8s;
+}
+
+.logos-lateral img:nth-child(6) {
+    animation-delay: -10s;
+}
+
+.logos-lateral img:nth-child(7) {
+    animation-delay: -12s;
+}
+
+
+/* ==========================================
+   MOVIMIENTO HACIA ABAJO
+   ========================================== */
+
+@keyframes bajarLogo {
+
+    0% {
+        top: -150px;
+    }
+
+    100% {
+        top: 100vh;
+    }
+
+}
