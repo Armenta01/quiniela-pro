@@ -1348,11 +1348,12 @@ function toggleMenu() {
     .toggle("activo");
 }
 
+
 /* =========================================================
-   BUSCADOR DE PARTICIPANTES
+   BUSCADOR Y MI POSICIÓN
    ========================================================= */
 
-document.addEventListener("input", function(e) {
+document.addEventListener("input", function (e) {
 
   if (e.target.id !== "buscarJugador") return;
 
@@ -1366,20 +1367,15 @@ document.addEventListener("input", function(e) {
 
   filas.forEach(fila => {
 
-    const jugador =
-      fila.querySelector(".jugador");
+    const jugador = fila.querySelector(".jugador");
 
     if (!jugador) return;
 
-    const nombreJugador =
-      jugador.textContent
-        .trim()
-        .toLowerCase();
+    const nombreJugador = jugador.textContent
+      .trim()
+      .toLowerCase();
 
-    if (
-      texto === "" ||
-      nombreJugador.includes(texto)
-    ) {
+    if (texto === "" || nombreJugador.includes(texto)) {
       fila.style.removeProperty("display");
     } else {
       fila.style.display = "none";
@@ -1390,19 +1386,11 @@ document.addEventListener("input", function(e) {
 });
 
 
-/* =========================================================
-   VER MI POSICIÓN
-   ========================================================= */
-
 function verMiPosicion() {
 
-  const nombreGuardado =
-    localStorage.getItem("miNombre");
+  const nombreGuardado = localStorage.getItem("miNombre");
 
-  if (
-    !nombreGuardado ||
-    !nombreGuardado.trim()
-  ) {
+  if (!nombreGuardado || !nombreGuardado.trim()) {
 
     mostrarMensaje(
       "Nombre no encontrado",
@@ -1413,37 +1401,53 @@ function verMiPosicion() {
     return;
   }
 
-  const nombre =
-    nombreGuardado
-      .trim()
-      .toLowerCase();
+  const nombre = nombreGuardado
+    .trim()
+    .toLowerCase();
 
-  const filas =
-    document.querySelectorAll(
-      "#tabla .fila:not(.header)"
-    );
+  const filas = document.querySelectorAll(
+    "#tabla .fila:not(.header)"
+  );
 
   let encontrada = null;
 
   filas.forEach(fila => {
 
-    const jugador =
-      fila.querySelector(".jugador");
+    const jugador = fila.querySelector(".jugador");
 
     if (!jugador) return;
 
-    const nombreJugador =
-      jugador.textContent
-        .trim()
-        .toLowerCase();
+    const nombreJugador = jugador.textContent
+      .trim()
+      .toLowerCase();
 
-    if (
-      nombreJugador.includes(nombre)
-    ) {
+    if (nombreJugador === nombre) {
       encontrada = fila;
     }
 
   });
+
+  /* Si no encontró coincidencia exacta,
+     intenta encontrarla dentro del nombre */
+  if (!encontrada) {
+
+    filas.forEach(fila => {
+
+      const jugador = fila.querySelector(".jugador");
+
+      if (!jugador || encontrada) return;
+
+      const nombreJugador = jugador.textContent
+        .trim()
+        .toLowerCase();
+
+      if (nombreJugador.includes(nombre)) {
+        encontrada = fila;
+      }
+
+    });
+
+  }
 
   if (!encontrada) {
 
@@ -1456,23 +1460,18 @@ function verMiPosicion() {
     return;
   }
 
-  /* Quitar cualquier filtro del buscador */
-  const buscador =
-    document.getElementById("buscarJugador");
+  /* Quitar búsqueda */
+  const buscador = document.getElementById("buscarJugador");
 
   if (buscador) {
-
     buscador.value = "";
-
-    document
-      .querySelectorAll("#tabla .fila:not(.header)")
-      .forEach(fila => {
-        fila.style.removeProperty("display");
-      });
-
   }
 
-  /* Llevar al participante al centro */
+  filas.forEach(fila => {
+    fila.style.removeProperty("display");
+  });
+
+  /* Llevar al jugador al centro */
   encontrada.scrollIntoView({
     behavior: "smooth",
     block: "center"
@@ -1486,9 +1485,7 @@ function verMiPosicion() {
     "box-shadow 0.3s ease";
 
   setTimeout(() => {
-
     encontrada.style.boxShadow = "";
-
   }, 4000);
 
 }
