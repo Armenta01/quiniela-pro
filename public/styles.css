@@ -4638,3 +4638,43 @@ to{
     position: relative;
     z-index: 1;
 }
+
+/* =====================================================
+   FONDO DE LOGOS - VERSIÓN FINAL
+   ===================================================== */
+
+#contenido {
+    position: relative !important;
+    isolation: isolate !important;
+    background: #0b162d !important;
+}
+
+/* Capa del patrón */
+#contenido .fondo-logos {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+
+    width: 100% !important;
+    min-height: 100% !important;
+
+    background-color: #0b162d !important;
+    background-image: url("/quinielasinge.png") !important;
+    background-repeat: repeat !important;
+    background-size: 190px auto !important;
+    background-position: center top !important;
+
+    opacity: 0.50 !important;
+
+    pointer-events: none !important;
+
+    z-index: 0 !important;
+}
+
+/* Todo lo demás encima */
+#contenido > *:not(.fondo-logos) {
+    position: relative;
+    z-index: 1;
+}
