@@ -1347,29 +1347,37 @@ function toggleMenu() {
     .classList
     .toggle("activo");
 }
+document.addEventListener("input", function(e) {
 
-document.addEventListener("input", function(e){
+  if (e.target.id !== "buscarJugador") return;
 
-  if(e.target.id !== "buscarJugador") return;
+  const texto = e.target.value
+    .trim()
+    .toLowerCase();
 
-  const texto = e.target.value.toLowerCase();
+  document.querySelectorAll("#tabla .fila").forEach(fila => {
 
-  document.querySelectorAll(".fila").forEach(fila => {
-
-    if(fila.classList.contains("header")) return;
+    // No ocultar el encabezado
+    if (fila.classList.contains("header")) return;
 
     const jugador =
       fila.querySelector(".jugador")
       ?.innerText
+      .trim()
       .toLowerCase() || "";
 
-    fila.style.display =
-      jugador.includes(texto)
-      ? "flex"
-      : "none";
+    if (texto === "") {
+      fila.style.display = "";
+    } else if (jugador.includes(texto)) {
+      fila.style.display = "";
+    } else {
+      fila.style.display = "none";
+    }
+
   });
 
 });
+
 
 function verMiPosicion(){
 
