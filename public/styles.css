@@ -1721,59 +1721,218 @@ body h1{
 
 }
 
-/* ðŸ“± RESPONSIVE TABLA */
+/* =========================================
+   📱 TABLA RESPONSIVA - UNA SOLA PANTALLA
+   ========================================= */
 
 .tabla-scroll{
   width:100%;
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
+  max-width:100%;
+  overflow-x:hidden;
 }
+
+
+/* =========================================
+   CELULAR
+   ========================================= */
 
 @media (max-width:768px){
 
-  .fila{
-    min-width:max-content;
+  #tabla{
+    width:100%;
+    max-width:100%;
+    overflow:hidden;
+    padding:0 5px;
+    box-sizing:border-box;
   }
 
-  .celda{
-    min-width:45px;
-    padding:6px 4px;
-    font-size:12px;
+  /*
+     La tabla se adapta automáticamente
+     al número de partidos.
+  */
+
+  #tabla .fila{
+    width:100%;
+    min-width:0;
+    max-width:100%;
+
+    display:grid;
+
+    grid-template-columns:
+      28px
+      68px
+      repeat(var(--partidos), minmax(0,1fr))
+      28px;
+
+    box-sizing:border-box;
   }
 
-  .posicion{
-    min-width:50px;
-    font-size:16px;
-  }
 
-  .jugador{
-    min-width:110px;
-    font-size:13px;
-  }
+  /* =====================================
+     CELDAS
+     ===================================== */
 
-  .puntos{
-    min-width:50px;
-    font-size:14px;
-  }
+  #tabla .celda{
+    min-width:0;
+    width:auto;
 
-  .partido-header{
-    min-width:60px;
-    width:60px;
-  }
+    padding:5px 2px;
 
-  .logo-equipo{
-    width:20px;
-    height:20px;
-  }
-
-  .nombre-equipo{
-    font-size:10px;
-    line-height:1.1;
-  }
-
-  .resultado-header{
     font-size:11px;
-    font-weight:bold;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    box-sizing:border-box;
+
+    overflow:hidden;
+  }
+
+
+  /* =====================================
+     POSICIÓN
+     ===================================== */
+
+  #tabla .posicion{
+    min-width:0;
+    font-size:12px;
+    font-weight:800;
+  }
+
+
+  /* =====================================
+     JUGADOR
+     ===================================== */
+
+  #tabla .jugador{
+    min-width:0;
+
+    font-size:11px;
+    font-weight:700;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+
+    justify-content:flex-start;
+    padding-left:5px;
+  }
+
+
+  /* =====================================
+     MARCADORES
+     ===================================== */
+
+  #tabla .celda.gris,
+  #tabla .celda.verde,
+  #tabla .celda.rojo,
+  #tabla .celda.amarillo,
+  #tabla .celda.azul{
+    min-width:0;
+    padding:5px 1px;
+
+    font-size:11px;
+    font-weight:800;
+
+    border-radius:7px;
+  }
+
+
+  /* =====================================
+     PUNTOS
+     ===================================== */
+
+  #tabla .puntos{
+    min-width:0;
+    font-size:12px;
+    font-weight:900;
+  }
+
+
+  /* =====================================
+     ENCABEZADO DE PARTIDOS
+     ===================================== */
+
+  #tabla .partido-header{
+
+    min-width:0;
+    width:auto;
+
+    padding:3px 1px;
+
+    display:flex;
+    flex-direction:column;
+
+    justify-content:center;
+    align-items:center;
+
+    gap:1px;
+
+    overflow:hidden;
+  }
+
+
+  /*
+     SOLO ESCUDOS EN CELULAR
+  */
+
+  #tabla .partido-header .nombre-equipo{
+    display:none;
+  }
+
+
+  /* =====================================
+     ESCUDOS
+     ===================================== */
+
+  #tabla .partido-header .logo-equipo{
+
+    width:18px;
+    height:18px;
+
+    max-width:18px;
+    max-height:18px;
+
+    object-fit:contain;
+
+    margin:0;
+  }
+
+
+  /* =====================================
+     RESULTADO REAL
+     ===================================== */
+
+  #tabla .resultado-header{
+
+    font-size:10px;
+    line-height:1;
+
+    font-weight:900;
+
+    white-space:nowrap;
+  }
+
+
+  /* =====================================
+     FILA DEL LÍDER
+     ===================================== */
+
+  #tabla .top1,
+  #tabla .top2{
+    width:100%;
+  }
+
+
+  /* =====================================
+     EVITAR DESBORDAMIENTO
+     ===================================== */
+
+  #tabla *,
+  #tabla *::before,
+  #tabla *::after{
+    box-sizing:border-box;
   }
 
 }
