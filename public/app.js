@@ -1348,97 +1348,198 @@ function toggleMenu() {
     .toggle("activo");
 }
 
+
+/* =========================================================
+   BUSCADOR DE PARTICIPANTES
+   ========================================================= */
+
 document.addEventListener("input", function(e) {
 
   if (e.target.id !== "buscarJugador") return;
-
-  console.log("BUSCADOR FUNCIONANDO:", e.target.value);
 
   const texto = e.target.value
     .trim()
     .toLowerCase();
 
-  const filas = document.querySelectorAll("#tabla .fila:not(.header)");
-
-  console.log("FILAS ENCONTRADAS:", filas.length);
+  const filas = document.querySelectorAll(
+    "#tabla .fila:not(.header)"
+  );
 
   filas.forEach(fila => {
 
     const jugador =
-      fila.querySelector(".jugador")?.textContent
-      .trim()
-      .toLowerCase() || "";
+      fila.querySelector(".jugador")
+        ?.textContent
+        .trim()
+        .toLowerCase() || "";
 
-    console.log("JUGADOR:", jugador);
+    if (texto === "") {
 
-    fila.style.display =
-      !texto || jugador.includes(texto)
-        ? ""
-        : "none";
+      /* Mostrar nuevamente todas las filas */
+      fila.style.removeProperty("display");
+
+    } else if (jugador.includes(texto)) {
+
+      /* Mostrar coincidencia */
+      fila.style.removeProperty("display");
+
+    } else {
+
+      /* Ocultar las que no coinciden */
+      fila.style.display = "none";
+
+    }
+
   });
 
 });
 
-function verMiPosicion(){
 
-  const nombre =
+/* =========================================================
+   VER MI POSICIÓN
+   ========================================================= */
+
+function verMiPosicion() {
+
+  const nombreGuardado =
     localStorage.getItem("miNombre");
 
- if(!nombre){
+  /* -----------------------------------------
+     Comprobar nombre guardado
+     ----------------------------------------- */
 
-    mostrarMensaje(
+  if (!nombreGuardado || !nombreGuardado.trim()) {
+
+    if (typeof mostrarMensaje === "function") {
+
+      mostrarMensaje(
         "Nombre no encontrado",
         "Primero debes guardar una quiniela para poder localizar tu posición.",
         "👤"
-    );
+      );
+
+    } else {
+
+      alert(
+        "Primero debes guardar una quiniela para poder localizar tu posición."
+      );
+
+    }
 
     return;
+  }
 
-}
+
+  const nombre =
+    nombreGuardado.trim().toLowerCase();
+
+
+  /* -----------------------------------------
+     Buscar solamente participantes
+     ----------------------------------------- */
 
   const filas =
-    document.querySelectorAll(".fila");
+    document.querySelectorAll(
+      "#tabla .fila:not(.header)"
+    );
+
 
   let encontrada = null;
+
 
   filas.forEach(fila => {
 
     const jugador =
       fila.querySelector(".jugador");
 
-    if(!jugador) return;
+    if (!jugador) return;
 
-    if(
-      jugador.innerText
-      .toLowerCase()
-      .includes(nombre.toLowerCase())
-    ){
+
+    const nombreJugador =
+      jugador.textContent
+        .trim()
+        .toLowerCase();
+
+
+    if (
+      nombreJugador.includes(nombre)
+    ) {
+
       encontrada = fila;
+
     }
 
   });
 
-  if(!encontrada){
 
-    mostrarMensaje(
+  /* -----------------------------------------
+     No encontrado
+     ----------------------------------------- */
+
+  if (!encontrada) {
+
+    if (typeof mostrarMensaje === "function") {
+
+      mostrarMensaje(
         "Sin resultados",
         "No apareces registrado en la tabla de esta jornada.",
         "📋"
-    );
+      );
+
+    } else {
+
+      alert(
+        "No apareces registrado en la tabla de esta jornada."
+      );
+
+    }
 
     return;
+  }
 
-}
+
+  /* -----------------------------------------
+     Limpiar búsqueda
+     ----------------------------------------- */
+
+  const buscador =
+    document.getElementById("buscarJugador");
+
+  if (buscador) {
+    buscador.value = "";
+
+    filas.forEach(fila => {
+      fila.style.removeProperty("display");
+    });
+  }
+
+
+  /* -----------------------------------------
+     Ir al participante
+     ----------------------------------------- */
 
   encontrada.scrollIntoView({
-    behavior:"smooth",
-    block:"center"
+    behavior: "smooth",
+    block: "center"
   });
+
+
+  /* -----------------------------------------
+     Resaltar participante
+     ----------------------------------------- */
 
   encontrada.style.boxShadow =
     "0 0 25px #22c55e";
 
-  setTimeout(()=>{
-    encontrada.style.boxShadow="";
-  },4000);
+
+  encontrada.style.transition =
+    "box-shadow 0.3s ease";
+
+
+  setTimeout(() => {
+
+    encontrada.style.boxShadow = "";
+
+  }, 4000);
+
 }
