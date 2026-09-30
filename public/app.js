@@ -1365,7 +1365,7 @@ document.addEventListener("input", function(e){
 
     fila.style.display =
       jugador.includes(texto)
-      ? "flex"
+      ? "grid"
       : "none";
   });
 
