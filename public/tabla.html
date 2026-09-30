@@ -56,10 +56,49 @@
 
 <div id="tabla" class="tabla-scroll"></div>
 
+<!-- MODAL PERSONALIZADO -->
+<div id="modalPersonalizado" class="modal-personalizado">
 
+  <div class="modal-box">
 
-<!-- 🔥 IMPORTANTE: cargar tu lógica -->
-<script src="app.js"></script>
+    <div id="modalIcono" class="modal-icono">⚠️</div>
+
+    <h2 id="modalTitulo">Título</h2>
+
+    <p id="modalMensaje">
+      Mensaje
+    </p>
+
+    <div class="modal-botones">
+
+      <button
+        id="btnCancelar"
+        class="btn-modal cancelar"
+        type="button">
+        Cancelar
+      </button>
+
+      <button
+        id="btnAceptar"
+        class="btn-modal aceptar"
+        type="button">
+        Aceptar
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast">
+
+  <span id="toastIcono">✅</span>
+
+  <span id="toastTexto"></span>
+
+</div>
 
 <script>
 
@@ -130,6 +169,11 @@ async function cargarResumenPartidos(jornada) {
   cont.innerHTML = html;
 }
 </script>
+
+<!-- 🔥 IMPORTANTE: cargar tu lógica -->
+<script src="app.js"></script>
+<script src="ui.js"></script>
+
 
 </body>
 </html>
