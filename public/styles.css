@@ -5691,3 +5691,31 @@ body {
     top: auto !important;
     z-index: auto !important;
 }
+
+/* =========================================
+   MI POSICIÓN
+   ========================================= */
+
+.mi-posicion-activa {
+  outline: 3px solid #22c55e !important;
+  outline-offset: 3px !important;
+  box-shadow:
+    0 0 10px #22c55e,
+    0 0 25px rgba(34, 197, 94, 0.8) !important;
+
+  animation: destacarMiPosicion 0.8s ease-in-out infinite alternate;
+  position: relative;
+  z-index: 20;
+}
+
+@keyframes destacarMiPosicion {
+
+  from {
+    transform: scale(1);
+  }
+
+  to {
+    transform: scale(1.02);
+  }
+
+}

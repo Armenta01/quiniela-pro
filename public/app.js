@@ -1385,15 +1385,9 @@ document.addEventListener("input", function (e) {
 
 });
 
-
-/* =========================================================
-   VER MI POSICIÓN
-   ========================================================= */
-
 function verMiPosicion() {
 
-  const nombreGuardado =
-    localStorage.getItem("miNombre");
+  const nombreGuardado = localStorage.getItem("miNombre");
 
   if (!nombreGuardado || !nombreGuardado.trim()) {
 
@@ -1406,32 +1400,27 @@ function verMiPosicion() {
     return;
   }
 
-  const nombre =
-    nombreGuardado.trim().toLowerCase();
+  const nombre = nombreGuardado
+    .trim()
+    .toLowerCase();
 
-  const filas =
-    document.querySelectorAll(
-      "#tabla .fila:not(.header)"
-    );
+  const filas = document.querySelectorAll(
+    "#tabla .fila:not(.header)"
+  );
 
   let encontrada = null;
 
-  filas.forEach(function (fila) {
+  filas.forEach(function(fila) {
 
-    const jugador =
-      fila.querySelector(".jugador");
+    const jugador = fila.querySelector(".jugador");
 
     if (!jugador) return;
 
-    const nombreJugador =
-      jugador.textContent
-        .trim()
-        .toLowerCase();
+    const nombreJugador = jugador.textContent
+      .trim()
+      .toLowerCase();
 
-    if (
-      nombreJugador === nombre ||
-      nombreJugador.includes(nombre)
-    ) {
+    if (nombreJugador === nombre) {
       encontrada = fila;
     }
 
@@ -1441,26 +1430,38 @@ function verMiPosicion() {
 
     mostrarMensaje(
       "Participante no encontrado",
-      "Tu nombre está guardado en este dispositivo, pero no aparece en la tabla de esta jornada.",
+      "Tu nombre está guardado en este dispositivo, pero no aparece en esta jornada.",
       "🔎"
     );
 
     return;
   }
 
-  encontrada.scrollIntoView({
-    behavior: "smooth",
-    block: "center"
-  });
+  /* Quitar resaltado anterior */
+  document.querySelectorAll(".mi-posicion-activa")
+    .forEach(function(fila) {
+      fila.classList.remove("mi-posicion-activa");
+    });
 
-  encontrada.style.boxShadow =
-    "0 0 0 3px #22c55e, 0 0 20px #22c55e";
+  /* Resaltar */
+  encontrada.classList.add("mi-posicion-activa");
 
-  encontrada.style.transition =
-    "box-shadow 0.3s ease";
+  /* Llevar al jugador al centro */
+  setTimeout(function() {
 
-  setTimeout(function () {
-    encontrada.style.boxShadow = "";
-  }, 4000);
+    encontrada.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+      inline: "nearest"
+    });
+
+  }, 100);
+
+  /* Quitar resaltado después de 5 segundos */
+  setTimeout(function() {
+
+    encontrada.classList.remove("mi-posicion-activa");
+
+  }, 5000);
 
 }
