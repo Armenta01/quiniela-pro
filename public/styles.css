@@ -4591,8 +4591,9 @@ to{
 
 }
 
+
 /* =====================================================
-   FONDO DE LOGOS - PÁGINA PRINCIPAL
+   FONDO DE LOGOS - QUINIELAS EL INGE
    ===================================================== */
 
 #contenido {
@@ -4619,7 +4620,7 @@ to{
     z-index: 0;
 }
 
-/* Todo lo que está dentro de contenido queda encima */
+/* Todo el contenido queda encima de los logos */
 #contenido > * {
     position: relative;
     z-index: 1;
