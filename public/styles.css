@@ -5214,3 +5214,190 @@ body {
   }
 
 }
+
+/* ==========================================
+   📱 TABLA MÓVIL — TODO EN UNA SOLA FILA
+   ========================================== */
+
+@media (max-width: 768px) {
+
+  /* Nunca permitir scroll lateral */
+  .tabla-scroll,
+  #tabla {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+  }
+
+  /* ==========================================
+     CADA JUGADOR = UNA SOLA FILA
+     ========================================== */
+
+  #tabla .fila {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+      32px
+      minmax(70px, 1.5fr)
+      repeat(var(--partidos), minmax(0, 1fr))
+      32px !important;
+
+    gap: 2px !important;
+
+    flex-wrap: nowrap !important;
+
+    box-sizing: border-box !important;
+
+    overflow: hidden !important;
+  }
+
+  /* ==========================================
+     TODAS LAS CELDAS
+     ========================================== */
+
+  #tabla .fila > * {
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    box-sizing: border-box !important;
+
+    overflow: hidden !important;
+  }
+
+  /* ==========================================
+     POSICIÓN
+     ========================================== */
+
+  #tabla .posicion {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    padding: 4px 1px !important;
+
+    font-size: 10px !important;
+
+    text-align: center !important;
+
+    white-space: nowrap !important;
+  }
+
+  /* ==========================================
+     NOMBRE DEL JUGADOR
+     ========================================== */
+
+  #tabla .jugador {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    padding: 4px 3px !important;
+
+    font-size: 10px !important;
+
+    white-space: nowrap !important;
+
+    overflow: hidden !important;
+
+    text-overflow: ellipsis !important;
+
+    text-align: left !important;
+  }
+
+  /* ==========================================
+     MARCADORES
+     ========================================== */
+
+  #tabla .celda {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    padding: 4px 1px !important;
+
+    margin: 0 !important;
+
+    font-size: 10px !important;
+
+    line-height: 1 !important;
+
+    white-space: nowrap !important;
+
+    text-align: center !important;
+
+    overflow: hidden !important;
+  }
+
+  /* ==========================================
+     PUNTOS
+     ========================================== */
+
+  #tabla .puntos {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    padding: 4px 1px !important;
+
+    font-size: 10px !important;
+
+    white-space: nowrap !important;
+
+    text-align: center !important;
+  }
+
+  /* ==========================================
+     ENCABEZADO DE PARTIDOS
+     ========================================== */
+
+  #tabla .partido-header {
+    width: 100% !important;
+    min-width: 0 !important;
+
+    padding: 2px 0 !important;
+
+    margin: 0 !important;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    align-items: center !important;
+
+    justify-content: center !important;
+
+    overflow: hidden !important;
+  }
+
+  /* Ocultar nombres de equipos */
+  #tabla .partido-header .nombre-equipo {
+    display: none !important;
+  }
+
+  /* ==========================================
+     ESCUDOS PEQUEÑOS
+     ========================================== */
+
+  #tabla .partido-header .logo-equipo {
+    width: 16px !important;
+    height: 16px !important;
+
+    max-width: 16px !important;
+    max-height: 16px !important;
+
+    object-fit: contain !important;
+
+    margin: 0 !important;
+  }
+
+  /* Resultado del partido */
+  #tabla .resultado-header {
+    font-size: 9px !important;
+
+    line-height: 1 !important;
+
+    white-space: nowrap !important;
+  }
+
+}
