@@ -323,6 +323,7 @@ async function verTablaCompleta(jornada) {
 
   // 🔥 usar el primero seguro
   const totalPartidos = Math.max(...data.map(u => u.picks.length));
+  cont.style.setProperty("--partidos", totalPartidos);
   const partidos = await (await fetch(`/partidos?jornada=${jornada}`)).json();
 
   // 🔥 No mostrar tabla hasta que exista al menos un resultado
