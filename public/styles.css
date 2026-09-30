@@ -4591,116 +4591,51 @@ to{
 
 }
 
-
 /* =====================================================
-   FONDO DE LOGOS - QUINIELAS EL INGE
-   ===================================================== */
-
-#contenido {
-    position: relative;
-    isolation: isolate;
-}
-
-/* =====================================================
-   FONDO DE LOGOS - QUINIELAS EL INGE
-   ===================================================== */
-
-#contenido {
-    position: relative;
-    isolation: isolate;
-    min-height: 100vh;
-}
-
-/* Capa de logos */
-.fondo-logos {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-
-    background-color: #0b162d;
-    background-image: url("/quinielasinge.png");
-
-    background-repeat: repeat;
-    background-size: 190px auto;
-    background-position: center top;
-
-    opacity: 0.18;
-
-    pointer-events: none;
-
-    z-index: 0;
-}
-
-
-
-/* =====================================================
-   FONDO DE LOGOS - VERSIÓN FINAL
-   ===================================================== */
-
-#contenido {
-    position: relative !important;
-    isolation: isolate !important;
-    background: #0b162d !important;
-}
-
-/* Capa del patrón */
-#contenido .fondo-logos {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-
-    width: 100% !important;
-    min-height: 100% !important;
-
-    background-color: #0b162d !important;
-    background-image: url("/inge.PNG") !important;
-    background-repeat: repeat !important;
-    background-size: 190px auto !important;
-    background-position: center top !important;
-
-    opacity: 0.50 !important;
-
-    pointer-events: none !important;
-
-    z-index: 0 !important;
-}
-
-/* Todo lo demás encima */
-#contenido > *:not(.fondo-logos) {
-    position: relative;
-    z-index: 1;
-}
-
-/* =====================================================
-   FONDO DE LOGOS - QUINIELAS EL INGE
+   FONDO OFICIAL - QUINIELAS EL INGE
    ===================================================== */
 
 html,
 body {
+    margin: 0;
+    padding: 0;
     min-height: 100%;
 }
 
 body {
-    background-color: #0b162d !important;
+    background-color: #0b162d;
 
-    background-image: url("/inge.PNG") !important;
+    background-image: url("/quinielasinge.png");
 
-    background-repeat: repeat !important;
+    background-repeat: repeat;
 
-    background-size: 190px auto !important;
+    background-size: 190px auto;
 
-    background-position: center center !important;
+    background-position: center top;
 
-    background-attachment: fixed !important;
+    background-attachment: fixed;
 }
 
-/* Mantiene todo el contenido por encima del patrón */
-
+/* El contenido queda encima del fondo */
 #contenido {
     position: relative;
     z-index: 1;
+}
+
+/* Evita espacio extraño debajo del banner */
+.banner {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    line-height: 0;
+}
+
+.banner img {
+    display: block;
+    width: 100%;
+    max-width: 650px;
+    height: auto;
+    margin: 0 auto;
+    border-radius: 15px;
 }
