@@ -1350,32 +1350,44 @@ function toggleMenu() {
 
 
 /* =========================================================
-   BUSCADOR Y MI POSICIÓN
+   BUSCADOR DE PARTICIPANTES
    ========================================================= */
 
 document.addEventListener("input", function (e) {
 
-  if (e.target.id !== "buscarJugador") return;
+  if (e.target.id !== "buscarJugador") {
+    return;
+  }
 
   const texto = e.target.value
     .trim()
     .toLowerCase();
 
   const filas = document.querySelectorAll(
-    "#tabla .fila:not(.header)"
+    "#tabla .fila"
   );
 
-  filas.forEach(fila => {
+  filas.forEach(function (fila) {
+
+    // Nunca ocultar el encabezado
+    if (fila.classList.contains("header")) {
+      return;
+    }
 
     const jugador = fila.querySelector(".jugador");
 
-    if (!jugador) return;
+    if (!jugador) {
+      return;
+    }
 
-    const nombreJugador = jugador.textContent
+    const nombre = jugador.textContent
       .trim()
       .toLowerCase();
 
-    if (texto === "" || nombreJugador.includes(texto)) {
+    if (
+      texto === "" ||
+      nombre.includes(texto)
+    ) {
       fila.style.removeProperty("display");
     } else {
       fila.style.display = "none";
@@ -1386,106 +1398,123 @@ document.addEventListener("input", function (e) {
 });
 
 
+/* =========================================================
+   VER MI POSICIÓN
+   ========================================================= */
+
 function verMiPosicion() {
 
-  const nombreGuardado = localStorage.getItem("miNombre");
+  // Primero intenta recuperar el nombre guardado
+  let nombre = localStorage.getItem("miNombre");
 
-  if (!nombreGuardado || !nombreGuardado.trim()) {
+  // Si no existe, intenta usar lo que está escrito
+  // en el buscador
+  if (!nombre || !nombre.trim()) {
+
+    const buscador =
+      document.getElementById("buscarJugador");
+
+    if (buscador && buscador.value.trim()) {
+      nombre = buscador.value.trim();
+    }
+
+  }
+
+  // Si todavía no tenemos nombre
+  if (!nombre || !nombre.trim()) {
 
     mostrarMensaje(
       "Nombre no encontrado",
-      "Primero debes guardar una quiniela para poder localizar tu posición.",
+      "Primero escribe tu nombre en el buscador o guarda una quiniela.",
       "👤"
     );
 
     return;
   }
 
-  const nombre = nombreGuardado
+  nombre = nombre
     .trim()
     .toLowerCase();
 
   const filas = document.querySelectorAll(
-    "#tabla .fila:not(.header)"
+    "#tabla .fila"
   );
 
   let encontrada = null;
 
-  filas.forEach(fila => {
+  filas.forEach(function (fila) {
 
-    const jugador = fila.querySelector(".jugador");
+    if (fila.classList.contains("header")) {
+      return;
+    }
 
-    if (!jugador) return;
+    const jugador =
+      fila.querySelector(".jugador");
 
-    const nombreJugador = jugador.textContent
-      .trim()
-      .toLowerCase();
+    if (!jugador) {
+      return;
+    }
 
-    if (nombreJugador === nombre) {
+    const nombreJugador =
+      jugador.textContent
+        .trim()
+        .toLowerCase();
+
+    if (
+      nombreJugador === nombre ||
+      nombreJugador.includes(nombre)
+    ) {
       encontrada = fila;
     }
 
   });
 
-  /* Si no encontró coincidencia exacta,
-     intenta encontrarla dentro del nombre */
-  if (!encontrada) {
-
-    filas.forEach(fila => {
-
-      const jugador = fila.querySelector(".jugador");
-
-      if (!jugador || encontrada) return;
-
-      const nombreJugador = jugador.textContent
-        .trim()
-        .toLowerCase();
-
-      if (nombreJugador.includes(nombre)) {
-        encontrada = fila;
-      }
-
-    });
-
-  }
-
+  // No encontró al jugador
   if (!encontrada) {
 
     mostrarMensaje(
       "Sin resultados",
-      "No apareces registrado en la tabla de esta jornada.",
-      "📋"
+      "No encontramos ese nombre en la tabla de esta jornada.",
+      "🔎"
     );
 
     return;
   }
 
-  /* Quitar búsqueda */
-  const buscador = document.getElementById("buscarJugador");
+  // Mostrar nuevamente todas las filas
+  filas.forEach(function (fila) {
+
+    if (!fila.classList.contains("header")) {
+      fila.style.removeProperty("display");
+    }
+
+  });
+
+  // Limpiar buscador
+  const buscador =
+    document.getElementById("buscarJugador");
 
   if (buscador) {
     buscador.value = "";
   }
 
-  filas.forEach(fila => {
-    fila.style.removeProperty("display");
-  });
-
-  /* Llevar al jugador al centro */
+  // Llevar al jugador al centro de la pantalla
   encontrada.scrollIntoView({
     behavior: "smooth",
     block: "center"
   });
 
-  /* Resaltar */
+  // Resaltar
   encontrada.style.boxShadow =
     "0 0 25px #22c55e";
 
   encontrada.style.transition =
     "box-shadow 0.3s ease";
 
-  setTimeout(() => {
+  setTimeout(function () {
+
     encontrada.style.boxShadow = "";
+
   }, 4000);
 
 }
