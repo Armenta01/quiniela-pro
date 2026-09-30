@@ -4598,10 +4598,10 @@ to{
 
 #contenido {
     position: relative;
-    z-index: 1;
-    overflow: hidden;
+    isolation: isolate;
 }
 
+/* Patrón de logos detrás de todo el contenido */
 #contenido::before {
     content: "";
 
@@ -4611,17 +4611,11 @@ to{
     background-image: url("quinielasinge.png");
     background-repeat: repeat;
     background-size: 190px auto;
-    background-position: center center;
+    background-position: center top;
 
     opacity: 0.10;
 
     pointer-events: none;
 
-    z-index: 0;
-}
-
-/* Todo el contenido queda encima de los logos */
-#contenido > * {
-    position: relative;
-    z-index: 1;
+    z-index: -1;
 }
