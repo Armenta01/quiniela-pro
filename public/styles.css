@@ -4725,3 +4725,125 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
 }
+
+/* =========================================
+   TABLA GENERAL - VISTA COMPACTA
+   ========================================= */
+
+#tabla {
+  width: 100%;
+  max-width: 100%;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+/* Encabezado de partidos */
+.fila.header {
+  margin-bottom: 25px !important;
+  min-height: 0 !important;
+  height: auto !important;
+  padding: 0 !important;
+  gap: 4px !important;
+}
+
+/* Columnas generales */
+.posicion {
+  width: 65px !important;
+  min-width: 65px !important;
+}
+
+.jugador {
+  width: 120px !important;
+  min-width: 120px !important;
+}
+
+.puntos {
+  width: 60px !important;
+  min-width: 60px !important;
+}
+
+/* Partidos */
+.partido-header {
+  width: 75px !important;
+  min-width: 75px !important;
+  min-height: 105px !important;
+  height: 105px !important;
+
+  gap: 2px !important;
+  padding: 5px !important;
+}
+
+/* Logos */
+.logo-equipo {
+  width: 24px !important;
+  height: 24px !important;
+}
+
+/* Nombres de equipos */
+.nombre-equipo {
+  font-size: 10px !important;
+  line-height: 1 !important;
+}
+
+/* Marcador */
+.resultado-header {
+  font-size: 15px !important;
+  line-height: 1 !important;
+}
+
+/* Pos / jugador / puntos */
+.header .posicion,
+.header .jugador,
+.header .puntos {
+  padding-top: 0 !important;
+  height: 105px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Filas de jugadores */
+#tabla .fila:not(.header) {
+  margin-top: 5px !important;
+  margin-bottom: 5px !important;
+}
+
+/* Celdas */
+.celda {
+  min-width: 70px !important;
+  padding: 8px 5px !important;
+  margin: 2px !important;
+  border-radius: 8px !important;
+}
+
+/* Posición */
+.fila .posicion {
+  font-size: 16px !important;
+}
+
+/* Nombre jugador */
+.fila .jugador {
+  font-size: 14px !important;
+}
+
+/* Puntos */
+.fila .puntos {
+  font-size: 15px !important;
+}
+
+/* En computadora */
+@media (min-width: 769px) {
+
+  .tabla-scroll {
+    overflow-x: hidden !important;
+  }
+
+  #tabla {
+    transform: scale(0.92);
+    transform-origin: top center;
+    width: 108.7%;
+    margin-left: -4.35%;
+  }
+
+}
