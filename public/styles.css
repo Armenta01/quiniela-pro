@@ -4600,23 +4600,20 @@ body {
     background: #0b162d;
 }
 
-/* Patrón de logos */
+/* Patrón de logos detrás de todo el contenido */
 body::before {
     content: "";
 
     position: fixed;
     inset: 0;
 
-    z-index: -1;
+    z-index: 0;
 
     background-color: #0b162d;
-
     background-image: url("quinielasinge.png");
 
     background-repeat: repeat;
-
     background-size: 190px auto;
-
     background-position: center center;
 
     opacity: 0.055;
@@ -4624,6 +4621,7 @@ body::before {
     pointer-events: none;
 }
 
+/* Todo el contenido queda por encima */
 #contenido {
     position: relative;
     z-index: 1;
