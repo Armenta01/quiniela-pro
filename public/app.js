@@ -1391,6 +1391,8 @@ document.addEventListener("input", function (e) {
 
 function verMiPosicion() {
 
+  alert("EL BOTÓN SÍ FUNCIONA");
+
   const nombreGuardado =
     localStorage.getItem("miNombre");
 
