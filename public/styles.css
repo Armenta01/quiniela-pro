@@ -4669,3 +4669,20 @@ body {
     margin: 0 auto;
     border-radius: 15px;
 }
+
+/* QUITAR LA BARRA HORIZONTAL DEL MENU */
+.menu-btn,
+#menuBtn {
+    position: relative;
+    z-index: 10;
+}
+
+/* El contenedor que contiene al botón no debe pintar una barra */
+.menu-btn-wrapper,
+.menu-container,
+.menu-bar,
+.nav-menu {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
