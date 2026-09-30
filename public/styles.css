@@ -5664,3 +5664,30 @@ body {
   }
 
 }
+/* =====================================================
+   TABLA — ENCABEZADO NORMAL, NO FIJO
+   ===================================================== */
+
+#tabla .fila.header {
+    position: static !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    z-index: auto !important;
+    transform: none !important;
+}
+
+/* El contenedor de la tabla tampoco debe fijar el encabezado */
+.tabla-scroll {
+    position: static !important;
+}
+
+/* Evita cualquier comportamiento sticky dentro de la tabla */
+#tabla .header,
+#tabla .fila.header,
+#tabla .partido-header {
+    position: static !important;
+    top: auto !important;
+    z-index: auto !important;
+}
