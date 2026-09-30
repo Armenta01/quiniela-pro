@@ -1394,8 +1394,6 @@ function verMiPosicion() {
   const nombreGuardado =
     localStorage.getItem("miNombre");
 
-  alert("Nombre guardado: " + nombreGuardado);
-
   if (!nombreGuardado || !nombreGuardado.trim()) {
 
     mostrarMensaje(
