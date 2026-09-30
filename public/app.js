@@ -1348,7 +1348,6 @@ function toggleMenu() {
     .toggle("activo");
 }
 
-
 /* =========================================================
    BUSCADOR DE PARTICIPANTES
    ========================================================= */
@@ -1368,26 +1367,22 @@ document.addEventListener("input", function(e) {
   filas.forEach(fila => {
 
     const jugador =
-      fila.querySelector(".jugador")
-        ?.textContent
+      fila.querySelector(".jugador");
+
+    if (!jugador) return;
+
+    const nombreJugador =
+      jugador.textContent
         .trim()
-        .toLowerCase() || "";
+        .toLowerCase();
 
-    if (texto === "") {
-
-      /* Mostrar nuevamente todas las filas */
+    if (
+      texto === "" ||
+      nombreJugador.includes(texto)
+    ) {
       fila.style.removeProperty("display");
-
-    } else if (jugador.includes(texto)) {
-
-      /* Mostrar coincidencia */
-      fila.style.removeProperty("display");
-
     } else {
-
-      /* Ocultar las que no coinciden */
       fila.style.display = "none";
-
     }
 
   });
@@ -1404,48 +1399,31 @@ function verMiPosicion() {
   const nombreGuardado =
     localStorage.getItem("miNombre");
 
-  /* -----------------------------------------
-     Comprobar nombre guardado
-     ----------------------------------------- */
+  if (
+    !nombreGuardado ||
+    !nombreGuardado.trim()
+  ) {
 
-  if (!nombreGuardado || !nombreGuardado.trim()) {
-
-    if (typeof mostrarMensaje === "function") {
-
-      mostrarMensaje(
-        "Nombre no encontrado",
-        "Primero debes guardar una quiniela para poder localizar tu posición.",
-        "👤"
-      );
-
-    } else {
-
-      alert(
-        "Primero debes guardar una quiniela para poder localizar tu posición."
-      );
-
-    }
+    mostrarMensaje(
+      "Nombre no encontrado",
+      "Primero debes guardar una quiniela para poder localizar tu posición.",
+      "👤"
+    );
 
     return;
   }
 
-
   const nombre =
-    nombreGuardado.trim().toLowerCase();
-
-
-  /* -----------------------------------------
-     Buscar solamente participantes
-     ----------------------------------------- */
+    nombreGuardado
+      .trim()
+      .toLowerCase();
 
   const filas =
     document.querySelectorAll(
       "#tabla .fila:not(.header)"
     );
 
-
   let encontrada = null;
-
 
   filas.forEach(fila => {
 
@@ -1454,87 +1432,58 @@ function verMiPosicion() {
 
     if (!jugador) return;
 
-
     const nombreJugador =
       jugador.textContent
         .trim()
         .toLowerCase();
 
-
     if (
       nombreJugador.includes(nombre)
     ) {
-
       encontrada = fila;
-
     }
 
   });
 
-
-  /* -----------------------------------------
-     No encontrado
-     ----------------------------------------- */
-
   if (!encontrada) {
 
-    if (typeof mostrarMensaje === "function") {
-
-      mostrarMensaje(
-        "Sin resultados",
-        "No apareces registrado en la tabla de esta jornada.",
-        "📋"
-      );
-
-    } else {
-
-      alert(
-        "No apareces registrado en la tabla de esta jornada."
-      );
-
-    }
+    mostrarMensaje(
+      "Sin resultados",
+      "No apareces registrado en la tabla de esta jornada.",
+      "📋"
+    );
 
     return;
   }
 
-
-  /* -----------------------------------------
-     Limpiar búsqueda
-     ----------------------------------------- */
-
+  /* Quitar cualquier filtro del buscador */
   const buscador =
     document.getElementById("buscarJugador");
 
   if (buscador) {
+
     buscador.value = "";
 
-    filas.forEach(fila => {
-      fila.style.removeProperty("display");
-    });
+    document
+      .querySelectorAll("#tabla .fila:not(.header)")
+      .forEach(fila => {
+        fila.style.removeProperty("display");
+      });
+
   }
 
-
-  /* -----------------------------------------
-     Ir al participante
-     ----------------------------------------- */
-
+  /* Llevar al participante al centro */
   encontrada.scrollIntoView({
     behavior: "smooth",
     block: "center"
   });
 
-
-  /* -----------------------------------------
-     Resaltar participante
-     ----------------------------------------- */
-
+  /* Resaltar */
   encontrada.style.boxShadow =
     "0 0 25px #22c55e";
 
-
   encontrada.style.transition =
     "box-shadow 0.3s ease";
-
 
   setTimeout(() => {
 
