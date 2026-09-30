@@ -1115,27 +1115,57 @@ button:active {
   margin-top:10px;
 }
 
-/* BOTON MENU */
-.menu-btn {
+/* =========================================
+   BOTÓN DE MENÚ - MODERNO REDONDEADO
+   ========================================= */
 
-  width: 30px;
-  height: 30px;
+.menu-btn,
+#menuBtn {
+    width: 54px;
+    height: 54px;
 
-  margin: 0;
+    margin: 0;
 
-  background: rgba(255,255,255,.15);
-  backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-  border-radius: 6px;
+    background: #34577f;
+    color: #ffffff;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    border: none;
+    border-radius: 12px;
 
-  font-size: 18px;
-  color: white;
+    font-size: 25px;
+    line-height: 1;
 
-  cursor: pointer;
+    cursor: pointer;
+
+    box-shadow:
+        0 4px 10px rgba(0, 0, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+/* Al pasar el mouse */
+.menu-btn:hover,
+#menuBtn:hover {
+    background: #3d668f;
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 6px 14px rgba(0, 0, 0, 0.30),
+        inset 0 1px 0 rgba(255, 255, 255, 0.10);
+}
+
+/* Al presionar */
+.menu-btn:active,
+#menuBtn:active {
+    transform: scale(0.96);
 }
 
 
