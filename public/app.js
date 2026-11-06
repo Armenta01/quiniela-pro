@@ -712,7 +712,9 @@ let mensaje = "";
 mensaje += "🏆 *Quinielas El Inge*\n\n";
 mensaje += `👤 Jugador: *${usuario}*\n`;
 mensaje += `📅 Semana: *${jornadaActual}*\n`;
-mensaje += `🕒 Registro: *${fechaHora}*\n\n`;
+mensaje += `🕒 Registro: *${fechaHora}*\n`;
+mensaje += "🎟️ Total: *1 quiniela*\n";
+mensaje += "💰 Importe: *$50 MXN*\n\n";
 mensaje += "━━━ *PRONÓSTICOS* ━━━\n\n";
 
 lista.forEach(p => {
@@ -1894,7 +1896,7 @@ function crearMensajeMultiples(nombre, quinielas, partidos) {
 
     mensaje += "\n";
   });
-
+  mensaje += "\n━━━━━━━━━━━━\n";
   mensaje += "🍀 *¡Mucha suerte!*\n";
 
   return mensaje;
