@@ -435,12 +435,22 @@ app.get('/check-user', async (req, res) => {
 
 
 
-// 🔥 GUARDAR PRONÓSTICOS (FIX PRINCIPAL)
-app.post('/guardar', async (req, res) => {
- let { nombre, telefono, jornada, pronosticos } = req.body;
 
-nombre = nombre.trim();
-const llaveEnvio = `${nombre.toLowerCase()}-${jornada}`;
+app.post('/guardar', async (req, res) => {
+  let { nombre, telefono, jornada, pronosticos } = req.body || {};
+
+  // Validar el nombre antes de utilizar trim()
+  if (typeof nombre !== "string" || nombre.trim().length < 2) {
+    return res.status(400).json({
+      ok: false,
+      error: "Escribe un nombre válido."
+    });
+  }
+
+  nombre = nombre.trim();
+
+  const llaveEnvio = `${nombre.toLowerCase()}-${jornada}`;
+
 
 if (enviosEnProceso.has(llaveEnvio)) {
   return res.status(429).json({
@@ -456,36 +466,120 @@ enviosEnProceso.add(llaveEnvio);
   .tz("America/Mexico_City")
   .format("YYYY-MM-DD HH:mm:ss");
   
+let client;
+
   try {
-    if (!nombre || nombre.length < 2) {
-      return res.status(400).json({ error: "Nombre inválido" });
-    }
+    
+if (
+  !Number.isInteger(Number(jornada)) ||
+  Number(jornada) < 1 ||
+  !Array.isArray(pronosticos)
+) {
+  return res.status(400).json({
+    error: "La jornada o los pronósticos no son válidos."
+  });
+}
+
+// Consultar los partidos registrados en la jornada
+const partidosResult = await pool.query(
+  `SELECT id FROM partidos WHERE jornada = $1`,
+  [jornada]
+);
+
+const idsValidos = new Set(
+  partidosResult.rows.map(p => Number(p.id))
+);
+
+// Verificar que se capturen todos los partidos
+if (
+  idsValidos.size === 0 ||
+  pronosticos.length !== idsValidos.size
+) {
+  return res.status(400).json({
+    error: "Debes completar todos los partidos de la jornada."
+  });
+}
+
+const idsUsados = new Set();
+
+for (const p of pronosticos) {
+  if (!p || typeof p !== "object") {
+    return res.status(400).json({
+      error: "Pronóstico inválido."
+    });
+  }
+
+  const partidoId = Number(p.partido_id);
+
+  if (
+    !idsValidos.has(partidoId) ||
+    idsUsados.has(partidoId)
+  ) {
+    return res.status(400).json({
+      error: "Hay partidos incorrectos o repetidos."
+    });
+  }
+
+  if (
+    p.local === "" || p.local == null ||
+    p.visitante === "" || p.visitante == null
+  ) {
+    return res.status(400).json({
+      error: "Debes llenar todos los marcadores."
+    });
+  }
+
+  const gl = Number(p.local);
+  const gv = Number(p.visitante);
+
+  if (
+    !Number.isInteger(gl) ||
+    !Number.isInteger(gv) ||
+    gl < 0 || gv < 0 ||
+    gl > 20 || gv > 20
+  ) {
+    return res.status(400).json({
+      error: "Los marcadores deben ser números entre 0 y 20."
+    });
+  }
+
+  idsUsados.add(partidoId);
+}
 
     if (await jornadaBloqueada(jornada)) {
       return res.status(403).json({ error: "Jornada cerrada" });
     }
 
-    let user = await pool.query(
-  `SELECT id FROM users WHERE nombre = $1`,
-  [nombre]
+
+client = await pool.connect();
+await client.query("BEGIN");
+
+
+   
+const usuarioResult = await client.query(
+  `INSERT INTO users (nombre, telefono)
+   VALUES ($1, $2)
+   ON CONFLICT (nombre) DO NOTHING
+   RETURNING id`,
+  [nombre, telefono]
 );
 
 let userId;
 
-if (user.rows.length === 0) {
-  const newUser = await pool.query(
-    `INSERT INTO users(nombre, telefono)
-      VALUES($1, $2)
-      RETURNING id`,
-      [nombre, telefono]
-  );
-  userId = newUser.rows[0].id;
+if (usuarioResult.rows.length > 0) {
+  userId = usuarioResult.rows[0].id;
 } else {
-  userId = user.rows[0].id;
+  const usuarioExistente = await client.query(
+    `SELECT id FROM users WHERE nombre = $1`,
+    [nombre]
+  );
+
+  userId = usuarioExistente.rows[0].id;
 }
+ 
 
 // 🔥 validar si ya mandó EXACTfAMENTE lo mismo
-const existentes = await pool.query(
+const existentes = await client.query(
   `SELECT envio_id
    FROM predicciones pr
    JOIN users u ON pr.user_id = u.id
@@ -495,7 +589,7 @@ const existentes = await pool.query(
 );
 
 for (let envio of existentes.rows) {
-  const rows = await pool.query(
+  const rows = await client.query(
     `SELECT partido_id,
             goles_local,
             goles_visitante
@@ -505,13 +599,18 @@ for (let envio of existentes.rows) {
     [envio.envio_id]
   );
 
-  const viejo = JSON.stringify(
-  rows.rows.map(x => ({
-    partido_id: x.partido_id,
-    local: x.goles_local,
-    visitante: x.goles_visitante
-  }))
+ 
+const viejo = JSON.stringify(
+  rows.rows
+    .map(x => ({
+      partido_id: Number(x.partido_id),
+      local: Number(x.goles_local),
+      visitante: Number(x.goles_visitante)
+    }))
+    .sort((a, b) => a.partido_id - b.partido_id)
 );
+
+
 
 const nuevo = JSON.stringify(
   [...pronosticos]
@@ -523,26 +622,15 @@ const nuevo = JSON.stringify(
     }))
 );
 
+
 if (viejo === nuevo) {
+  await client.query("ROLLBACK");
+
   return res.status(400).json({
     error: "Ya enviaste los mismos resultados, captura una quiniela distinta."
   });
 }
 
-}
-
-// convertir lista actual a string para comparar
-const nuevo = JSON.stringify(pronosticos);
-
-const viejo = JSON.stringify(
-  existentes.rows.map(x => ({
-    local: x.goles_local,
-    visitante: x.goles_visitante
-  }))
-);
-
-if (nuevo === viejo) {
-  return res.status(400).json({ error: "Ya enviaste esta misma quiniela" });
 }
 
     // 🔥 FIX AQUÍ (error de integer "")
@@ -551,7 +639,7 @@ if (nuevo === viejo) {
   const goles_local = p.local === "" ? null : parseInt(p.local);
   const goles_visitante = p.visitante === "" ? null : parseInt(p.visitante);
 
- await pool.query(`
+ await client.query(`
     INSERT INTO predicciones
 (
   user_id,
@@ -578,22 +666,40 @@ VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)
 ]);
 }
 
-   res.json({ ok: true });
+
+await client.query("COMMIT");
+
+res.json({ ok: true });
+
 
 } catch (err) {
 
-   console.error(err);
+  if (client) {
+    try {
+      await client.query("ROLLBACK");
+    } catch (rollbackError) {
+      console.error("Error al revertir transacción:", rollbackError);
+    }
+  }
 
-   res.status(500).json({
-      error: "Error interno"
-   });
+  console.error("Error al guardar quiniela:", err);
+
+  res.status(500).json({
+    ok: false,
+    error: "No se pudo guardar la quiniela. Intenta nuevamente."
+  });
 
 } finally {
 
-   enviosEnProceso.delete(llaveEnvio);
+  if (client) {
+    client.release();
+  }
+
+  enviosEnProceso.delete(llaveEnvio);
 
 }
 });
+
 
 // ==========================================
 // 🏆 GUARDAR VARIAS QUINIELAS
@@ -2175,7 +2281,9 @@ app.post('/admin/resultados', async (req, res) => {
     `, [gl, gv, r.partido_id]);
   }
 
-  res.json({ ok: true });
+
+res.json({ ok: true });
+
 });
 
 
