@@ -992,7 +992,7 @@ if (social) {
       window.pageYOffset ||
       document.documentElement.scrollTop;
 
-    if (posicion > 150) {
+    if (posicion > 500) {
       social.style.display = "none";
     } else {
       social.style.display = "flex";
