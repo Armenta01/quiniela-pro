@@ -5852,13 +5852,14 @@ body {
   }
 
   /* Escudos originales */
-  #partidos .partido-card .team img {
-    width: 29px !important;
-    height: 29px !important;
-    min-width: 29px !important;
+ /* Escudos originales más grandes */
+#partidos .partido-card .team img {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
     object-fit: contain !important;
     flex-shrink: 0 !important;
-  }
+}
 
   /* Nombres de los equipos */
   #partidos .partido-card .nombre-abajo {
