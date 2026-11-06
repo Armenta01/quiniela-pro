@@ -6297,3 +6297,66 @@ body {
     padding: 5px 7px;
   }
 }
+
+
+
+/* =========================================
+   QUINIELAS EL INGE - AJUSTES DE BOTONES
+   ========================================= */
+
+/* Botón agregar: AZUL */
+#btnAgregarQuiniela {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  color: #ffffff !important;
+  border: 1px solid #60a5fa !important;
+  margin-bottom: 6px !important;
+}
+
+/* Menos espacio debajo del botón agregar */
+.agregar-quiniela-box {
+  margin-bottom: 12px !important;
+}
+
+.agregar-ayuda {
+  margin: 8px 0 12px !important;
+}
+
+/* Menos espacio entre quinielas y datos */
+#misQuinielas {
+  margin-bottom: 12px !important;
+}
+
+/* Editar: AMARILLO */
+.quiniela-mini-acciones .btn-editar-mini {
+  background: #facc15 !important;
+  color: #111827 !important;
+  border: none !important;
+}
+
+/* Eliminar: ROJO */
+.quiniela-mini-acciones .btn-eliminar-mini {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+/* Botón enviar: VERDE */
+#btnGuardar,
+#btnGuardarMultiples {
+  background: linear-gradient(135deg, #16a34a, #22c55e) !important;
+  color: white !important;
+}
+
+/* Compactar botones de envío */
+#btnGuardar,
+#btnGuardarMultiples {
+  margin-top: 8px !important;
+  margin-bottom: 8px !important;
+}
+
+/* Respetar elementos ocultos */
+#btnGuardar[hidden],
+#btnGuardarMultiples[hidden],
+#misQuinielas[hidden] {
+  display: none !important;
+}

@@ -1773,8 +1773,17 @@ async function mostrarMisQuinielas(partidosRecibidos = null) {
   const boton = document.getElementById("btnGuardarMultiples");
   const cantidad = quinielasAgregadas.length;
 
-  seccion.hidden = cantidad === 0;
-  boton.hidden = cantidad === 0;
+
+seccion.hidden = cantidad === 0;
+boton.hidden = cantidad === 0;
+
+// Mostrar únicamente un botón de envío
+const botonIndividual = document.getElementById("btnGuardar");
+
+if (botonIndividual) {
+  botonIndividual.hidden = cantidad > 0;
+}
+
 
   document.getElementById("cantidadQuinielas").textContent =
     `${cantidad} agregada${cantidad === 1 ? "" : "s"}`;
