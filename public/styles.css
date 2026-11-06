@@ -5784,3 +5784,142 @@ body {
     margin: 0 !important;
   }
 }
+
+
+
+
+
+
+
+/* -----------Codigo nuevo--------*/
+
+
+/* ==========================================
+   QUINIELAS EL INGE
+   PARTIDOS COMPACTOS SOLO EN CELULAR
+   ========================================== */
+
+@media screen and (max-width: 600px) {
+
+  /* Tarjeta principal */
+  #partidos .partido-card {
+    margin: 5px 6px !important;
+    padding: 7px 9px !important;
+    border-radius: 12px !important;
+  }
+
+  /* Estado: próximo, en vivo, finalizado */
+  #partidos .partido-card .estado {
+    min-width: 0 !important;
+    width: fit-content !important;
+    margin: 0 auto 4px !important;
+    padding: 2px 10px !important;
+    font-size: 10px !important;
+    line-height: 14px !important;
+    border-radius: 20px !important;
+  }
+
+  /* Distribución horizontal */
+  #partidos .partido-card .match {
+    display: grid !important;
+    grid-template-columns:
+      minmax(0, 1fr) 86px minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: 4px !important;
+  }
+
+  /* Contenedor de cada equipo */
+  #partidos .partido-card .team {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+    gap: 4px !important;
+  }
+
+  /* Equipo local: nombre y escudo */
+  #partidos .partido-card .team.left {
+    flex-direction: row-reverse !important;
+  }
+
+  /* Equipo visitante */
+  #partidos .partido-card .team.right {
+    flex-direction: row !important;
+  }
+
+  /* Escudos originales */
+  #partidos .partido-card .team img {
+    width: 29px !important;
+    height: 29px !important;
+    min-width: 29px !important;
+    object-fit: contain !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Nombres de los equipos */
+  #partidos .partido-card .nombre-abajo {
+    width: auto !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    line-height: 1.1 !important;
+    overflow-wrap: anywhere !important;
+    text-align: center !important;
+  }
+
+  /* Contenedor de marcadores */
+  #partidos .partido-card .score {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 0 !important;
+    gap: 3px !important;
+  }
+
+  /* Casillas de goles */
+  #partidos .partido-card .score input {
+    width: 34px !important;
+    min-width: 0 !important;
+    height: 34px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 7px !important;
+    font-size: 16px !important;
+    text-align: center !important;
+  }
+
+  /* Separador de marcadores */
+  #partidos .partido-card .score span {
+    font-size: 13px !important;
+    margin: 0 !important;
+  }
+
+  /* Información: fecha, hora y liga */
+  #partidos .partido-card .meta {
+    margin-top: 4px !important;
+    padding: 3px 5px !important;
+    border-radius: 6px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    gap: 3px 9px !important;
+  }
+
+  #partidos .partido-card .hora {
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+  }
+
+  #partidos .partido-card .liga {
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
+  }
+
+}
