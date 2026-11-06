@@ -5923,3 +5923,104 @@ body {
   }
 
 }
+
+
+/* ==========================================
+   QUINIELAS EL INGE
+   RECUADROS SUPERIORES COMPACTOS
+   SOLO CELULAR
+   ========================================== */
+
+@media screen and (max-width: 600px) {
+
+  /* QUINIELA ABIERTA / CERRADA */
+  #estadoQuiniela {
+    min-width: 0 !important;
+    width: fit-content !important;
+    max-width: 90% !important;
+    margin: 10px auto !important;
+    padding: 8px 18px !important;
+    font-size: 17px !important;
+    line-height: 1.3 !important;
+    border-radius: 12px !important;
+  }
+
+  /* RECUADRO DEL COSTO Y RELOJ */
+  #infoQuiniela {
+    width: 94% !important;
+    margin: 10px auto !important;
+    padding: 12px 10px !important;
+    border-radius: 14px !important;
+    font-size: 16px !important;
+  }
+
+  /* COSTO $50 */
+  #infoQuiniela .costo {
+    font-size: 19px !important;
+    margin: 0 0 8px !important;
+    line-height: 1.3 !important;
+  }
+
+  /* CONTENEDOR DEL CONTADOR */
+  #infoQuiniela .contador-box {
+    margin: 0 !important;
+    padding: 5px 0 !important;
+  }
+
+  /* TÍTULO CIERRE DE REGISTROS */
+  #infoQuiniela .contador-titulo {
+    font-size: 15px !important;
+    margin-bottom: 8px !important;
+  }
+
+  /* CUATRO CASILLAS DEL RELOJ */
+  #infoQuiniela .contador-digital {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 7px !important;
+  }
+
+  #infoQuiniela .tiempo {
+    min-width: 0 !important;
+    width: 65px !important;
+    padding: 6px 3px !important;
+    border-radius: 10px !important;
+  }
+
+  #infoQuiniela .tiempo span {
+    font-size: 25px !important;
+    line-height: 1.1 !important;
+  }
+
+  #infoQuiniela .tiempo small {
+    font-size: 9px !important;
+    letter-spacing: 0 !important;
+  }
+
+  /* RECUADRO DE PREMIOS */
+  #bolsaInfo {
+    width: 94% !important;
+    max-width: 100% !important;
+    margin: 8px auto 12px !important;
+    padding: 10px !important;
+    border-radius: 12px !important;
+    font-size: 13px !important;
+    line-height: 1.3 !important;
+  }
+
+  /* TÍTULO DE PREMIOS */
+  #bolsaInfo h2,
+  #bolsaInfo h3 {
+    font-size: 17px !important;
+    margin: 3px 0 8px !important;
+  }
+
+  /* TEXTOS DE PREMIOS */
+  #bolsaInfo p {
+    font-size: 13px !important;
+    line-height: 1.3 !important;
+    margin: 5px 0 !important;
+  }
+
+}
+
