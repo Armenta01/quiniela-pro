@@ -299,7 +299,7 @@ async function jornadaBloqueada(jornada) {
 
  const limite = fechaPartido
   .clone()
-  .subtract(3, 'hours');
+  .subtract(2, 'hours');
 
   const ahora = moment.tz("America/Mexico_City");
 

@@ -113,7 +113,7 @@ function getEstadoPartido(fechaStr) {
 
   const diffMin = (ahora - partidoFecha) / 60000;
 
-  if (diffMin > 130) {
+  if (diffMin > 100) {
     return {
       texto: "FINALIZADO",
       clase: "finalizado",
