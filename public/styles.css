@@ -6025,3 +6025,44 @@ body {
 
 }
 
+
+/* ==========================================
+   FECHA Y LIGA EN DOS LÍNEAS
+   SOLO EN CELULAR
+   ========================================== */
+
+@media screen and (max-width: 600px) {
+
+  #partidos .partido-card .meta {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-wrap: nowrap !important;
+    gap: 2px !important;
+    margin-top: 4px !important;
+    padding: 4px 6px !important;
+    text-align: center !important;
+  }
+
+  /* Primera línea: fecha y hora */
+  #partidos .partido-card .hora {
+    display: block !important;
+    width: 100% !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
+  }
+
+  /* Segunda línea: liga y jornada */
+  #partidos .partido-card .liga {
+    display: block !important;
+    width: 100% !important;
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
+    text-align: center !important;
+  }
+
+}
