@@ -6066,3 +6066,234 @@ body {
   }
 
 }
+
+
+
+/* =========================================
+   MIS QUINIELAS - QUINIELAS EL INGE
+   ========================================= */
+
+.agregar-quiniela-box {
+  max-width: 600px;
+  margin: 16px auto;
+  text-align: center;
+  padding: 0 12px;
+}
+
+.btn-agregar-quiniela {
+  width: 100%;
+  border: 1px solid #38bdf8;
+  border-radius: 12px;
+  padding: 13px;
+  background: linear-gradient(135deg, #164e81, #17649d);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.agregar-ayuda {
+  color: #b7c8dc;
+  font-size: 12px;
+  margin: 9px 0 0;
+}
+
+.mis-quinielas {
+  max-width: 600px;
+  margin: 18px auto;
+  padding: 14px;
+  border-radius: 16px;
+  background: #0b1930;
+  color: white;
+  box-sizing: border-box;
+}
+
+.mis-quinielas[hidden],
+.btn-guardar-multiples[hidden] {
+  display: none !important;
+}
+
+.mis-quinielas-encabezado,
+.total-quinielas {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.mis-quinielas-encabezado h3 {
+  font-size: 17px;
+  margin: 0 0 12px;
+}
+
+#cantidadQuinielas {
+  font-size: 12px;
+  color: #86efac;
+}
+
+.quiniela-mini {
+  background: #152c49;
+  border: 1px solid #35506e;
+  border-radius: 12px;
+  padding: 11px;
+  margin-bottom: 10px;
+}
+
+.quiniela-mini summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 800;
+  font-size: 14px;
+  list-style: none;
+}
+
+.quiniela-mini summary::-webkit-details-marker {
+  display: none;
+}
+
+.quiniela-mini summary::after {
+  content: "⌄";
+  color: #b7c8dc;
+}
+
+.quiniela-mini[open] summary::after {
+  content: "⌃";
+}
+
+.quiniela-mini-precio {
+  color: #facc15;
+  margin-left: auto;
+  margin-right: 12px;
+}
+
+.quiniela-mini-partidos {
+  margin-top: 10px;
+  border-top: 1px solid #35506e;
+  padding-top: 6px;
+}
+
+.quiniela-mini-partido {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+}
+
+.quiniela-mini-equipo {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.quiniela-mini-equipo.local {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.quiniela-mini-equipo.visitante {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.quiniela-mini-equipo img {
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px;
+  object-fit: contain;
+}
+
+.quiniela-mini-nombre {
+  font-size: 11px;
+  overflow-wrap: anywhere;
+  line-height: 1.2;
+}
+
+.quiniela-mini-marcador {
+  background: #07172a;
+  padding: 5px 9px;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.quiniela-mini-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.quiniela-mini-acciones button {
+  border: 0;
+  border-radius: 7px;
+  padding: 8px 12px;
+  color: white;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.btn-editar-mini {
+  background: #17649d;
+}
+
+.btn-eliminar-mini {
+  background: #9f2535;
+}
+
+.total-quinielas {
+  border-top: 1px solid #35506e;
+  padding-top: 12px;
+  margin-top: 10px;
+  font-size: 15px;
+}
+
+#precioQuinielas {
+  color: #facc15;
+  font-size: 19px;
+}
+
+.btn-guardar-multiples {
+  display: block;
+  width: min(100% - 24px, 600px);
+  margin: 12px auto;
+  border: 0;
+  border-radius: 12px;
+  padding: 15px;
+  color: white;
+  background: #16a34a;
+  font-weight: 800;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.btn-guardar-multiples:disabled,
+.btn-agregar-quiniela:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .mis-quinielas {
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 10px;
+  }
+
+  .quiniela-mini {
+    padding: 9px;
+  }
+
+  .quiniela-mini-nombre {
+    font-size: 10px;
+  }
+
+  .quiniela-mini-marcador {
+    font-size: 12px;
+    padding: 5px 7px;
+  }
+}

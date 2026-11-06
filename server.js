@@ -213,6 +213,11 @@ async function initDB() {
   `);
 
   await pool.query(`
+  ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS telefono TEXT;
+`);
+
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS partidos (
     id SERIAL PRIMARY KEY,
     local TEXT,
@@ -252,6 +257,14 @@ async function initDB() {
 await pool.query(`
   ALTER TABLE predicciones
   ADD COLUMN IF NOT EXISTS estado_pago TEXT DEFAULT 'Pendiente';
+`);
+
+// 🏆 Columnas necesarias para las quinielas
+await pool.query(`
+  ALTER TABLE predicciones
+  ADD COLUMN IF NOT EXISTS envio_id TEXT,
+  ADD COLUMN IF NOT EXISTS telefono TEXT,
+  ADD COLUMN IF NOT EXISTS fecha_envio TIMESTAMP;
 `);
 
   // ⚡ performance
@@ -581,6 +594,243 @@ VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)
 
 }
 });
+
+// ==========================================
+// 🏆 GUARDAR VARIAS QUINIELAS
+// ==========================================
+app.post("/guardar-multiples", async (req, res) => {
+  const { nombre, telefono, jornada, quinielas } = req.body || {};
+
+  const nombreLimpio = typeof nombre === "string" ? nombre.trim() : "";
+  const telefonoLimpio = String(telefono ?? "").trim();
+  const jornadaNumero = Number(jornada);
+
+  if (
+    nombreLimpio.length < 2 ||
+    !/^\d{10}$/.test(telefonoLimpio) ||
+    !Number.isInteger(jornadaNumero) ||
+    jornadaNumero < 1 ||
+    !Array.isArray(quinielas) ||
+    quinielas.length === 0
+  ) {
+    return res.status(400).json({
+      ok: false,
+      error: "Verifica tu nombre, teléfono, jornada y quinielas."
+    });
+  }
+
+  const llaveEnvio = `${nombreLimpio.toLowerCase()}-${jornadaNumero}`;
+
+  if (enviosEnProceso.has(llaveEnvio)) {
+    return res.status(429).json({
+      ok: false,
+      error: "Ya estamos procesando tus quinielas."
+    });
+  }
+
+  enviosEnProceso.add(llaveEnvio);
+
+  let client;
+
+  try {
+    if (await jornadaBloqueada(jornadaNumero)) {
+      return res.status(403).json({
+        ok: false,
+        error: "La jornada ya está cerrada."
+      });
+    }
+
+    client = await pool.connect();
+
+    await client.query("BEGIN");
+
+    const partidosResult = await client.query(
+      `SELECT id FROM partidos
+       WHERE jornada = $1
+       ORDER BY id`,
+      [jornadaNumero]
+    );
+
+    const idsValidos = partidosResult.rows.map(p => Number(p.id));
+
+    if (!idsValidos.length) {
+      throw new Error("La jornada no tiene partidos registrados.");
+    }
+
+    const firmas = new Set();
+    const quinielasNormalizadas = [];
+
+    for (const quiniela of quinielas) {
+      if (!Array.isArray(quiniela) || quiniela.length !== idsValidos.length) {
+        throw new Error("Cada quiniela debe incluir todos los partidos.");
+      }
+
+      const pronosticos = [];
+      const idsUsados = new Set();
+
+      for (const p of quiniela) {
+        const partidoId = Number(p.partido_id);
+        const local = p.local;
+        const visitante = p.visitante;
+
+        if (
+          !idsValidos.includes(partidoId) ||
+          idsUsados.has(partidoId)
+        ) {
+          throw new Error("Hay partidos incorrectos o repetidos.");
+        }
+
+        if (
+          local === "" || local == null ||
+          visitante === "" || visitante == null
+        ) {
+          throw new Error("Debes completar todos los marcadores.");
+        }
+
+        const gl = Number(local);
+        const gv = Number(visitante);
+
+        if (
+          !Number.isInteger(gl) ||
+          !Number.isInteger(gv) ||
+          gl < 0 || gv < 0 ||
+          gl > 20 || gv > 20
+        ) {
+          throw new Error("Los marcadores deben estar entre 0 y 20.");
+        }
+
+        idsUsados.add(partidoId);
+
+        pronosticos.push({
+          partido_id: partidoId,
+          local: gl,
+          visitante: gv
+        });
+      }
+
+      pronosticos.sort((a, b) => a.partido_id - b.partido_id);
+
+      const firma = JSON.stringify(pronosticos);
+
+      if (firmas.has(firma)) {
+        throw new Error("No puedes registrar quinielas idénticas.");
+      }
+
+      firmas.add(firma);
+      quinielasNormalizadas.push(pronosticos);
+    }
+
+    const usuarioResult = await client.query(
+      `INSERT INTO users (nombre, telefono)
+       VALUES ($1, $2)
+       ON CONFLICT (nombre)
+       DO UPDATE SET telefono = EXCLUDED.telefono
+       RETURNING id`,
+      [nombreLimpio, telefonoLimpio]
+    );
+
+    const userId = usuarioResult.rows[0].id;
+
+    const existentes = await client.query(
+      `SELECT envio_id, partido_id, goles_local, goles_visitante
+       FROM predicciones
+       WHERE user_id = $1 AND jornada = $2
+       ORDER BY envio_id, partido_id`,
+      [userId, jornadaNumero]
+    );
+
+    const grupos = new Map();
+
+    for (const p of existentes.rows) {
+      if (!grupos.has(p.envio_id)) grupos.set(p.envio_id, []);
+
+      grupos.get(p.envio_id).push({
+        partido_id: Number(p.partido_id),
+        local: p.goles_local,
+        visitante: p.goles_visitante
+      });
+    }
+
+    const firmasExistentes = new Set(
+      [...grupos.values()].map(p => JSON.stringify(p))
+    );
+
+    for (const firma of firmas) {
+      if (firmasExistentes.has(firma)) {
+        throw new Error(
+          "Una de estas quinielas ya fue registrada anteriormente."
+        );
+      }
+    }
+
+    const fechaEnvio = moment
+      .tz("America/Mexico_City")
+      .format("YYYY-MM-DD HH:mm:ss");
+
+    const envios = [];
+
+    for (const quiniela of quinielasNormalizadas) {
+      const envioId =
+        Date.now().toString() +
+        "_MULTI_" +
+        require("crypto").randomBytes(8).toString("hex");
+
+      for (const p of quiniela) {
+        await client.query(
+          `INSERT INTO predicciones
+           (user_id, partido_id, goles_local, goles_visitante,
+            jornada, envio_id, telefono, estado_pago, fecha_envio)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+          [
+            userId,
+            p.partido_id,
+            p.local,
+            p.visitante,
+            jornadaNumero,
+            envioId,
+            telefonoLimpio,
+            "Pendiente",
+            fechaEnvio
+          ]
+        );
+      }
+
+      envios.push(envioId);
+    }
+
+    await client.query("COMMIT");
+
+    return res.json({
+      ok: true,
+      cantidad: envios.length,
+      total: envios.length * 50,
+      envios
+    });
+
+  } catch (error) {
+    if (client) {
+      try {
+        await client.query("ROLLBACK");
+      } catch (rollbackError) {
+        console.error("Error al revertir:", rollbackError);
+      }
+    }
+
+    console.error("Error guardando múltiples:", error);
+
+    return res.status(
+      error.message.startsWith("duplicate key") ? 409 : 400
+    ).json({
+      ok: false,
+      error: error.message || "No se pudieron guardar las quinielas."
+    });
+
+  } finally {
+    if (client) client.release();
+    enviosEnProceso.delete(llaveEnvio);
+  }
+});
+
 
 // ==========================================================
 // 🔓 CAPTURA ADMINISTRATIVA DE QUINIELAS

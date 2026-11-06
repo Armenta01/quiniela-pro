@@ -10,7 +10,6 @@ async function obtenerJornadaActual() {
 
   document.getElementById("jornadaSelect").value = jornadaActual;
 
-  cargarPartidos();
 }
 
 // 🔥 INIT
@@ -20,7 +19,7 @@ window.onload = async () => {
 
   await obtenerJornadaActual();
 
-  cambiarJornada();
+  await cambiarJornada();
 
   cargarTop4();
 
@@ -72,24 +71,37 @@ async function cargarJornadas() {
   });
 }
 
-// 🔥 CAMBIO
-function cambiarJornada() {
+
+ // 🔥 CAMBIO DE JORNADA
+async function cambiarJornada() {
 
   jornadaActual = document.getElementById("jornadaSelect").value || 1;
 
-  cargarPartidos();
+  quinielasAgregadas = [];
+  editandoQuiniela = null;
 
+  document.getElementById("btnAgregarQuiniela").textContent =
+    "➕ Agregar quiniela";
+
+  await mostrarMisQuinielas();
+
+  // Primero cargar todos los partidos
+  await cargarPartidos();
+
+  // Después comprobar si la jornada está abierta o cerrada
+  await checkBloqueo();
+
+  // Actualizar información de la jornada
   cargarTop4();
 
   cargarBolsa(jornadaActual);
-
-  checkBloqueo();
 
   actualizarContador();
 
   setTimeout(mostrarRankingPopup, 500);
 
 }
+
 
 // 🔥 ESTADO PARTIDO
 function getEstadoPartido(fechaStr) {
@@ -491,7 +503,7 @@ for (let i = u.picks.length; i < totalPartidos; i++) {
 }
 
 // 🔥 GUARDAR
-async function guardarTodo() {
+async function guardarIndividual() {
 
   if (enviandoQuiniela) {
 
@@ -919,29 +931,53 @@ async function cargarTop4() {
 
 // 🔒 BLOQUEO
 async function checkBloqueo() {
+
   const r = await fetch(`/limite?jornada=${jornadaActual}`);
   const d = await r.json();
 
   const estado = document.getElementById("estadoQuiniela");
 
   if (d.bloqueada) {
+
     quinielaCerrada = true;
 
     estado.innerText = "🔒 Quiniela cerrada";
     estado.className = "estado closed";
 
-    document.querySelectorAll(".score input").forEach(i => i.disabled = true);
+    document.querySelectorAll(".score input").forEach(i => {
+      i.disabled = true;
+    });
+
     document.getElementById("btnGuardar").disabled = true;
 
   } else {
+
     quinielaCerrada = false;
 
     estado.innerText = "🟢 Quiniela abierta";
     estado.className = "estado open";
 
-    document.querySelectorAll(".score input").forEach(i => i.disabled = false);
+    document.querySelectorAll(".score input").forEach(i => {
+      i.disabled = false;
+    });
+
     document.getElementById("btnGuardar").disabled = false;
+
   }
+
+  // 🔥 BLOQUEO DE QUINIELAS MÚLTIPLES
+
+  const btnAgregar = document.getElementById("btnAgregarQuiniela");
+  const btnMultiples = document.getElementById("btnGuardarMultiples");
+
+  if (btnAgregar) {
+    btnAgregar.disabled = quinielaCerrada;
+  }
+
+  if (btnMultiples) {
+    btnMultiples.disabled = quinielaCerrada;
+  }
+
 }
 
 const social = document.getElementById("socialFloat");
@@ -1032,11 +1068,18 @@ async function actualizarContador() {
 
         const d = await r.json();
 
-        // Jornada cerrada
-        if (d.bloqueada) {
-            info.style.display = "none";
-            return;
-        }
+       
+      // Jornada cerrada
+      if (d.bloqueada) {
+      info.style.display = "none";
+
+      if (!quinielaCerrada) {
+        await checkBloqueo();
+      }
+
+      return;
+      }
+
 
         info.style.display = "block";
 
@@ -1506,4 +1549,455 @@ function verMiPosicion() {
 
   }, 5000);
 
+}
+
+
+/* =========================================
+   SISTEMA DE QUINIELAS MÚLTIPLES
+   ========================================= */
+
+let quinielasAgregadas = [];
+let editandoQuiniela = null;
+let enviandoMultiples = false;
+
+function escaparHTML(valor) {
+  return String(valor ?? "").replace(/[&<>"']/g, c => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[c]));
+}
+
+async function obtenerPartidosCaptura() {
+  const res = await fetch(
+    `/partidos?jornada=${encodeURIComponent(jornadaActual)}`
+  );
+
+  if (!res.ok) {
+    throw new Error("No se pudieron obtener los partidos.");
+  }
+
+  const partidos = await res.json();
+
+  if (!Array.isArray(partidos) || !partidos.length) {
+    throw new Error("No hay partidos para esta jornada.");
+  }
+
+  return partidos;
+}
+
+function capturarMarcadores(partidos, obligatorio = true) {
+  const lista = [];
+  let hayAlgo = false;
+
+  for (const p of partidos) {
+    const localInput = document.getElementById("l" + p.id);
+    const visitaInput = document.getElementById("v" + p.id);
+
+    if (!localInput || !visitaInput) {
+      throw new Error("Faltan campos de partidos. Recarga la página.");
+    }
+
+    const gl = localInput.value.trim();
+    const gv = visitaInput.value.trim();
+
+    if (gl !== "" || gv !== "") hayAlgo = true;
+
+    if (gl === "" || gv === "") {
+      if (!obligatorio && gl === "" && gv === "") {
+        continue;
+      }
+
+      throw new Error(
+        `Falta capturar el marcador de ${p.local} vs ${p.visitante}.`
+      );
+    }
+
+    if (!/^\d{1,2}$/.test(gl) || !/^\d{1,2}$/.test(gv)) {
+      throw new Error("Los marcadores deben ser números enteros.");
+    }
+
+    const local = Number(gl);
+    const visitante = Number(gv);
+
+    if (local > 20 || visitante > 20) {
+      throw new Error("El máximo permitido es de 20 goles.");
+    }
+
+    lista.push({
+      partido_id: Number(p.id),
+      local,
+      visitante
+    });
+  }
+
+  if (!obligatorio && !hayAlgo) return null;
+
+  if (lista.length !== partidos.length) {
+    throw new Error("Debes completar los nueve marcadores.");
+  }
+
+  return lista;
+}
+
+function firmaQuiniela(pronosticos) {
+  return JSON.stringify(
+    [...pronosticos]
+      .sort((a, b) => a.partido_id - b.partido_id)
+      .map(p => [
+        Number(p.partido_id),
+        Number(p.local),
+        Number(p.visitante)
+      ])
+  );
+}
+
+function limpiarCamposPartidos() {
+  document.querySelectorAll("#partidos .score input")
+    .forEach(input => input.value = "");
+}
+
+function restaurarMarcadores(pronosticos) {
+  limpiarCamposPartidos();
+
+  pronosticos.forEach(p => {
+    const local = document.getElementById("l" + p.partido_id);
+    const visitante = document.getElementById("v" + p.partido_id);
+
+    if (local) local.value = p.local;
+    if (visitante) visitante.value = p.visitante;
+  });
+}
+
+function mostrarErrorQuiniela(mensaje) {
+  mostrarMensaje("Revisa tu quiniela", escaparHTML(mensaje), "⚠️");
+}
+
+async function agregarQuiniela() {
+  if (quinielaCerrada || enviandoMultiples || enviandoQuiniela) return;
+
+  try {
+    const partidos = await obtenerPartidosCaptura();
+    const pronosticos = capturarMarcadores(partidos);
+
+    const firma = firmaQuiniela(pronosticos);
+
+    const repetida = quinielasAgregadas.some(
+      (q, i) => i !== editandoQuiniela &&
+        firmaQuiniela(q) === firma
+    );
+
+    if (repetida) {
+      throw new Error(
+        "Ya agregaste una quiniela con estos mismos resultados."
+      );
+    }
+
+    if (editandoQuiniela !== null) {
+      quinielasAgregadas[editandoQuiniela] = pronosticos;
+      editandoQuiniela = null;
+      mostrarToast("Quiniela actualizada", "✅");
+    } else {
+      quinielasAgregadas.push(pronosticos);
+      mostrarToast("Quiniela agregada", "✅");
+    }
+
+    limpiarCamposPartidos();
+    await mostrarMisQuinielas(partidos);
+
+    document.getElementById("btnAgregarQuiniela").textContent =
+      "➕ Agregar quiniela";
+
+  } catch (error) {
+    mostrarErrorQuiniela(error.message);
+  }
+}
+
+async function editarQuiniela(indice) {
+  if (quinielaCerrada || enviandoMultiples) return;
+
+  if (editandoQuiniela !== null && editandoQuiniela !== indice) {
+    mostrarErrorQuiniela(
+      "Termina de editar la quiniela actual antes de abrir otra."
+    );
+    return;
+  }
+
+  if (!quinielasAgregadas[indice]) return;
+
+  restaurarMarcadores(quinielasAgregadas[indice]);
+  editandoQuiniela = indice;
+
+  document.getElementById("btnAgregarQuiniela").textContent =
+    "💾 Actualizar quiniela";
+
+  document.getElementById("partidos")
+    .scrollIntoView({ behavior: "smooth", block: "start" });
+
+  mostrarToast("Edita los marcadores y pulsa Actualizar", "✏️");
+}
+
+async function eliminarQuiniela(indice) {
+  if (enviandoMultiples) return;
+
+  const confirmado = await mostrarConfirmacion(
+    "Eliminar quiniela",
+    `¿Deseas eliminar la quiniela #${indice + 1}?`
+  );
+
+  if (!confirmado) return;
+
+  quinielasAgregadas.splice(indice, 1);
+
+  if (editandoQuiniela === indice) {
+    editandoQuiniela = null;
+    limpiarCamposPartidos();
+  } else if (editandoQuiniela !== null && editandoQuiniela > indice) {
+    editandoQuiniela--;
+  }
+
+  document.getElementById("btnAgregarQuiniela").textContent =
+    editandoQuiniela === null
+      ? "➕ Agregar quiniela"
+      : "💾 Actualizar quiniela";
+
+  await mostrarMisQuinielas();
+  mostrarToast("Quiniela eliminada", "🗑️");
+}
+
+async function mostrarMisQuinielas(partidosRecibidos = null) {
+  const seccion = document.getElementById("misQuinielas");
+  const lista = document.getElementById("listaQuinielas");
+  const boton = document.getElementById("btnGuardarMultiples");
+  const cantidad = quinielasAgregadas.length;
+
+  seccion.hidden = cantidad === 0;
+  boton.hidden = cantidad === 0;
+
+  document.getElementById("cantidadQuinielas").textContent =
+    `${cantidad} agregada${cantidad === 1 ? "" : "s"}`;
+
+  document.getElementById("resumenQuinielas").textContent =
+    `${cantidad} quiniela${cantidad === 1 ? "" : "s"}`;
+
+  document.getElementById("precioQuinielas").textContent =
+    `$${cantidad * 50} MXN`;
+
+  boton.textContent = `📲 Guardar y enviar ${cantidad} quiniela${cantidad === 1 ? "" : "s"}`;
+
+  if (!cantidad) {
+    lista.innerHTML = "";
+    return;
+  }
+
+  const partidos = partidosRecibidos || await obtenerPartidosCaptura();
+  const mapa = new Map(partidos.map(p => [Number(p.id), p]));
+
+  lista.innerHTML = quinielasAgregadas.map((quiniela, indice) => {
+    const filas = quiniela.map(pr => {
+      const p = mapa.get(Number(pr.partido_id));
+      if (!p) return "";
+
+      return `
+        <div class="quiniela-mini-partido">
+
+          <div class="quiniela-mini-equipo local">
+            <span class="quiniela-mini-nombre">${escaparHTML(p.local)}</span>
+            <img src="${escaparHTML(p.logo_local || "")}"
+                 alt="" loading="lazy">
+          </div>
+
+          <span class="quiniela-mini-marcador">
+            ${pr.local} - ${pr.visitante}
+          </span>
+
+          <div class="quiniela-mini-equipo visitante">
+            <img src="${escaparHTML(p.logo_visitante || "")}"
+                 alt="" loading="lazy">
+            <span class="quiniela-mini-nombre">${escaparHTML(p.visitante)}</span>
+          </div>
+
+        </div>
+      `;
+    }).join("");
+
+    return `
+      <details class="quiniela-mini" ${indice === cantidad - 1 ? "open" : ""}>
+        <summary>
+          <span>🎟️ Quiniela #${indice + 1}</span>
+          <span class="quiniela-mini-precio">$50</span>
+        </summary>
+
+        <div class="quiniela-mini-partidos">
+          ${filas}
+        </div>
+
+        <div class="quiniela-mini-acciones">
+          <button type="button"
+                  class="btn-editar-mini"
+                  onclick="editarQuiniela(${indice})">
+            ✏️ Editar
+          </button>
+
+          <button type="button"
+                  class="btn-eliminar-mini"
+                  onclick="eliminarQuiniela(${indice})">
+            🗑️ Eliminar
+          </button>
+        </div>
+      </details>
+    `;
+  }).join("");
+}
+
+/* El botón original decide qué enviar */
+async function guardarTodo() {
+  if (quinielasAgregadas.length > 0) {
+    return guardarMultiples();
+  }
+
+  return guardarIndividual();
+}
+
+function crearMensajeMultiples(nombre, quinielas, partidos) {
+  const mapa = new Map(partidos.map(p => [Number(p.id), p]));
+
+  const fechaHora = new Date().toLocaleString("es-MX");
+
+  let mensaje = "🏆 *Quinielas El Inge*\n\n";
+  mensaje += `👤 Jugador: *${nombre}*\n`;
+  mensaje += `📅 Semana: *${jornadaActual}*\n`;
+  mensaje += `🕒 Registro: *${fechaHora}*\n`;
+  mensaje += `🎟️ Total: *${quinielas.length} quinielas*\n`;
+  mensaje += `💰 Importe: *$${quinielas.length * 50} MXN*\n\n`;
+
+  quinielas.forEach((quiniela, indice) => {
+    mensaje += `━━━ *QUINIELA #${indice + 1}* ━━━\n`;
+
+    quiniela.forEach(pr => {
+      const p = mapa.get(Number(pr.partido_id));
+      if (!p) return;
+
+      mensaje += `⚽ ${p.local} *[${pr.local}]-[${pr.visitante}]* ${p.visitante}\n`;
+    });
+
+    mensaje += "\n";
+  });
+
+  mensaje += "🍀 *¡Mucha suerte!*\n";
+
+  return mensaje;
+}
+
+async function guardarMultiples() {
+  if (enviandoMultiples || enviandoQuiniela || quinielaCerrada) return;
+
+  const boton = document.getElementById("btnGuardarMultiples");
+
+  try {
+    if (editandoQuiniela !== null) {
+      throw new Error(
+        "Primero pulsa Actualizar quiniela para guardar tus cambios."
+      );
+    }
+
+    let nombre = document.getElementById("usuario").value.trim();
+    const telefono = document.getElementById("telefono").value.trim();
+
+    nombre = nombre.replace(/[^a-zA-Z0-9\s]/g, "");
+
+    if (nombre.length < 3) {
+      throw new Error("Ingresa un nombre válido.");
+    }
+
+    if (!/^\d{10}$/.test(telefono)) {
+      throw new Error("Ingresa un WhatsApp válido de 10 dígitos.");
+    }
+
+    
+const partidos = await obtenerPartidosCaptura();
+
+const actual = capturarMarcadores(partidos, false);
+
+if (actual) {
+    throw new Error(
+        "Tienes marcadores pendientes. Pulsa Agregar quiniela antes de enviar todas."
+    );
+}
+
+const todas = quinielasAgregadas.map(q =>
+    q.map(p => ({ ...p }))
+);
+
+
+    if (!todas.length) {
+      throw new Error("No hay quinielas para enviar.");
+    }
+
+    const firmas = todas.map(firmaQuiniela);
+
+    if (new Set(firmas).size !== firmas.length) {
+      throw new Error(
+        "Tienes quinielas repetidas. Modifica los resultados antes de enviar."
+      );
+    }
+
+    enviandoMultiples = true;
+    boton.disabled = true;
+    boton.textContent = "⏳ Guardando quinielas...";
+
+    const res = await fetch("/guardar-multiples", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        nombre,
+        telefono,
+        jornada: jornadaActual,
+        quinielas: todas
+      })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.ok) {
+      throw new Error(data.error || "No fue posible guardar.");
+    }
+
+    localStorage.setItem("miNombre", nombre);
+
+    const mensaje = crearMensajeMultiples(nombre, todas, partidos);
+    const url = "https://wa.me/524531336012?text=" +
+      encodeURIComponent(mensaje);
+
+    quinielasAgregadas = [];
+    editandoQuiniela = null;
+    limpiarCamposPartidos();
+    await mostrarMisQuinielas(partidos);
+
+    document.getElementById("btnAgregarQuiniela").textContent =
+      "➕ Agregar quiniela";
+
+    mostrarToast("¡Quinielas registradas! Abriendo WhatsApp", "✅");
+
+    if (typeof confetti === "function") {
+      confetti({ particleCount: 180, spread: 100 });
+    }
+
+    if (/Android|iPhone/i.test(navigator.userAgent)) {
+      window.location.href = url;
+    } else {
+      window.open(url, "_blank");
+    }
+
+  } catch (error) {
+    mostrarErrorQuiniela(error.message);
+  } finally {
+    enviandoMultiples = false;
+    boton.disabled = quinielaCerrada;
+    if (!quinielaCerrada && quinielasAgregadas.length) {
+      boton.textContent = "📲 Guardar y enviar todas";
+    }
+  }
 }

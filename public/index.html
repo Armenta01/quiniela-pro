@@ -217,6 +217,41 @@
 
 <div id="partidos"></div>
 
+<!-- AGREGAR VARIAS QUINIELAS -->
+<div class="agregar-quiniela-box">
+
+  <button
+    type="button"
+    id="btnAgregarQuiniela"
+    class="btn-agregar-quiniela"
+    onclick="agregarQuiniela()">
+    ➕ Agregar quiniela
+  </button>
+
+  <p class="agregar-ayuda">
+    ¿Quieres jugar varias? Agrégalas aquí.
+    Si solo juegas una, puedes guardarla directamente.
+  </p>
+
+</div>
+
+<!-- LISTA DE QUINIELAS AGREGADAS -->
+<section id="misQuinielas" class="mis-quinielas" hidden>
+
+  <div class="mis-quinielas-encabezado">
+    <h3>🏆 Mis quinielas</h3>
+    <span id="cantidadQuinielas">0 agregadas</span>
+  </div>
+
+  <div id="listaQuinielas"></div>
+
+  <div class="total-quinielas">
+    <strong id="resumenQuinielas">0 quinielas</strong>
+    <strong id="precioQuinielas">$0 MXN</strong>
+  </div>
+
+</section>
+
 <div class="usuario-box">
   <input id="usuario"
          maxlength="15"
@@ -234,6 +269,15 @@
         class="btn-main"
         onclick="guardarTodo()">
   Guardar Quiniela
+</button>
+
+<button
+  type="button"
+  id="btnGuardarMultiples"
+  class="btn-guardar-multiples"
+  onclick="guardarMultiples()"
+  hidden>
+  📲 Guardar y enviar todas
 </button>
 
 <div class="acciones-quiniela">
