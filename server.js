@@ -15,8 +15,15 @@ const PgSession = require('connect-pg-simple')(session);
 
 const app = express();
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
 
+app.use((req, res, next) => {
+  if (req.path.toLowerCase() === '/admin.html') {
+    return res.redirect('/admin');
+  }
+  next();
+});
+
+app.use(express.static(path.join(__dirname, 'public')));
 // ==========================================
 // 🖼️ PROXY PARA LOGOS DE EQUIPOS
 // ==========================================
@@ -1365,8 +1372,7 @@ try {
   }
 });
 
-app.post('/recordatorio/enviado', async (req, res) => {
-
+app.post('/recordatorio/enviado', verificarAdmin, async (req, res) => {
   const { id } = req.body;
 
   try {
@@ -3230,8 +3236,7 @@ const mejorRacha = await pool.query(`
 });
 
 // 📲 Usuarios que aún no han enviado su quiniela
-app.get('/recordatorios', async (req, res) => {
-
+app.get('/recordatorios', verificarAdmin, async (req, res) => {
   try {
 
     const { jornada } = req.query;
@@ -3273,8 +3278,7 @@ app.get('/recordatorios', async (req, res) => {
 
 });
 
-app.post('/recordatorios/reiniciar', async (req, res) => {
-
+app.post('/recordatorios/reiniciar', verificarAdmin, async (req, res) => {
   try {
 
     await pool.query(`
