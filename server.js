@@ -10,6 +10,8 @@ types.setTypeParser(1114, value => value);
 const ExcelJS = require('exceljs');
 const fetch = require('node-fetch');
 const moment = require('moment-timezone');
+const session = require('express-session');
+const PgSession = require('connect-pg-simple')(session);
 
 const app = express();
 app.use(express.json());
@@ -202,6 +204,40 @@ const pool = new Pool({
     ? { rejectUnauthorized: false }
     : false
 });
+
+app.set('trust proxy', 1);
+
+app.use(session({
+  store: new PgSession({
+    pool,
+    createTableIfMissing: true
+  }),
+  name: 'inge.sid',
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 1000 * 60 * 60 * 4
+  }
+}));
+
+
+ // 🔒 PROTEGER TODAS LAS RUTAS ADMINISTRATIVAS
+app.use('/admin', (req, res, next) => {
+
+  // Permitir iniciar sesión
+  if (req.path === '/login' && req.method === 'POST') {
+    return next();
+  }
+
+  // Exigir sesión administrativa
+  return verificarAdmin(req, res, next);
+
+});
+
 
 // 🔥 INIT DB + ÍNDICES
 async function initDB() {
@@ -1310,8 +1346,8 @@ app.post('/admin/guardar-quiniela', async (req, res) => {
 
 });
 
-app.post('/admin/resultado', async (req, res) => {
-  try {
+app.post('/admin/resultado', verificarAdmin, async (req, res) => {
+try {
     const { partido_id, goles_local, goles_visitante } = req.body;
 
     await pool.query(
@@ -1360,8 +1396,7 @@ app.post('/recordatorio/enviado', async (req, res) => {
 
 });
 
-app.post('/recordatorios/quitar', async (req, res) => {
-
+app.post('/recordatorios/quitar', verificarAdmin, async (req, res) => {
     const { ids } = req.body;
 
     try{
@@ -1392,8 +1427,7 @@ app.post('/recordatorios/quitar', async (req, res) => {
 
 });
 
-app.post('/recordatorios/eliminar', async (req, res) => {
-
+app.post('/recordatorios/eliminar', verificarAdmin, async (req, res) => {
     const { ids } = req.body;
 
     try{
@@ -2314,7 +2348,7 @@ app.get('/limite', async (req, res) => {
 // 🔒 Cierre 3 horas antes del primer partido
 const limite = fechaPartido
   .clone()
-  .subtract(3, 'hours');
+  .subtract(2, 'hours');
 
   
 
@@ -2432,7 +2466,7 @@ if (!Number.isInteger(orden) || orden <= 0) {
   }
 });
 
-app.get('/backup', async (req, res) => {
+app.get('/backup', verificarAdmin, async (req, res) => {
   try {
 
     const users = await pool.query(`SELECT * FROM users`);
@@ -2455,8 +2489,7 @@ app.get('/backup', async (req, res) => {
 });
 
 
-app.get('/exportar-excel', async (req, res) => {
-
+app.get('/exportar-excel', verificarAdmin, async (req, res) => {
   const jornada = req.query.jornada || 1;
 
   try {
@@ -3018,24 +3051,56 @@ for (let col = 1; col <= sheet.columnCount; col++) {
 });
 
 
-app.post('/admin/login', (req, res) => {
-
-  const user = (req.body.user || "").trim();
-  const password = (req.body.password || "").trim();
-
-  const ADMIN_USER = (process.env.ADMIN_USER || "").trim();
-  const ADMIN_PASSWORD = (process.env.ADMIN_PASSWORD || "").trim();
+app.post('/admin/login', (req, res, next) => {
+  const user = String(req.body?.user ?? '').trim();
+  const password = String(req.body?.password ?? '');
 
   if (
-    user === ADMIN_USER &&
-    password === ADMIN_PASSWORD
+    !process.env.ADMIN_USER ||
+    !process.env.ADMIN_PASSWORD ||
+    user !== process.env.ADMIN_USER ||
+    password !== process.env.ADMIN_PASSWORD
   ) {
-    return res.json({ ok: true });
+    return res.status(401).json({
+      ok: false,
+      error: 'Credenciales incorrectas'
+    });
   }
 
-  res.status(401).json({ error: "Usuario Incorrecto" });
+  req.session.regenerate(err => {
+    if (err) return next(err);
 
+    req.session.esAdmin = true;
+
+    req.session.save(err => {
+      if (err) return next(err);
+
+      res.json({ ok: true });
+    });
+  });
 });
+
+app.post('/admin/logout', verificarAdmin, (req, res, next) => {
+  req.session.destroy(err => {
+    if (err) return next(err);
+
+    res.clearCookie('inge.sid');
+    res.json({ ok: true });
+  });
+});
+
+
+
+function verificarAdmin(req, res, next) {
+  if (req.session?.esAdmin === true) {
+    return next();
+  }
+
+  return res.status(401).json({
+    ok: false,
+    error: 'Sesión administrativa requerida'
+  });
+}
 
 
 app.get('/jornada-actual', async (req, res) => {
