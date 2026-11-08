@@ -392,6 +392,153 @@ button{
 
 }
 
+
+/* ==========================================
+   CONTROL DE PAGOS - AJUSTE PARA CELULARES
+   SIN CAMBIAR EL DISEÑO ORIGINAL
+   ========================================== */
+
+@media (max-width: 768px) {
+
+    html,
+    body {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        overflow-x: clip;
+    }
+
+    body {
+        padding: 12px 6px;
+    }
+
+    h1 {
+        font-size: 26px;
+        line-height: 1.2;
+    }
+
+    .barra-superior {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .resumen {
+        width: 100%;
+        gap: 15px;
+    }
+
+    .card {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .contenedorBusqueda {
+        width: 100%;
+    }
+
+    #buscar {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    /* Las cinco columnas dentro de la pantalla */
+
+    table {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        table-layout: fixed;
+        border-collapse: collapse;
+    }
+
+    th,
+    td {
+        min-width: 0;
+        max-width: 100%;
+        padding: 8px 2px;
+        text-align: center;
+        font-size: 10px;
+        line-height: 1.3;
+        overflow-wrap: anywhere;
+        word-break: normal;
+        white-space: normal;
+    }
+
+    th:nth-child(1),
+    td:nth-child(1) {
+        width: 20%;
+    }
+
+    th:nth-child(2),
+    td:nth-child(2) {
+        width: 22%;
+    }
+
+    th:nth-child(3),
+    td:nth-child(3) {
+        width: 18%;
+    }
+
+    th:nth-child(4),
+    td:nth-child(4) {
+        width: 20%;
+    }
+
+    th:nth-child(5),
+    td:nth-child(5) {
+        width: 20%;
+    }
+
+    /* Teléfono visible sin desbordarse */
+
+    td:nth-child(2) a {
+        font-size: 10px;
+        overflow-wrap: anywhere;
+        color: inherit;
+    }
+
+    /* Conservar colores y forma de los estados */
+
+    table .estado {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        margin: 0;
+        padding: 6px 2px;
+        font-size: 10px;
+        line-height: 1.2;
+        border-radius: 20px;
+        letter-spacing: 0;
+    }
+
+    /* Conservar botones verdes y grises */
+
+    table button {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        margin: 0;
+        padding: 7px 2px;
+        font-size: 10px;
+        line-height: 1.2;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        border-radius: 8px;
+    }
+
+    /* Mantener el modal dentro del celular */
+
+    .modalContenido {
+        width: 95%;
+        max-width: 95%;
+        padding: 18px;
+    }
+}
+
+
 </style>
 
 </head>
