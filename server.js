@@ -2565,6 +2565,27 @@ app.get('/admin/exportar-pdf', verificarAdmin, async (req, res) => {
       a.nombre.localeCompare(b.nombre, 'es')
     );
 
+    // GANADORES SOLO CUANDO TODOS LOS PARTIDOS TERMINEN
+const jornadaTerminada = partidos.every(p =>
+  p.goles_local != null && p.goles_visitante != null
+);
+
+// Obtener puntuaciones distintas de mayor a menor
+const puntuaciones = [
+  ...new Set(tabla.map(jugador => jugador.puntos))
+].sort((a, b) => b - a);
+
+const primerPuntaje = puntuaciones[0];
+const segundoPuntaje = puntuaciones[1];
+
+const primerosLugares = jornadaTerminada
+  ? tabla.filter(j => j.puntos === primerPuntaje)
+  : [];
+
+const segundosLugares = jornadaTerminada
+  ? tabla.filter(j => j.puntos === segundoPuntaje)
+  : [];
+
     // Descargar logos compatibles con PDFKit
     const logos = new Map();
 
@@ -2578,12 +2599,16 @@ app.get('/admin/exportar-pdf', verificarAdmin, async (req, res) => {
         const direccion = new URL(url);
 
         if (direccion.protocol === 'https:') {
-          const respuesta = await fetch(url, {
-            timeout: 6000,
-            headers: {
-              Accept: 'image/png,image/jpeg'
-            }
-          });
+
+  // Fetch exclusivo para los logos del PDF
+  const { default: fetchPDF } = await import('node-fetch');
+
+  const respuesta = await fetchPDF(url, {
+    timeout: 6000,
+    headers: {
+      Accept: 'image/png,image/jpeg'
+    }
+  });
 
           const tipo = respuesta.headers.get('content-type') || '';
           const largo = Number(
@@ -2612,6 +2637,11 @@ app.get('/admin/exportar-pdf', verificarAdmin, async (req, res) => {
       await obtenerLogo(p.logo_local);
       await obtenerLogo(p.logo_visitante);
     }
+const fs = require('fs');
+
+const rutaLogoInge = path.join(__dirname, 'public', 'logo2.png');
+
+const logoIngeDisponible = fs.existsSync(rutaLogoInge);
 
     const doc = new PDFDocument({
       size: 'LETTER',
@@ -2646,7 +2676,24 @@ app.get('/admin/exportar-pdf', verificarAdmin, async (req, res) => {
       partidos.length;
 
     const alturaFila = 23;
-    const inicioFilas = 192;
+
+// Espacio reservado para ganadores
+const mostrarGanadores = jornadaTerminada && tabla.length > 0;
+
+const textoPrimeros = primerosLugares
+  .map(j => j.nombre)
+  .join(', ');
+
+const textoSegundos = segundosLugares
+  .map(j => j.nombre)
+  .join(', ');
+
+const alturaGanadores = mostrarGanadores
+  ? 66
+  : 0;
+
+const inicioFilas = 192 + alturaGanadores;
+
     const limiteInferior = doc.page.height - 45;
 
     function textoCorto(texto, maximo) {
@@ -2662,7 +2709,7 @@ app.get('/admin/exportar-pdf', verificarAdmin, async (req, res) => {
       if (imagen) {
         try {
           doc.image(imagen, x, y, {
-            fit: [12, 12],
+            fit: [15, 15],
             align: 'center'
           });
           return;
@@ -2683,6 +2730,18 @@ app.get('/admin/exportar-pdf', verificarAdmin, async (req, res) => {
 
     function encabezado() {
       doc.rect(0, 0, doc.page.width, 75).fill(AZUL);
+// LOGO DE QUINIELAS EL INGE - TODAS LAS PÁGINAS
+if (logoIngeDisponible) {
+  try {
+    doc.image(rutaLogoInge, doc.page.width - 88, 12, {
+      fit: [55, 55],
+      align: 'center',
+      valign: 'center'
+    });
+  } catch (error) {
+    console.log('No se pudo mostrar el logo:', error.message);
+  }
+}
 
       doc.fillColor(BLANCO)
         .font('Helvetica-Bold')
@@ -2719,88 +2778,148 @@ app.get('/admin/exportar-pdf', verificarAdmin, async (req, res) => {
 
         lx += 125;
       }
+// CUADRO DE GANADORES - REPETIDO EN TODAS LAS PÁGINAS
+if (mostrarGanadores) {
+  const yGanadores = 105;
+
+  doc.roundedRect(
+    margen,
+    yGanadores,
+    anchoPagina,
+    62,
+    6
+  ).fill('#EAF1F8');
+
+  doc.fillColor(AZUL)
+    .font('Helvetica-Bold')
+    .fontSize(10)
+    .text('GANADORES OFICIALES', margen + 8, yGanadores + 5, {
+      width: anchoPagina - 16,
+      align: 'center'
+    });
+
+  doc.fillColor('#A47A12')
+    .font('Helvetica-Bold')
+    .fontSize(8)
+    .text(
+      `1ER LUGAR (${primerPuntaje} PTS): ${textoPrimeros}`,
+      margen + 10,
+      yGanadores + 23,
+      {
+        width: anchoPagina - 20,
+        height: 15,
+        ellipsis: true
+      }
+    );
+
+  if (segundosLugares.length) {
+    doc.fillColor('#52657A')
+      .font('Helvetica-Bold')
+      .fontSize(8)
+      .text(
+        `2DO LUGAR (${segundoPuntaje} PTS): ${textoSegundos}`,
+        margen + 10,
+        yGanadores + 42,
+        {
+          width: anchoPagina - 20,
+          height: 15,
+          ellipsis: true
+        }
+      );
+  }
+}
 
       // Encabezado de partidos
-      doc.rect(margen, 108, anchoPagina, 76).fill(AZUL);
+    
+      // ENCABEZADO COMPACTO:
+      // LOGO LOCAL | RESULTADO O VS | LOGO VISITANTE
 
+      const yEncabezado = 108 + alturaGanadores;
+      const altoEncabezado = 76;
+
+      doc.rect(
+        margen,
+        yEncabezado,
+        anchoPagina,
+        altoEncabezado
+      ).fill(AZUL);
+
+      // Título de la primera columna
       doc.fillColor(BLANCO)
         .font('Helvetica-Bold')
         .fontSize(8)
-        .text('PARTICIPANTE', margen + 5, 143, {
-          width: anchoNombre - 8
-        });
+        .text(
+          'PARTICIPANTE',
+          margen + 5,
+          yEncabezado + 34,
+          {
+            width: anchoNombre - 8
+          }
+        );
 
+      // Logos y marcadores de los partidos
       partidos.forEach((p, i) => {
         const x = margen + anchoNombre + i * anchoPartido;
-
-        const resultado =
-          p.goles_local == null || p.goles_visitante == null
-            ? '- -'
-            : `${p.goles_local}-${p.goles_visitante}`;
-
-        // Logos y marcador oficial:
-        // LOGO LOCAL | RESULTADO | LOGO VISITANTE
         const centro = x + anchoPartido / 2;
 
+        const finalizado =
+          p.goles_local != null &&
+          p.goles_visitante != null;
+
+        const resultado = finalizado
+          ? `${p.goles_local}-${p.goles_visitante}`
+          : 'VS';
+
+        // Posiciones de logos y resultado
+        const tamanoLogo = Math.min(15, anchoPartido * 0.25);
+        const separacion = Math.min(20, anchoPartido * 0.31);
+
+        const yLogo = yEncabezado + 26;
+
+        // LOGO LOCAL
         pintarLogo(
           p.logo_local,
-          centro - 23,
-          119,
+          centro - separacion - tamanoLogo / 2,
+          yLogo,
           p.local
         );
 
-        doc.fillColor(DORADO)
+        // MARCADOR OFICIAL O VS
+        doc.fillColor(finalizado ? DORADO : BLANCO)
           .font('Helvetica-Bold')
           .fontSize(8)
-          .text(resultado, centro - 12, 120, {
-            width: 24,
-            align: 'center'
-          });
-
-        pintarLogo(
-          p.logo_visitante,
-          centro + 12,
-          119,
-          p.visitante
-        );
-
-        doc.fillColor(BLANCO)
-          .font('Helvetica')
-          .fontSize(5.5)
           .text(
-            textoCorto(p.local, 9),
-            x + 1, 143,
+            resultado,
+            centro - 12,
+            yLogo + 3,
             {
-              width: anchoPartido - 2,
-              align: 'center'
-            }
-          )
-          .text(
-            'VS',
-            x + 1, 151,
-            {
-              width: anchoPartido - 2,
-              align: 'center'
-            }
-          )
-          .text(
-            textoCorto(p.visitante, 9),
-            x + 1, 159,
-            {
-              width: anchoPartido - 2,
+              width: 24,
               align: 'center'
             }
           );
+
+        // LOGO VISITANTE
+        pintarLogo(
+          p.logo_visitante,
+          centro + separacion - tamanoLogo / 2,
+          yLogo,
+          p.visitante
+        );
       });
 
-      doc.fillColor(DORADO)
+      // Título de la última columna
+          doc.fillColor(DORADO)
         .font('Helvetica-Bold')
-        .fontSize(8)
-        .text('PTS', margen + anchoPagina - anchoPuntos,
-          143, {
+        .fontSize(9)
+        .text(
+          'PTS',
+          margen + anchoPagina - anchoPuntos,
+          yEncabezado + 34,
+          {
             width: anchoPuntos,
             align: 'center'
-          });
+          }
+        );
 
       doc.y = inicioFilas;
     }
