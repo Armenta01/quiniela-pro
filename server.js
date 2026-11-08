@@ -2549,6 +2549,19 @@ app.get('/admin/exportar-pdf', verificarAdmin, async (req, res) => {
 
     const tabla = [...participantes.values()];
 
+    // CALCULAR BOLSA DE PREMIOS
+const cantidadQuinielas = participantes.size;
+const costoQuiniela = 50;
+const porcentajePremios = 0.80;
+
+const bolsaPremiosPDF =
+  cantidadQuinielas * costoQuiniela * porcentajePremios;
+
+const bolsaFormateada = bolsaPremiosPDF.toLocaleString('es-MX', {
+  style: 'currency',
+  currency: 'MXN'
+});
+
     for (const jugador of tabla) {
       for (const partido of partidos) {
         const pr = jugador.pronosticos.get(Number(partido.id));
@@ -2618,8 +2631,7 @@ const segundosLugares = jornadaTerminada
           if (respuesta.ok &&
               /image\/(png|jpeg|jpg)/i.test(tipo) &&
               largo <= 1000000) {
-            const buffer = await respuesta.buffer();
-
+            const buffer = Buffer.from(await respuesta.arrayBuffer());
             if (buffer.length <= 1000000) {
               imagen = buffer;
             }
@@ -2729,7 +2741,7 @@ const inicioFilas = 192 + alturaGanadores;
     }
 
     function encabezado() {
-      doc.rect(0, 0, doc.page.width, 75).fill(AZUL);
+      doc.rect(0, 0, doc.page.width, 80).fill(AZUL);
 // LOGO DE QUINIELAS EL INGE - TODAS LAS PÁGINAS
 if (logoIngeDisponible) {
   try {
@@ -2750,13 +2762,29 @@ if (logoIngeDisponible) {
           align: 'center'
         });
 
-      doc.fillColor(DORADO)
-        .fontSize(11)
-        .text(`TABLA DE RESULTADOS - SEMANA ${jornada}`,
-          20, 47, { align: 'center' });
 
-      // Leyenda de colores
-      const leyenda = [
+      doc.fillColor(DORADO)
+  .fontSize(11)
+  .text(`TABLA DE RESULTADOS - SEMANA ${jornada}`,
+    20, 47, { align: 'center' });
+
+// BOLSA EN JUEGO
+doc.fillColor(DORADO)
+  .font('Helvetica-Bold')
+  .fontSize(11)
+  .text(
+    `BOLSA EN JUEGO: ${bolsaFormateada}`,
+    margen,
+    64,
+    {
+      width: anchoPagina,
+      align: 'center',
+      lineBreak: false
+    }
+  );
+
+// Leyenda de colores
+const leyenda = [
         { color: VERDE, texto: '2 PUNTOS' },
         { color: AMARILLO, texto: '1 PUNTO' },
         { color: ROJO, texto: '0 PUNTOS' },
