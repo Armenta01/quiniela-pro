@@ -2496,294 +2496,420 @@ app.get('/backup', verificarAdmin, async (req, res) => {
 });
 
 
-// ================================================
-// PDF VERTICAL - QUINIELAS EL INGE
-// ================================================
+/* ============================================
+   PDF TABLA GENERAL - QUINIELAS EL INGE
+   FORMATO CARTA VERTICAL
+============================================ */
+
 app.get('/admin/exportar-pdf', verificarAdmin, async (req, res) => {
   try {
     const jornada = Number(req.query.jornada);
 
     if (!Number.isInteger(jornada) || jornada < 1) {
-      return res.status(400).send('Selecciona una jornada válida.');
+      return res.status(400).send('Jornada no válida');
     }
 
-    const partidosResult = await pool.query(`
-      SELECT id, local, visitante, goles_local, goles_visitante
+    const resultadoPartidos = await pool.query(`
+      SELECT id, local, visitante, logo_local, logo_visitante,
+             goles_local, goles_visitante
       FROM partidos
       WHERE jornada = $1
       ORDER BY COALESCE(orden, 999), id
     `, [jornada]);
 
-    const partidos = partidosResult.rows;
+    const partidos = resultadoPartidos.rows;
 
-    const datosResult = await pool.query(`
-      SELECT
-        pr.envio_id,
-        u.nombre,
-        pr.partido_id,
-        pr.goles_local AS pronostico_local,
-        pr.goles_visitante AS pronostico_visitante
+    if (!partidos.length) {
+      return res.status(404).send('No hay partidos registrados');
+    }
+
+    const resultadoPronosticos = await pool.query(`
+      SELECT pr.envio_id, u.nombre, pr.partido_id,
+             pr.goles_local, pr.goles_visitante
       FROM predicciones pr
       JOIN users u ON u.id = pr.user_id
       WHERE pr.jornada = $1
       ORDER BY pr.envio_id
     `, [jornada]);
 
-    if (!partidos.length || !datosResult.rows.length) {
-      return res.status(404).send(
-        'No hay partidos o participantes para esta jornada.'
-      );
-    }
+    const participantes = new Map();
 
-    const jugadoresMap = new Map();
-
-    for (const fila of datosResult.rows) {
-      if (!jugadoresMap.has(fila.envio_id)) {
-        jugadoresMap.set(fila.envio_id, {
-          nombre: fila.nombre,
-          puntos: 0,
-          pronosticos: new Map()
+    for (const pr of resultadoPronosticos.rows) {
+      if (!participantes.has(pr.envio_id)) {
+        participantes.set(pr.envio_id, {
+          nombre: pr.nombre,
+          pronosticos: new Map(),
+          puntos: 0
         });
       }
 
-      jugadoresMap.get(fila.envio_id).pronosticos.set(
-        Number(fila.partido_id),
-        fila
-      );
+      participantes.get(pr.envio_id)
+        .pronosticos.set(Number(pr.partido_id), pr);
     }
 
-    const jugadores = [...jugadoresMap.values()];
+    const tabla = [...participantes.values()];
 
-    for (const jugador of jugadores) {
+    for (const jugador of tabla) {
       for (const partido of partidos) {
         const pr = jugador.pronosticos.get(Number(partido.id));
 
-        if (!pr ||
-            partido.goles_local == null ||
+        if (!pr || partido.goles_local == null ||
             partido.goles_visitante == null) continue;
 
-        jugador.puntos += calcularPuntos(partido, {
-          goles_local: pr.pronostico_local,
-          goles_visitante: pr.pronostico_visitante
-        });
+        jugador.puntos += calcularPuntos(partido, pr);
       }
     }
 
-    jugadores.sort((a, b) =>
+    tabla.sort((a, b) =>
       b.puntos - a.puntos ||
       a.nombre.localeCompare(b.nombre, 'es')
     );
 
+    // Descargar logos compatibles con PDFKit
+    const logos = new Map();
+
+    async function obtenerLogo(url) {
+      if (!url || typeof url !== 'string') return null;
+      if (logos.has(url)) return logos.get(url);
+
+      let imagen = null;
+
+      try {
+        const direccion = new URL(url);
+
+        if (direccion.protocol === 'https:') {
+          const respuesta = await fetch(url, {
+            timeout: 6000,
+            headers: {
+              Accept: 'image/png,image/jpeg'
+            }
+          });
+
+          const tipo = respuesta.headers.get('content-type') || '';
+          const largo = Number(
+            respuesta.headers.get('content-length') || 0
+          );
+
+          if (respuesta.ok &&
+              /image\/(png|jpeg|jpg)/i.test(tipo) &&
+              largo <= 1000000) {
+            const buffer = await respuesta.buffer();
+
+            if (buffer.length <= 1000000) {
+              imagen = buffer;
+            }
+          }
+        }
+      } catch (error) {
+        console.log('Logo no disponible:', error.message);
+      }
+
+      logos.set(url, imagen);
+      return imagen;
+    }
+
+    for (const p of partidos) {
+      await obtenerLogo(p.logo_local);
+      await obtenerLogo(p.logo_visitante);
+    }
+
     const doc = new PDFDocument({
       size: 'LETTER',
       layout: 'portrait',
-      margins: {
-        top: 45,
-        bottom: 48,
-        left: 42,
-        right: 42
-      },
-      bufferPages: true
+      margin: 20,
+      bufferPages: true,
+      autoFirstPage: true
     });
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader(
       'Content-Disposition',
-      `attachment; filename="Quinielas-El-Inge-Semana-${jornada}.pdf"`
+      `attachment; filename="Resultados-Semana-${jornada}.pdf"`
     );
 
     doc.pipe(res);
 
-    const AZUL = '#1F4E78';
-    const OSCURO = '#101A30';
-    const DORADO = '#FFD000';
-    const VERDE = '#28A745';
-    const AMARILLO = '#FFC107';
-    const ROJO = '#F44348';
-    const GRIS = '#E9EDF3';
+    const AZUL = '#102B50';
+    const DORADO = '#F3C84B';
+    const VERDE = '#24A148';
+    const AMARILLO = '#F8C53A';
+    const ROJO = '#D83B40';
+    const GRIS = '#B7BDC8';
+    const BLANCO = '#FFFFFF';
 
-    const ancho = doc.page.width - 84;
-    const izquierda = 42;
+    const margen = 20;
+    const anchoPagina = doc.page.width - margen * 2;
+    const anchoNombre = 116;
+    const anchoPuntos = 38;
+    const anchoPartido =
+      (anchoPagina - anchoNombre - anchoPuntos) /
+      partidos.length;
 
-    // Encabezado de la primera página
-    doc.rect(0, 0, doc.page.width, 115).fill(AZUL);
+    const alturaFila = 23;
+    const inicioFilas = 192;
+    const limiteInferior = doc.page.height - 45;
 
-    const logoPath = path.join(__dirname, 'public', 'logo2.png');
-
-    if (require('fs').existsSync(logoPath)) {
-      doc.image(logoPath, 45, 20, {
-        fit: [75, 75]
-      });
+    function textoCorto(texto, maximo) {
+      const valor = String(texto || '');
+      return valor.length > maximo
+        ? valor.slice(0, maximo - 1) + '.'
+        : valor;
     }
 
-    doc.fillColor('#FFFFFF')
-      .font('Helvetica-Bold')
-      .fontSize(21)
-      .text('QUINIELAS EL INGE', 135, 30, {
-        width: 425
-      });
+    function pintarLogo(url, x, y, nombre) {
+      const imagen = logos.get(url);
 
-    doc.fillColor(DORADO)
-      .fontSize(14)
-      .text(`RESULTADOS - SEMANA ${jornada}`, 135, 63);
-
-    doc.y = 135;
-
-    doc.fillColor(OSCURO)
-      .font('Helvetica-Bold')
-      .fontSize(15)
-      .text('TABLA GENERAL DE PARTICIPANTES');
-
-    doc.moveDown(0.4);
-
-    doc.font('Helvetica')
-      .fontSize(10)
-      .fillColor('#555555')
-      .text(`Total de quinielas: ${jugadores.length}`);
-
-    doc.moveDown(1);
-
-    function encabezadoContinuacion() {
-      doc.rect(0, 0, doc.page.width, 48).fill(AZUL);
-
-      doc.fillColor('#FFFFFF')
-        .font('Helvetica-Bold')
-        .fontSize(13)
-        .text(
-          `QUINIELAS EL INGE | SEMANA ${jornada}`,
-          42, 17
-        );
-
-      doc.y = 65;
-    }
-
-    function colorPuntuacion(puntos) {
-      if (puntos === 2) return VERDE;
-      if (puntos === 1) return AMARILLO;
-      if (puntos === 0) return ROJO;
-      return GRIS;
-    }
-
-    // Un bloque vertical por participante
-    jugadores.forEach((jugador, indice) => {
-      const alturaFila = 21;
-      const alturaBloque = 52 + partidos.length * alturaFila + 15;
-
-      if (doc.y + alturaBloque > doc.page.height - 50) {
-        doc.addPage();
-        encabezadoContinuacion();
+      if (imagen) {
+        try {
+          doc.image(imagen, x, y, {
+            fit: [12, 12],
+            align: 'center'
+          });
+          return;
+        } catch (error) {
+          // Usar abreviatura si PDFKit no admite el logo
+        }
       }
 
-      const x = izquierda;
-      const y = doc.y;
-
-      // Nombre y puntos
-      doc.roundedRect(x, y, ancho, 43, 7).fill(OSCURO);
-
-      doc.fillColor('#FFFFFF')
+      doc.fillColor(BLANCO)
         .font('Helvetica-Bold')
-        .fontSize(11)
+        .fontSize(5)
         .text(
-          `${indice + 1}. ${jugador.nombre}`,
-          x + 12, y + 14,
-          { width: ancho - 125, ellipsis: true }
+          textoCorto(nombre, 3).toUpperCase(),
+          x - 1, y + 3,
+          { width: 15, align: 'center' }
         );
+    }
+
+    function encabezado() {
+      doc.rect(0, 0, doc.page.width, 75).fill(AZUL);
+
+      doc.fillColor(BLANCO)
+        .font('Helvetica-Bold')
+        .fontSize(19)
+        .text('QUINIELAS EL INGE', 20, 18, {
+          align: 'center'
+        });
 
       doc.fillColor(DORADO)
-        .fontSize(12)
-        .text(
-          `${jugador.puntos} PTS`,
-          x + ancho - 100,
-          y + 13,
-          { width: 85, align: 'right' }
+        .fontSize(11)
+        .text(`TABLA DE RESULTADOS - SEMANA ${jornada}`,
+          20, 47, { align: 'center' });
+
+      // Leyenda de colores
+      const leyenda = [
+        { color: VERDE, texto: '2 PUNTOS' },
+        { color: AMARILLO, texto: '1 PUNTO' },
+        { color: ROJO, texto: '0 PUNTOS' },
+        { color: GRIS, texto: 'PENDIENTE' }
+      ];
+
+      let lx = 68;
+
+      for (const item of leyenda) {
+        doc.roundedRect(lx, 85, 11, 11, 2)
+          .fill(item.color);
+
+        doc.fillColor(AZUL)
+          .font('Helvetica-Bold')
+          .fontSize(7)
+          .text(item.texto, lx + 15, 87, {
+            width: 80
+          });
+
+        lx += 125;
+      }
+
+      // Encabezado de partidos
+      doc.rect(margen, 108, anchoPagina, 76).fill(AZUL);
+
+      doc.fillColor(BLANCO)
+        .font('Helvetica-Bold')
+        .fontSize(8)
+        .text('PARTICIPANTE', margen + 5, 143, {
+          width: anchoNombre - 8
+        });
+
+      partidos.forEach((p, i) => {
+        const x = margen + anchoNombre + i * anchoPartido;
+
+        const resultado =
+          p.goles_local == null || p.goles_visitante == null
+            ? '- -'
+            : `${p.goles_local}-${p.goles_visitante}`;
+
+        // Logos y marcador oficial:
+        // LOGO LOCAL | RESULTADO | LOGO VISITANTE
+        const centro = x + anchoPartido / 2;
+
+        pintarLogo(
+          p.logo_local,
+          centro - 23,
+          119,
+          p.local
         );
 
-      let filaY = y + 48;
+        doc.fillColor(DORADO)
+          .font('Helvetica-Bold')
+          .fontSize(8)
+          .text(resultado, centro - 12, 120, {
+            width: 24,
+            align: 'center'
+          });
+
+        pintarLogo(
+          p.logo_visitante,
+          centro + 12,
+          119,
+          p.visitante
+        );
+
+        doc.fillColor(BLANCO)
+          .font('Helvetica')
+          .fontSize(5.5)
+          .text(
+            textoCorto(p.local, 9),
+            x + 1, 143,
+            {
+              width: anchoPartido - 2,
+              align: 'center'
+            }
+          )
+          .text(
+            'VS',
+            x + 1, 151,
+            {
+              width: anchoPartido - 2,
+              align: 'center'
+            }
+          )
+          .text(
+            textoCorto(p.visitante, 9),
+            x + 1, 159,
+            {
+              width: anchoPartido - 2,
+              align: 'center'
+            }
+          );
+      });
+
+      doc.fillColor(DORADO)
+        .font('Helvetica-Bold')
+        .fontSize(8)
+        .text('PTS', margen + anchoPagina - anchoPuntos,
+          143, {
+            width: anchoPuntos,
+            align: 'center'
+          });
+
+      doc.y = inicioFilas;
+    }
+
+    encabezado();
+
+    let y = inicioFilas;
+
+    tabla.forEach((jugador, indice) => {
+      if (y + alturaFila > limiteInferior) {
+        doc.addPage();
+        encabezado();
+        y = inicioFilas;
+      }
+
+      const fondo = indice % 2 === 0
+        ? '#EDF2F8'
+        : BLANCO;
+
+      doc.rect(margen, y, anchoPagina, alturaFila)
+        .fill(fondo);
+
+      doc.fillColor(AZUL)
+        .font('Helvetica-Bold')
+        .fontSize(7.5)
+        .text(
+          `${indice + 1}. ${jugador.nombre}`,
+          margen + 4,
+          y + 7,
+          {
+            width: anchoNombre - 7,
+            ellipsis: true,
+            lineBreak: false
+          }
+        );
 
       partidos.forEach((partido, i) => {
+        const x = margen + anchoNombre + i * anchoPartido;
         const pr = jugador.pronosticos.get(Number(partido.id));
 
+        let marcador = '-';
+        let color = GRIS;
         let puntos = null;
-        let marcador = '—';
 
         if (pr) {
-          marcador =
-            `${pr.pronostico_local}-${pr.pronostico_visitante}`;
+          marcador = `${pr.goles_local}-${pr.goles_visitante}`;
 
           if (partido.goles_local != null &&
               partido.goles_visitante != null) {
-            puntos = calcularPuntos(partido, {
-              goles_local: pr.pronostico_local,
-              goles_visitante: pr.pronostico_visitante
-            });
+            puntos = calcularPuntos(partido, pr);
+
+            color = puntos === 2 ? VERDE
+              : puntos === 1 ? AMARILLO
+              : ROJO;
           }
         }
 
-        const fondo = i % 2 === 0 ? '#F4F6FA' : '#FFFFFF';
-
-        doc.rect(x, filaY, ancho, alturaFila).fill(fondo);
-
-        doc.fillColor(OSCURO)
-          .font('Helvetica')
-          .fontSize(8.2)
-          .text(
-            `${partido.local} vs ${partido.visitante}`,
-            x + 9, filaY + 6,
-            { width: ancho - 150, ellipsis: true }
-          );
-
-        doc.font('Helvetica-Bold')
-          .fontSize(9)
-          .text(
-            marcador,
-            x + ancho - 133,
-            filaY + 5,
-            { width: 62, align: 'center' }
-          );
-
-        const color = puntos === null
-          ? '#A5ADBA'
-          : colorPuntuacion(puntos);
-
         doc.roundedRect(
-          x + ancho - 62,
-          filaY + 3,
-          51,
-          15,
-          4
+          x + 2,
+          y + 3,
+          Math.max(1, anchoPartido - 4),
+          17,
+          3
         ).fill(color);
 
-        doc.fillColor(puntos === 1 ? OSCURO : '#FFFFFF')
+        doc.fillColor(
+          puntos === 1 || puntos === null
+            ? '#172033'
+            : BLANCO
+        )
           .font('Helvetica-Bold')
           .fontSize(8)
-          .text(
-            puntos === null ? 'PEND.' : `+${puntos}`,
-            x + ancho - 62,
-            filaY + 6,
-            { width: 51, align: 'center' }
-          );
-
-        filaY += alturaFila;
+          .text(marcador, x + 2, y + 7, {
+            width: anchoPartido - 4,
+            align: 'center'
+          });
       });
 
-      doc.y = filaY + 15;
+      doc.fillColor(AZUL)
+        .font('Helvetica-Bold')
+        .fontSize(10)
+        .text(
+          String(jugador.puntos),
+          margen + anchoPagina - anchoPuntos,
+          y + 6,
+          {
+            width: anchoPuntos,
+            align: 'center'
+          }
+        );
+
+      y += alturaFila;
     });
 
-    // Numeración de páginas
+    // Número de página en todas las hojas
     const rango = doc.bufferedPageRange();
 
     for (let i = rango.start; i < rango.start + rango.count; i++) {
       doc.switchToPage(i);
 
-      doc.fillColor('#6B7280')
+      doc.fillColor('#697386')
         .font('Helvetica')
         .fontSize(8)
         .text(
-          `Quinielas El Inge | Página ${i + 1} de ${rango.count}`,
-          42,
+          `quinielasinge.com  |  Página ${i + 1} de ${rango.count}`,
+          margen,
           doc.page.height - 30,
           {
-            width: ancho,
+            width: anchoPagina,
             align: 'center'
           }
         );
@@ -2792,15 +2918,16 @@ app.get('/admin/exportar-pdf', verificarAdmin, async (req, res) => {
     doc.end();
 
   } catch (error) {
-    console.error('ERROR EXPORTANDO PDF:', error);
+    console.error('ERROR PDF:', error);
 
     if (!res.headersSent) {
-      res.status(500).send('Error al generar el PDF.');
+      res.status(500).send('Error al generar PDF');
     } else {
       res.destroy(error);
     }
   }
 });
+
 
 app.get('/exportar-excel', verificarAdmin, async (req, res) => {
   const jornada = req.query.jornada || 1;
