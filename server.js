@@ -2709,7 +2709,7 @@ const inicioFilas = 192 + alturaGanadores;
       if (imagen) {
         try {
           doc.image(imagen, x, y, {
-            fit: [15, 15],
+            fit: [22, 22],
             align: 'center'
           });
           return;
@@ -2858,54 +2858,55 @@ if (mostrarGanadores) {
         );
 
       // Logos y marcadores de los partidos
-      partidos.forEach((p, i) => {
-        const x = margen + anchoNombre + i * anchoPartido;
-        const centro = x + anchoPartido / 2;
+      // LOGOS VERTICALES Y MARCADOR CENTRADO
+partidos.forEach((p, i) => {
 
-        const finalizado =
-          p.goles_local != null &&
-          p.goles_visitante != null;
+  const x = margen + anchoNombre + i * anchoPartido;
+  const centro = x + anchoPartido / 2;
 
-        const resultado = finalizado
-          ? `${p.goles_local}-${p.goles_visitante}`
-          : 'VS';
+  const finalizado =
+    p.goles_local != null &&
+    p.goles_visitante != null;
 
-        // Posiciones de logos y resultado
-        const tamanoLogo = Math.min(15, anchoPartido * 0.25);
-        const separacion = Math.min(20, anchoPartido * 0.31);
+  const resultado = finalizado
+    ? `${p.goles_local}-${p.goles_visitante}`
+    : 'VS';
 
-        const yLogo = yEncabezado + 26;
+  // Escudos de 24 puntos, centrados
+  const tamanoLogo = Math.min(24, anchoPartido - 6);
+  const xLogo = centro - tamanoLogo / 2;
 
-        // LOGO LOCAL
-        pintarLogo(
-          p.logo_local,
-          centro - separacion - tamanoLogo / 2,
-          yLogo,
-          p.local
-        );
+  // LOGO LOCAL - ARRIBA
+  pintarLogo(
+    p.logo_local,
+    xLogo,
+    yEncabezado + 5,
+    p.local
+  );
 
-        // MARCADOR OFICIAL O VS
-        doc.fillColor(finalizado ? DORADO : BLANCO)
-          .font('Helvetica-Bold')
-          .fontSize(8)
-          .text(
-            resultado,
-            centro - 12,
-            yLogo + 3,
-            {
-              width: 24,
-              align: 'center'
-            }
-          );
+  // MARCADOR - EN MEDIO
+  doc.fillColor(finalizado ? DORADO : BLANCO)
+    .font('Helvetica-Bold')
+    .fontSize(9)
+    .text(
+      resultado,
+      x + 2,
+      yEncabezado + 34,
+      {
+        width: anchoPartido - 4,
+        align: 'center'
+      }
+    );
 
-        // LOGO VISITANTE
-        pintarLogo(
-          p.logo_visitante,
-          centro + separacion - tamanoLogo / 2,
-          yLogo,
-          p.visitante
-        );
-      });
+  // LOGO VISITANTE - ABAJO
+  pintarLogo(
+    p.logo_visitante,
+    xLogo,
+    yEncabezado + 48,
+    p.visitante
+  );
+
+});
 
       // Título de la última columna
           doc.fillColor(DORADO)
