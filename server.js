@@ -2559,7 +2559,9 @@ const bolsaPremiosPDF =
 
 const bolsaFormateada = bolsaPremiosPDF.toLocaleString('es-MX', {
   style: 'currency',
-  currency: 'MXN'
+  currency: 'MXN',
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 0
 });
 
     for (const jugador of tabla) {
@@ -2769,13 +2771,13 @@ if (logoIngeDisponible) {
     20, 47, { align: 'center' });
 
 // BOLSA EN JUEGO
-doc.fillColor(DORADO)
+doc.fillColor('#FFD700')
   .font('Helvetica-Bold')
-  .fontSize(11)
+  .fontSize(13)
   .text(
     `BOLSA EN JUEGO: ${bolsaFormateada}`,
     margen,
-    64,
+    62,
     {
       width: anchoPagina,
       align: 'center',
