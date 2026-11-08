@@ -6360,3 +6360,20 @@ body {
 #misQuinielas[hidden] {
   display: none !important;
 }
+
+.btn-descargar-pdf {
+    width: 100%;
+    background: linear-gradient(135deg, #087E99, #07566F);
+    color: #FFFFFF;
+    border: 2px solid #19A3BC;
+    border-radius: 30px;
+    padding: 14px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.btn-descargar-pdf:hover {
+    background: linear-gradient(135deg, #0998B6, #087E99);
+}

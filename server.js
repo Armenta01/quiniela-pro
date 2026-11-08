@@ -8,6 +8,7 @@ const enviosEnProceso = new Set();
 // Devolver SIEMPRE como texto
 types.setTypeParser(1114, value => value);
 const ExcelJS = require('exceljs');
+const PDFDocument = require('pdfkit');
 const fetch = require('node-fetch');
 const moment = require('moment-timezone');
 const session = require('express-session');
@@ -2494,6 +2495,312 @@ app.get('/backup', verificarAdmin, async (req, res) => {
   }
 });
 
+
+// ================================================
+// PDF VERTICAL - QUINIELAS EL INGE
+// ================================================
+app.get('/admin/exportar-pdf', verificarAdmin, async (req, res) => {
+  try {
+    const jornada = Number(req.query.jornada);
+
+    if (!Number.isInteger(jornada) || jornada < 1) {
+      return res.status(400).send('Selecciona una jornada válida.');
+    }
+
+    const partidosResult = await pool.query(`
+      SELECT id, local, visitante, goles_local, goles_visitante
+      FROM partidos
+      WHERE jornada = $1
+      ORDER BY COALESCE(orden, 999), id
+    `, [jornada]);
+
+    const partidos = partidosResult.rows;
+
+    const datosResult = await pool.query(`
+      SELECT
+        pr.envio_id,
+        u.nombre,
+        pr.partido_id,
+        pr.goles_local AS pronostico_local,
+        pr.goles_visitante AS pronostico_visitante
+      FROM predicciones pr
+      JOIN users u ON u.id = pr.user_id
+      WHERE pr.jornada = $1
+      ORDER BY pr.envio_id
+    `, [jornada]);
+
+    if (!partidos.length || !datosResult.rows.length) {
+      return res.status(404).send(
+        'No hay partidos o participantes para esta jornada.'
+      );
+    }
+
+    const jugadoresMap = new Map();
+
+    for (const fila of datosResult.rows) {
+      if (!jugadoresMap.has(fila.envio_id)) {
+        jugadoresMap.set(fila.envio_id, {
+          nombre: fila.nombre,
+          puntos: 0,
+          pronosticos: new Map()
+        });
+      }
+
+      jugadoresMap.get(fila.envio_id).pronosticos.set(
+        Number(fila.partido_id),
+        fila
+      );
+    }
+
+    const jugadores = [...jugadoresMap.values()];
+
+    for (const jugador of jugadores) {
+      for (const partido of partidos) {
+        const pr = jugador.pronosticos.get(Number(partido.id));
+
+        if (!pr ||
+            partido.goles_local == null ||
+            partido.goles_visitante == null) continue;
+
+        jugador.puntos += calcularPuntos(partido, {
+          goles_local: pr.pronostico_local,
+          goles_visitante: pr.pronostico_visitante
+        });
+      }
+    }
+
+    jugadores.sort((a, b) =>
+      b.puntos - a.puntos ||
+      a.nombre.localeCompare(b.nombre, 'es')
+    );
+
+    const doc = new PDFDocument({
+      size: 'LETTER',
+      layout: 'portrait',
+      margins: {
+        top: 45,
+        bottom: 48,
+        left: 42,
+        right: 42
+      },
+      bufferPages: true
+    });
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="Quinielas-El-Inge-Semana-${jornada}.pdf"`
+    );
+
+    doc.pipe(res);
+
+    const AZUL = '#1F4E78';
+    const OSCURO = '#101A30';
+    const DORADO = '#FFD000';
+    const VERDE = '#28A745';
+    const AMARILLO = '#FFC107';
+    const ROJO = '#F44348';
+    const GRIS = '#E9EDF3';
+
+    const ancho = doc.page.width - 84;
+    const izquierda = 42;
+
+    // Encabezado de la primera página
+    doc.rect(0, 0, doc.page.width, 115).fill(AZUL);
+
+    const logoPath = path.join(__dirname, 'public', 'logo2.png');
+
+    if (require('fs').existsSync(logoPath)) {
+      doc.image(logoPath, 45, 20, {
+        fit: [75, 75]
+      });
+    }
+
+    doc.fillColor('#FFFFFF')
+      .font('Helvetica-Bold')
+      .fontSize(21)
+      .text('QUINIELAS EL INGE', 135, 30, {
+        width: 425
+      });
+
+    doc.fillColor(DORADO)
+      .fontSize(14)
+      .text(`RESULTADOS - SEMANA ${jornada}`, 135, 63);
+
+    doc.y = 135;
+
+    doc.fillColor(OSCURO)
+      .font('Helvetica-Bold')
+      .fontSize(15)
+      .text('TABLA GENERAL DE PARTICIPANTES');
+
+    doc.moveDown(0.4);
+
+    doc.font('Helvetica')
+      .fontSize(10)
+      .fillColor('#555555')
+      .text(`Total de quinielas: ${jugadores.length}`);
+
+    doc.moveDown(1);
+
+    function encabezadoContinuacion() {
+      doc.rect(0, 0, doc.page.width, 48).fill(AZUL);
+
+      doc.fillColor('#FFFFFF')
+        .font('Helvetica-Bold')
+        .fontSize(13)
+        .text(
+          `QUINIELAS EL INGE | SEMANA ${jornada}`,
+          42, 17
+        );
+
+      doc.y = 65;
+    }
+
+    function colorPuntuacion(puntos) {
+      if (puntos === 2) return VERDE;
+      if (puntos === 1) return AMARILLO;
+      if (puntos === 0) return ROJO;
+      return GRIS;
+    }
+
+    // Un bloque vertical por participante
+    jugadores.forEach((jugador, indice) => {
+      const alturaFila = 21;
+      const alturaBloque = 52 + partidos.length * alturaFila + 15;
+
+      if (doc.y + alturaBloque > doc.page.height - 50) {
+        doc.addPage();
+        encabezadoContinuacion();
+      }
+
+      const x = izquierda;
+      const y = doc.y;
+
+      // Nombre y puntos
+      doc.roundedRect(x, y, ancho, 43, 7).fill(OSCURO);
+
+      doc.fillColor('#FFFFFF')
+        .font('Helvetica-Bold')
+        .fontSize(11)
+        .text(
+          `${indice + 1}. ${jugador.nombre}`,
+          x + 12, y + 14,
+          { width: ancho - 125, ellipsis: true }
+        );
+
+      doc.fillColor(DORADO)
+        .fontSize(12)
+        .text(
+          `${jugador.puntos} PTS`,
+          x + ancho - 100,
+          y + 13,
+          { width: 85, align: 'right' }
+        );
+
+      let filaY = y + 48;
+
+      partidos.forEach((partido, i) => {
+        const pr = jugador.pronosticos.get(Number(partido.id));
+
+        let puntos = null;
+        let marcador = '—';
+
+        if (pr) {
+          marcador =
+            `${pr.pronostico_local}-${pr.pronostico_visitante}`;
+
+          if (partido.goles_local != null &&
+              partido.goles_visitante != null) {
+            puntos = calcularPuntos(partido, {
+              goles_local: pr.pronostico_local,
+              goles_visitante: pr.pronostico_visitante
+            });
+          }
+        }
+
+        const fondo = i % 2 === 0 ? '#F4F6FA' : '#FFFFFF';
+
+        doc.rect(x, filaY, ancho, alturaFila).fill(fondo);
+
+        doc.fillColor(OSCURO)
+          .font('Helvetica')
+          .fontSize(8.2)
+          .text(
+            `${partido.local} vs ${partido.visitante}`,
+            x + 9, filaY + 6,
+            { width: ancho - 150, ellipsis: true }
+          );
+
+        doc.font('Helvetica-Bold')
+          .fontSize(9)
+          .text(
+            marcador,
+            x + ancho - 133,
+            filaY + 5,
+            { width: 62, align: 'center' }
+          );
+
+        const color = puntos === null
+          ? '#A5ADBA'
+          : colorPuntuacion(puntos);
+
+        doc.roundedRect(
+          x + ancho - 62,
+          filaY + 3,
+          51,
+          15,
+          4
+        ).fill(color);
+
+        doc.fillColor(puntos === 1 ? OSCURO : '#FFFFFF')
+          .font('Helvetica-Bold')
+          .fontSize(8)
+          .text(
+            puntos === null ? 'PEND.' : `+${puntos}`,
+            x + ancho - 62,
+            filaY + 6,
+            { width: 51, align: 'center' }
+          );
+
+        filaY += alturaFila;
+      });
+
+      doc.y = filaY + 15;
+    });
+
+    // Numeración de páginas
+    const rango = doc.bufferedPageRange();
+
+    for (let i = rango.start; i < rango.start + rango.count; i++) {
+      doc.switchToPage(i);
+
+      doc.fillColor('#6B7280')
+        .font('Helvetica')
+        .fontSize(8)
+        .text(
+          `Quinielas El Inge | Página ${i + 1} de ${rango.count}`,
+          42,
+          doc.page.height - 30,
+          {
+            width: ancho,
+            align: 'center'
+          }
+        );
+    }
+
+    doc.end();
+
+  } catch (error) {
+    console.error('ERROR EXPORTANDO PDF:', error);
+
+    if (!res.headersSent) {
+      res.status(500).send('Error al generar el PDF.');
+    } else {
+      res.destroy(error);
+    }
+  }
+});
 
 app.get('/exportar-excel', verificarAdmin, async (req, res) => {
   const jornada = req.query.jornada || 1;
