@@ -239,7 +239,7 @@ function obtenerColorTextoEquipo(color) {
   const luminosidad =
     (r * 299 + g * 587 + b * 114) / 1000;
 
-  return luminosidad > 150 ? "#000000" : "#FFFFFF";
+  return luminosidad > 150 ? "#000000" : "#000000";
 }
 
 
