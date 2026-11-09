@@ -6401,3 +6401,18 @@ body {
 }
 
 
+
+/* MARCADOR SELECCIONADO: COLOR DEL EQUIPO */
+#partidos .score input.marcador-equipo:focus:not(:disabled) {
+  background: var(--color-equipo, #2F80ED) !important;
+  background-color: var(--color-equipo, #2F80ED) !important;
+
+  color: var(--texto-equipo, #FFFFFF) !important;
+  -webkit-text-fill-color: var(--texto-equipo, #FFFFFF) !important;
+
+  border: 2px solid var(--color-equipo, #2F80ED) !important;
+
+  box-shadow: 0 0 12px var(--color-equipo, #2F80ED) !important;
+
+  outline: none !important;
+}

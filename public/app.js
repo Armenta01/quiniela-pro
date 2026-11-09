@@ -251,11 +251,24 @@ async function cargarPartidos() {
   const cont = document.getElementById("partidos");
   cont.innerHTML = "";
 
-  data.forEach((p, index) => {
 
-  
+data.forEach((p, index) => {
 
-const [fechaParte, horaParte] = fechaTexto.split(' ');
+  // ESTADO DEL PARTIDO
+  const estado = getEstadoPartido(p.fecha);
+
+  // COLORES DE LOS EQUIPOS
+  const colorLocal = obtenerColorEquipo(p.local);
+  const colorVisitante = obtenerColorEquipo(p.visitante);
+
+  // COLORES DE LOS NÚMEROS
+  const textoLocal = obtenerColorTextoEquipo(colorLocal);
+  const textoVisitante = obtenerColorTextoEquipo(colorVisitante);
+
+  // FECHA DEL PARTIDO
+  const fechaTexto = p.fecha;
+
+  const [fechaParte, horaParte] = fechaTexto.split(' ');
 
 const [anio, mes, dia] = fechaParte.split('-');
 
@@ -306,6 +319,7 @@ cont.innerHTML += `
     class="marcador-equipo"
     style="
       --color-equipo: ${colorLocal};
+      --texto-equipo: ${textoLocal};
     "
   >
 
@@ -321,6 +335,7 @@ cont.innerHTML += `
     class="marcador-equipo"
     style="
       --color-equipo: ${colorVisitante};
+      --texto-equipo: ${textoVisitante};
     "
   >
 
