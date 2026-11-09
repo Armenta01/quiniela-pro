@@ -228,6 +228,20 @@ function obtenerColorEquipo(nombre) {
   ] || "#2F80ED";
 }
 
+// 🎨 COLOR DE TEXTO SEGÚN EL FONDO DEL EQUIPO
+function obtenerColorTextoEquipo(color) {
+  const hex = color.replace("#", "");
+
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+
+  const luminosidad =
+    (r * 299 + g * 587 + b * 114) / 1000;
+
+  return luminosidad > 150 ? "#000000" : "#FFFFFF";
+}
+
 
 // 🔥 PARTIDOS
 async function cargarPartidos() {
@@ -239,9 +253,15 @@ async function cargarPartidos() {
 
   data.forEach((p, index) => {
 
-    const estado = getEstadoPartido(p.fecha);
-    const colorLocal = obtenerColorEquipo(p.local);
+  const estado = getEstadoPartido(p.fecha);
+
+// 🎨 COLORES DE LOS EQUIPOS
+const colorLocal = obtenerColorEquipo(p.local);
 const colorVisitante = obtenerColorEquipo(p.visitante);
+
+// 🔥 COLOR DE LOS NÚMEROS (NEGRO O BLANCO)
+const textoLocal = obtenerColorTextoEquipo(colorLocal);
+const textoVisitante = obtenerColorTextoEquipo(colorVisitante);
 
 const fechaTexto = p.fecha;
 
@@ -284,25 +304,37 @@ cont.innerHTML += `
 
         </div>
 
-        <div class="score">
+<div class="score">
 
-          <input
-            type="text"
-            inputmode="numeric"
-            pattern="[0-9]*"
-            maxlength="2"
-            id="l${p.id}">
+  <!-- MARCADOR EQUIPO LOCAL -->
+  <input
+    type="text"
+    inputmode="numeric"
+    pattern="[0-9]*"
+    maxlength="2"
+    id="l${p.id}"
+    class="marcador-equipo"
+    style="
+      --color-equipo: ${colorLocal};
+    "
+  >
 
-          <span>-</span>
+  <span>-</span>
 
-          <input
-            type="text"
-            inputmode="numeric"
-            pattern="[0-9]*"
-            maxlength="2"
-            id="v${p.id}">
+  <!-- MARCADOR EQUIPO VISITANTE -->
+  <input
+    type="text"
+    inputmode="numeric"
+    pattern="[0-9]*"
+    maxlength="2"
+    id="v${p.id}"
+    class="marcador-equipo"
+    style="
+      --color-equipo: ${colorVisitante};
+    "
+  >
 
-        </div>
+</div>
 
         <div class="team right">
 
