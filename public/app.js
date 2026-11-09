@@ -180,6 +180,21 @@ function obtenerColorEquipo(nombre) {
     "BÉLGICA": "#a78c04",
     "TURQUÍA": "#D62828",
 
+    "PAÍSES BAJOS": "#de620f",
+    "GRECIA": "#2e84c2",
+
+    "SERBIA": "#870a12",
+    "ARGENTINA": "#d6b928",
+
+    "URUGUAY": "#4fc1d3",
+    "JAPÓN": "#c60606",
+
+    "BRASIL": "#f1f651",
+    "TURQUÍA": "#D62828",
+
+    "DINAMARCA": "#e22a36",
+    "JAMAICA": "#3da82f",
+
     "FRANCIA": "#022f72",
     "ITALIA": "#246f94",
 
