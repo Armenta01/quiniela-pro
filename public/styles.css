@@ -6400,23 +6400,4 @@ body {
     color 0.25s ease;
 }
 
-/* INPUT SELECCIONADO: COLOR DEL EQUIPO */
-#partidos .score input.marcador-equipo:focus:not(:disabled) {
 
-  /* PINTAR TODO EL INTERIOR */
-  background: var(--color-equipo, #2F80ED) !important;
-  background-color: var(--color-equipo, #2F80ED) !important;
-
-  /* COLOR DEL NÚMERO */
-  color: var(--texto-equipo, #FFFFFF) !important;
-  -webkit-text-fill-color: var(--texto-equipo, #FFFFFF) !important;
-
-  /* BORDE DEL COLOR DEL EQUIPO */
-  border: 2px solid var(--color-equipo, #2F80ED) !important;
-
-  /* BRILLO EXTERIOR */
-  box-shadow:
-    0 0 12px var(--color-equipo, #2F80ED) !important;
-
-  outline: none !important;
-}
