@@ -239,7 +239,7 @@ function obtenerColorTextoEquipo(color) {
   const luminosidad =
     (r * 299 + g * 587 + b * 114) / 1000;
 
-  return luminosidad > 150 ? "#000000" : "#000000";
+  return luminosidad > 150 ? "#000000" : "#FFFFFF";
 }
 
 
@@ -253,17 +253,7 @@ async function cargarPartidos() {
 
   data.forEach((p, index) => {
 
-  const estado = getEstadoPartido(p.fecha);
-
-// 🎨 COLORES DE LOS EQUIPOS
-const colorLocal = obtenerColorEquipo(p.local);
-const colorVisitante = obtenerColorEquipo(p.visitante);
-
-// 🔥 COLOR DE LOS NÚMEROS (NEGRO O BLANCO)
-const textoLocal = obtenerColorTextoEquipo(colorLocal);
-const textoVisitante = obtenerColorTextoEquipo(colorVisitante);
-
-const fechaTexto = p.fecha;
+  
 
 const [fechaParte, horaParte] = fechaTexto.split(' ');
 
