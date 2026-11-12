@@ -467,7 +467,7 @@ app.delete('/admin/promociones/:id', async (req, res) => {
 
 const PRECIO_BASE_QUINIELA = 50;
 
-async function calcularPrecioPromocional(cantidad) {
+async function calcularPrecioPromocional(cantidad, db = pool) {
 
   const cantidadQuinielas = Number(cantidad);
 
@@ -482,7 +482,7 @@ async function calcularPrecioPromocional(cantidad) {
   const precioNormal =
     cantidadQuinielas * PRECIO_BASE_QUINIELA;
 
-  const resultado = await pool.query(`
+   const resultado = await db.query(`
     SELECT *
     FROM promociones
     WHERE habilitada = TRUE
@@ -746,6 +746,41 @@ await pool.query(`
     CREATE INDEX IF NOT EXISTS idx_promociones_vigencia
     ON promociones (habilitada, inicio, fin);
   `);
+
+
+  // ==========================================
+  // 💰 REGISTRO DE IMPORTES POR COMPRA
+  // ==========================================
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS compras_quinielas (
+      id BIGSERIAL PRIMARY KEY,
+      compra_id TEXT UNIQUE NOT NULL,
+      jornada INTEGER NOT NULL,
+      user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      cantidad INTEGER NOT NULL CHECK (cantidad > 0),
+      precio_normal NUMERIC(12,2) NOT NULL,
+      precio_final NUMERIC(12,2) NOT NULL,
+      ahorro NUMERIC(12,2) NOT NULL DEFAULT 0,
+      promocion_id INTEGER REFERENCES promociones(id) ON DELETE SET NULL,
+      promocion_nombre TEXT,
+      fecha_compra TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS compras_quinielas_envios (
+      compra_id TEXT NOT NULL
+        REFERENCES compras_quinielas(compra_id) ON DELETE CASCADE,
+      envio_id TEXT PRIMARY KEY NOT NULL
+    );
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_compras_quinielas_jornada
+    ON compras_quinielas(jornada);
+  `);
+
 
   console.log("🎁 Sistema de promociones preparado");
 
@@ -1144,10 +1179,67 @@ VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)
 }
 
 
+    // ==========================================
+    // 🎁 REGISTRAR PRECIO DE QUINIELA INDIVIDUAL
+    // ==========================================
+
+    const precioCompra = await calcularPrecioPromocional(1, client);
+
+    const compraId =
+      Date.now().toString() +
+      "_COMPRA_" +
+      require("crypto").randomBytes(8).toString("hex");
+
+    await client.query(`
+      INSERT INTO compras_quinielas (
+        compra_id,
+        jornada,
+        user_id,
+        cantidad,
+        precio_normal,
+        precio_final,
+        ahorro,
+        promocion_id,
+        promocion_nombre
+      )
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+    `, [
+      compraId,
+      Number(jornada),
+      userId,
+      1,
+      precioCompra.precio_normal,
+      precioCompra.precio_final,
+      precioCompra.ahorro,
+      precioCompra.promocion?.id ?? null,
+      precioCompra.promocion?.nombre ?? null
+    ]);
+
+    await client.query(`
+      INSERT INTO compras_quinielas_envios (
+        compra_id,
+        envio_id
+      )
+      VALUES ($1,$2)
+    `, [
+      compraId,
+      envioId
+    ]);
+
+
 await client.query("COMMIT");
 
-res.json({ ok: true });
 
+    res.json({
+      ok: true,
+      compra_id: compraId,
+      cantidad: 1,
+      precio_normal: precioCompra.precio_normal,
+      total: precioCompra.precio_final,
+      ahorro: precioCompra.ahorro,
+      promocion: precioCompra.promocion,
+      envio_id: envioId
+    });
 
 } catch (err) {
 
@@ -1194,7 +1286,8 @@ app.post("/guardar-multiples", async (req, res) => {
     !Number.isInteger(jornadaNumero) ||
     jornadaNumero < 1 ||
     !Array.isArray(quinielas) ||
-    quinielas.length === 0
+    quinielas.length === 0 ||
+    quinielas.length > 1000
   ) {
     return res.status(400).json({
       ok: false,
@@ -1352,6 +1445,47 @@ app.post("/guardar-multiples", async (req, res) => {
 
     const envios = [];
 
+
+    // ==========================================
+    // 🎁 PRECIO DEFINITIVO DE LA COMPRA
+    // ==========================================
+
+    const precioCompra = await calcularPrecioPromocional(
+    quinielasNormalizadas.length,
+    client
+    );
+
+    const compraId =
+      Date.now().toString() +
+      "_COMPRA_" +
+      require("crypto").randomBytes(8).toString("hex");
+
+    await client.query(`
+      INSERT INTO compras_quinielas (
+        compra_id,
+        jornada,
+        user_id,
+        cantidad,
+        precio_normal,
+        precio_final,
+        ahorro,
+        promocion_id,
+        promocion_nombre
+      )
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+    `, [
+      compraId,
+      jornadaNumero,
+      userId,
+      precioCompra.cantidad,
+      precioCompra.precio_normal,
+      precioCompra.precio_final,
+      precioCompra.ahorro,
+      precioCompra.promocion?.id ?? null,
+      precioCompra.promocion?.nombre ?? null
+    ]);
+
+
     for (const quiniela of quinielasNormalizadas) {
       const envioId =
         Date.now().toString() +
@@ -1379,16 +1513,36 @@ app.post("/guardar-multiples", async (req, res) => {
       }
 
       envios.push(envioId);
+
+
+      // Vincular esta quiniela con su compra
+      await client.query(`
+        INSERT INTO compras_quinielas_envios (
+          compra_id,
+          envio_id
+        )
+        VALUES ($1, $2)
+      `, [
+        compraId,
+        envioId
+      ]);
+
     }
 
     await client.query("COMMIT");
 
+  
     return res.json({
       ok: true,
+      compra_id: compraId,
       cantidad: envios.length,
-      total: envios.length * 50,
+      precio_normal: precioCompra.precio_normal,
+      total: precioCompra.precio_final,
+      ahorro: precioCompra.ahorro,
+      promocion: precioCompra.promocion,
       envios
     });
+
 
   } catch (error) {
     if (client) {
@@ -2098,9 +2252,38 @@ app.get("/tabla-imagen", async (req, res) => {
         const participantes =
             parseInt(bolsaResult.rows[0].participantes || 0);
 
-        const recaudado = participantes * 50;
+        
+        // 💰 Calcular la recaudación real de todas las compras
+        // Incluye pagadas y pendientes, con descuentos.
 
-        const bolsa = recaudado * 0.80;
+        const ingresosResult = await pool.query(`
+            SELECT COALESCE(SUM(precio_final), 0) AS total
+            FROM compras_quinielas
+            WHERE jornada = $1
+        `, [jornada]);
+
+        // Quinielas antiguas o administrativas sin compra vinculada
+        const anterioresResult = await pool.query(`
+            SELECT COUNT(DISTINCT pr.envio_id) AS total
+            FROM predicciones pr
+            LEFT JOIN compras_quinielas_envios ce
+                ON ce.envio_id = pr.envio_id
+            WHERE pr.jornada = $1
+              AND ce.envio_id IS NULL
+        `, [jornada]);
+
+        const totalCompras =
+            Number(ingresosResult.rows[0].total) || 0;
+
+        const totalAnteriores =
+            Number(anterioresResult.rows[0].total) || 0;
+
+        const recaudado = Math.round(
+            (totalCompras + totalAnteriores * 50) * 100
+        ) / 100;
+
+        const bolsa = Math.round(recaudado * 0.80 * 100) / 100;
+
 
         const premio =
             participantes <= 750
@@ -2478,23 +2661,44 @@ app.get("/admin/estado-quinielas", async (req, res) => {
             });
         }
 
-        const resultado = await pool.query(`
-            SELECT
-                pr.envio_id,
-                u.nombre,
-                pr.telefono,
-                MIN(pr.fecha_envio) AS fecha_envio,
-                MIN(pr.estado_pago) AS estado_pago
-            FROM predicciones pr
-            JOIN users u
-                ON u.id = pr.user_id
-            WHERE pr.jornada = $1
-            GROUP BY
-                pr.envio_id,
-                u.nombre,
-                pr.telefono
-            ORDER BY fecha_envio DESC
-        `, [jornada]);
+        
+const resultado = await pool.query(`
+    SELECT
+        pr.envio_id,
+        u.nombre,
+        pr.telefono,
+        MIN(pr.fecha_envio) AS fecha_envio,
+        MIN(pr.estado_pago) AS estado_pago,
+
+        
+        MAX(c.compra_id) AS compra_id,
+        MAX(c.cantidad) AS cantidad_compra,
+        MAX(c.precio_normal) AS precio_normal_compra,
+        MAX(c.precio_final) AS precio_final_compra,
+        MAX(c.ahorro) AS ahorro_compra
+
+    FROM predicciones pr
+
+    JOIN users u
+        ON u.id = pr.user_id
+
+    LEFT JOIN compras_quinielas_envios ce
+        ON ce.envio_id = pr.envio_id
+
+    LEFT JOIN compras_quinielas c
+        ON c.compra_id = ce.compra_id
+
+
+    WHERE pr.jornada = $1
+
+    GROUP BY
+        pr.envio_id,
+        u.nombre,
+        pr.telefono
+
+    ORDER BY fecha_envio DESC
+`, [jornada]);
+
 
         res.json({
             ok: true,
@@ -2645,11 +2849,45 @@ app.get('/bolsa', async (req, res) => {
     const participantes =
   parseInt(result.rows[0].participantes || 0);
 
-const recaudado = participantes * 50;
 
-const administracion = recaudado * 0.20;
+    // 💰 Recaudación de todas las compras registradas
+    // Incluye pagadas y pendientes, con descuentos aplicados.
 
-const bolsaPremios = recaudado * 0.80;
+    const ingresos = await pool.query(`
+        SELECT
+            COALESCE(SUM(precio_final), 0) AS total
+        FROM compras_quinielas
+        WHERE jornada = $1
+    `, [jornada]);
+
+    // Quinielas antiguas o administrativas
+    // que no están vinculadas a una compra.
+    const anteriores = await pool.query(`
+        SELECT COUNT(DISTINCT pr.envio_id) AS total
+        FROM predicciones pr
+        LEFT JOIN compras_quinielas_envios ce
+            ON ce.envio_id = pr.envio_id
+        WHERE pr.jornada = $1
+          AND ce.envio_id IS NULL
+    `, [jornada]);
+
+    const totalCompras = Number(ingresos.rows[0].total) || 0;
+
+    const totalAnteriores =
+        Number(anteriores.rows[0].total) || 0;
+
+    const recaudado = Math.round(
+        (totalCompras + totalAnteriores * 50) * 100
+    ) / 100;
+
+    const administracion = Math.round(
+        recaudado * 0.20 * 100
+    ) / 100;
+
+    const bolsaPremios = Math.round(
+        (recaudado - administracion) * 100
+    ) / 100;
+
 
 let primerLugar = 0;
 let segundoLugar = 0;
@@ -2983,12 +3221,37 @@ app.get('/admin/exportar-pdf', verificarAdmin, async (req, res) => {
     const tabla = [...participantes.values()];
 
     // CALCULAR BOLSA DE PREMIOS
+
 const cantidadQuinielas = participantes.size;
-const costoQuiniela = 50;
 const porcentajePremios = 0.80;
 
-const bolsaPremiosPDF =
-  cantidadQuinielas * costoQuiniela * porcentajePremios;
+// Compras registradas con sus descuentos
+const comprasPDF = await pool.query(`
+    SELECT COALESCE(SUM(precio_final), 0) AS total
+    FROM compras_quinielas
+    WHERE jornada = $1
+`, [jornada]);
+
+// Quinielas antiguas o administrativas
+const anterioresPDF = await pool.query(`
+    SELECT COUNT(DISTINCT pr.envio_id) AS total
+    FROM predicciones pr
+    LEFT JOIN compras_quinielas_envios ce
+        ON ce.envio_id = pr.envio_id
+    WHERE pr.jornada = $1
+      AND ce.envio_id IS NULL
+`, [jornada]);
+
+const recaudadoPDF = Math.round((
+    Number(comprasPDF.rows[0].total || 0) +
+    Number(anterioresPDF.rows[0].total || 0) * 50
+) * 100) / 100;
+
+const bolsaPremiosPDF = Math.round(
+    recaudadoPDF * porcentajePremios * 100
+) / 100;
+
+
 
 const bolsaFormateada = bolsaPremiosPDF.toLocaleString('es-MX', {
   style: 'currency',
@@ -3601,9 +3864,36 @@ const participantes = parseInt(
   bolsaResult.rows[0].participantes || 0
 );
 
-const recaudado = participantes * 50;
 
-const bolsaPremios = recaudado * 0.80;
+const ingresosExcel = await pool.query(`
+    SELECT COALESCE(SUM(precio_final), 0) AS total
+    FROM compras_quinielas
+    WHERE jornada = $1
+`, [jornada]);
+
+const anterioresExcel = await pool.query(`
+    SELECT COUNT(DISTINCT pr.envio_id) AS total
+    FROM predicciones pr
+    LEFT JOIN compras_quinielas_envios ce
+        ON ce.envio_id = pr.envio_id
+    WHERE pr.jornada = $1
+      AND ce.envio_id IS NULL
+`, [jornada]);
+
+const totalComprasExcel =
+    Number(ingresosExcel.rows[0].total) || 0;
+
+const totalAnterioresExcel =
+    Number(anterioresExcel.rows[0].total) || 0;
+
+const recaudado = Math.round(
+    (totalComprasExcel + totalAnterioresExcel * 50) * 100
+) / 100;
+
+const bolsaPremios = Math.round(
+    recaudado * 0.80 * 100
+) / 100;
+
 
 let premioPrimerLugar = 0;
 
@@ -4356,60 +4646,131 @@ app.get("/admin/jornadas", async (req, res) => {
 // CAMBIAR ESTADO DE PAGO
 // =========================================
 
+
 app.post("/admin/cambiar-estado", async (req, res) => {
+
+    const { envio_id } = req.body || {};
+
+    if (typeof envio_id !== "string" || !envio_id.trim()) {
+        return res.status(400).json({
+            ok: false,
+            error: "envio_id válido requerido"
+        });
+    }
+
+    let client;
 
     try {
 
-        const { envio_id } = req.body;
+        client = await pool.connect();
 
-        if (!envio_id) {
-            return res.status(400).json({
-                ok: false,
-                error: "envio_id requerido"
-            });
-        }
+        await client.query("BEGIN");
 
-        // Obtener el estado actual
-        const actual = await pool.query(`
-            SELECT estado_pago
-            FROM predicciones
+    
+        // Buscar si la quiniela pertenece a una compra.
+        const compra = await client.query(`
+            SELECT compra_id
+            FROM compras_quinielas_envios
             WHERE envio_id = $1
             LIMIT 1
         `, [envio_id]);
 
+        let envios = [envio_id];
+        let compraId = null;
+
+        if (compra.rows.length > 0) {
+
+            compraId = compra.rows[0].compra_id;
+
+            const relacionados = await client.query(`
+                SELECT envio_id
+                FROM compras_quinielas_envios
+                WHERE compra_id = $1
+            `, [compraId]);
+
+            envios = relacionados.rows.map(
+                fila => fila.envio_id
+            );
+
+        }
+
+        // Obtener el estado de todas las quinielas.
+        const actual = await client.query(`
+            SELECT estado_pago
+            FROM predicciones
+            WHERE envio_id = ANY($1)
+        `, [envios]);
+
         if (actual.rows.length === 0) {
+
+            await client.query("ROLLBACK");
+
             return res.status(404).json({
                 ok: false,
                 error: "Quiniela no encontrada"
             });
+
         }
 
-        const nuevoEstado =
-            actual.rows[0].estado_pago === "Pagado"
-                ? "Pendiente"
-                : "Pagado";
+        // Si todas están pagadas, pasar a pendiente.
+        // En cualquier otro caso, marcar toda la compra pagada.
+        const todasPagadas = actual.rows.every(
+            fila =>
+                String(fila.estado_pago || "")
+                    .trim()
+                    .toLowerCase() === "pagado"
+        );
 
-        await pool.query(`
+        const nuevoEstado = todasPagadas
+            ? "Pendiente"
+            : "Pagado";
+
+        await client.query(`
             UPDATE predicciones
             SET estado_pago = $1
-            WHERE envio_id = $2
-        `, [nuevoEstado, envio_id]);
+            WHERE envio_id = ANY($2)
+        `, [nuevoEstado, envios]);
+
+        await client.query("COMMIT");
 
         res.json({
             ok: true,
-            estado: nuevoEstado
+            estado: nuevoEstado,
+            compra_id: compraId,
+            quinielas_actualizadas: envios.length
         });
 
+   
     } catch (err) {
 
+        if (client) {
+            try {
+                await client.query("ROLLBACK");
+            } catch (rollbackError) {
+                console.error(
+                    "Error al revertir el cambio de pago:",
+                    rollbackError
+                );
+            }
+        }
+
         console.error(err);
+
 
         res.status(500).json({
             ok: false,
             error: "Error al cambiar estado"
         });
 
+  
+} finally {
+
+    if (client) {
+        client.release();
     }
+
+}
+
 
 });
 

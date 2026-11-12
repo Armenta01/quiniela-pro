@@ -69,7 +69,58 @@ const pagados = data.quinielas.filter(
 
 const pendientes = total - pagados;
 
-const costoQuiniela = 50; // cambia este valor si el costo cambia
+
+const costoQuiniela = 50;
+
+// Evitar sumar varias veces una misma compra.
+const comprasContabilizadas = new Set();
+
+let totalRecaudado = 0;
+
+data.quinielas.forEach(q => {
+
+    const estado = String(q.estado_pago || "")
+        .trim()
+        .toLowerCase();
+
+    if (estado !== "pagado") return;
+
+    if (q.compra_id != null) {
+
+        const compraId = String(q.compra_id);
+
+        if (comprasContabilizadas.has(compraId)) return;
+
+        // Solo contar la compra completa cuando
+        // todas sus quinielas estén pagadas.
+        const quinielasCompra = data.quinielas.filter(
+            item => String(item.compra_id) === compraId
+        );
+
+        const cantidadCompra = Number(q.cantidad_compra);
+
+        const compraCompleta =
+            quinielasCompra.length === cantidadCompra &&
+            quinielasCompra.every(item =>
+                String(item.estado_pago || "")
+                    .trim()
+                    .toLowerCase() === "pagado"
+            );
+
+        if (compraCompleta) {
+            totalRecaudado += Number(q.precio_final_compra) || 0;
+        }
+
+        comprasContabilizadas.add(compraId);
+
+    } else {
+
+        // Quinielas anteriores sin compra vinculada.
+        totalRecaudado += costoQuiniela;
+
+    }
+
+});
 
 document.getElementById("totalParticipantes").textContent = total;
 
@@ -78,7 +129,11 @@ document.getElementById("totalPagados").textContent = pagados;
 document.getElementById("totalPendientes").textContent = pendientes;
 
 document.getElementById("totalRecaudado").textContent =
-"$" + (pagados * costoQuiniela).toLocaleString("es-MX");
+    "$" + totalRecaudado.toLocaleString("es-MX", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+    });
+
 
         data.quinielas.forEach(q => {
 
@@ -99,12 +154,31 @@ document.getElementById("totalRecaudado").textContent =
 
 }
 
+
+const importeCompra = q.compra_id != null
+    ? Number(q.precio_final_compra)
+    : 50;
+
+const importeTexto = Number.isFinite(importeCompra)
+    ? "$" + importeCompra.toLocaleString("es-MX", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+    })
+    : "No disponible";
+
+const detalleImporte = q.compra_id != null
+    ? `${importeTexto} (compra de ${q.cantidad_compra} quiniela(s))`
+    : importeTexto;
+
+
             fila.innerHTML = `
     <td>${q.nombre}</td>
 
     <td>${q.telefono}</td>
 
     <td>${fecha.toLocaleString("es-MX")}</td>
+
+    <td>${detalleImporte}</td>
 
     <td>
         <span class="estado ${estado}">
@@ -140,8 +214,32 @@ boton.addEventListener("click", async () => {
         ? "marcar como PAGADO"
         : "marcar como PENDIENTE";
 
-modalMensaje.textContent =
-`¿Deseas ${accion} la quiniela de ${q.nombre}?`;
+
+const esCompraMultiple =
+    q.compra_id != null &&
+    Number(q.cantidad_compra) > 1;
+
+if (esCompraMultiple) {
+
+    const importe = Number(q.precio_final_compra);
+
+    const importeFormateado = importe.toLocaleString("es-MX", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+    });
+
+    modalMensaje.textContent =
+        `¿Deseas ${accion} la compra completa de ${q.nombre}?\n\n` +
+        `🎟️ Quinielas: ${q.cantidad_compra}\n` +
+        `💰 Importe total: $${importeFormateado} MXN\n\n` +
+        `Este cambio afectará a todas las quinielas de esta compra.`;
+
+} else {
+
+    modalMensaje.textContent =
+        `¿Deseas ${accion} la quiniela de ${q.nombre}?`;
+
+}
 
 modal.style.display = "flex";
 

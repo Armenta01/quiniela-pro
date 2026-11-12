@@ -749,6 +749,26 @@ if (btn) {
 
 }
 
+
+const importeFinal = Number(data.total);
+
+if (!Number.isFinite(importeFinal)) {
+  throw new Error("El servidor no devolvió un importe válido.");
+}
+
+const importeTexto = importeFinal.toLocaleString("es-MX", {
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 2
+});
+
+const promocionTexto =
+  Number(data.ahorro) > 0
+    ? `🎁 Promoción: *${data.promocion?.nombre || "Descuento especial"}*\n` +
+      `💰 Ahorraste: *$${Number(data.ahorro).toLocaleString("es-MX", {
+        maximumFractionDigits: 2
+      })} MXN*\n`
+    : "";
+
 const ahora = new Date();
 
 const fechaHora =
@@ -766,7 +786,10 @@ mensaje += `👤 Jugador: *${usuario}*\n`;
 mensaje += `📅 Semana: *${jornadaActual}*\n`;
 mensaje += `🕒 Registro: *${fechaHora}*\n`;
 mensaje += "🎟️ Total: *1 quiniela*\n";
-mensaje += "💰 Importe: *$50 MXN*\n\n";
+mensaje += `💰 Importe: *$${importeTexto} MXN*\n`;
+mensaje += promocionTexto;
+mensaje += "\n";
+
 mensaje += "━━━ *PRONÓSTICOS* ━━━\n\n";
 
 lista.forEach(p => {
@@ -1845,8 +1868,76 @@ if (botonIndividual) {
   document.getElementById("resumenQuinielas").textContent =
     `${cantidad} quiniela${cantidad === 1 ? "" : "s"}`;
 
-  document.getElementById("precioQuinielas").textContent =
-    `$${cantidad * 50} MXN`;
+
+  // ==========================================
+  // 🎁 MOSTRAR PRECIO CON PROMOCIONES
+  // ==========================================
+
+  const precioElemento =
+    document.getElementById("precioQuinielas");
+
+  if (precioElemento) {
+
+    if (cantidad === 0) {
+
+      precioElemento.textContent = "$0 MXN";
+
+    } else {
+
+      precioElemento.textContent = "⏳ Calculando precio...";
+
+      try {
+
+        const respuesta = await fetch(
+          `/promocion/precio?cantidad=${cantidad}`,
+          { cache: "no-store" }
+        );
+
+        if (!respuesta.ok) {
+          throw new Error("No se pudo consultar el precio");
+        }
+
+        const precio = await respuesta.json();
+
+        if (!precio.ok) {
+          throw new Error("Respuesta de precio inválida");
+        }
+
+        // Evitar mostrar un cálculo antiguo si cambió la cantidad
+        if (cantidad !== quinielasAgregadas.length) return;
+
+        const formato = valor =>
+          Number(valor).toLocaleString("es-MX", {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+          });
+
+        if (precio.promocion && precio.ahorro > 0) {
+
+          precioElemento.textContent =
+            `$${formato(precio.precio_final)} MXN ` +
+            `🎁 Ahorras $${formato(precio.ahorro)} ` +
+            `(${precio.promocion.nombre})`;
+
+        } else {
+
+          precioElemento.textContent =
+            `$${formato(precio.precio_final)} MXN`;
+
+        }
+
+      } catch (error) {
+
+        console.error("Error consultando promoción:", error);
+
+        // No presentar un precio no verificado como definitivo
+        precioElemento.textContent =
+          "⚠️ Precio no disponible";
+
+      }
+    }
+  }
+
 
   boton.textContent = `📲 Guardar y enviar ${cantidad} quiniela${cantidad === 1 ? "" : "s"}`;
 
@@ -1924,8 +2015,9 @@ async function guardarTodo() {
   return guardarIndividual();
 }
 
-function crearMensajeMultiples(nombre, quinielas, partidos) {
-  const mapa = new Map(partidos.map(p => [Number(p.id), p]));
+
+function crearMensajeMultiples(nombre, quinielas, partidos, precioCompra) {
+const mapa = new Map(partidos.map(p => [Number(p.id), p]));
 
   const fechaHora = new Date().toLocaleString("es-MX");
 
@@ -1934,7 +2026,21 @@ function crearMensajeMultiples(nombre, quinielas, partidos) {
   mensaje += `📅 Semana: *${jornadaActual}*\n`;
   mensaje += `🕒 Registro: *${fechaHora}*\n`;
   mensaje += `🎟️ Total: *${quinielas.length} quinielas*\n`;
-  mensaje += `💰 Importe: *$${quinielas.length * 50} MXN*\n\n`;
+  
+const total = Number(precioCompra.total);
+
+mensaje += `💰 Importe: *$${total.toLocaleString("es-MX", {
+  maximumFractionDigits: 2
+})} MXN*\n`;
+
+if (Number(precioCompra.ahorro) > 0) {
+  mensaje += `🎁 Promoción: *${precioCompra.promocion?.nombre || "Descuento especial"}*\n`;
+  mensaje += `💚 Ahorraste: *$${Number(precioCompra.ahorro).toLocaleString("es-MX", {
+    maximumFractionDigits: 2
+  })} MXN*\n`;
+}
+
+mensaje += "\n";
 
   quinielas.forEach((quiniela, indice) => {
     mensaje += `━━━ *QUINIELA #${indice + 1}* ━━━\n`;
@@ -2030,7 +2136,8 @@ const todas = quinielasAgregadas.map(q =>
 
     localStorage.setItem("miNombre", nombre);
 
-    const mensaje = crearMensajeMultiples(nombre, todas, partidos);
+    
+    const mensaje = crearMensajeMultiples(nombre, todas, partidos, data);
     const url = "https://wa.me/524531336012?text=" +
       encodeURIComponent(mensaje);
 
