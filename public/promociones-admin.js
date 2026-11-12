@@ -242,7 +242,56 @@ document.addEventListener("DOMContentLoaded", () => {
           }
         });
 
-        acciones.appendChild(boton);
+        // Botón existente: Activar / Desactivar
+acciones.appendChild(boton);
+
+// 🗑️ NUEVO BOTÓN: ELIMINAR PROMOCIÓN
+const botonEliminar = document.createElement("button");
+
+botonEliminar.type = "button";
+botonEliminar.textContent = "🗑️ Eliminar";
+
+botonEliminar.style.background = "#b91c1c";
+botonEliminar.style.color = "#ffffff";
+botonEliminar.style.padding = "8px 12px";
+botonEliminar.style.border = "none";
+botonEliminar.style.borderRadius = "7px";
+botonEliminar.style.cursor = "pointer";
+botonEliminar.style.margin = "4px";
+
+botonEliminar.addEventListener("click", async () => {
+
+  const confirmar = confirm(
+    `⚠️ ¿Estás seguro de eliminar permanentemente la promoción "${promo.nombre}"?\n\nEsta acción no se puede deshacer.`
+  );
+
+  if (!confirmar) return;
+
+  botonEliminar.disabled = true;
+
+  try {
+
+    await solicitar(
+      `/admin/promociones/${encodeURIComponent(promo.id)}`,
+      {
+        method: "DELETE"
+      }
+    );
+
+    mostrarMensaje("🗑️ Promoción eliminada correctamente.");
+
+    await cargarPromociones();
+
+  } catch (error) {
+
+    mostrarMensaje(error.message, true);
+    botonEliminar.disabled = false;
+
+  }
+
+});
+
+acciones.appendChild(botonEliminar);
 
         fila.append(
           nombre, detalle, vigencia, estado, acciones

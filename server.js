@@ -423,7 +423,7 @@ app.patch('/admin/promociones/:id/estado', async (req, res) => {
   }
 });
 
-// Eliminar promoción (desactivación permanente)
+// 🗑️ ELIMINAR PROMOCIÓN DEFINITIVAMENTE
 app.delete('/admin/promociones/:id', async (req, res) => {
   try {
     const id = Number(req.params.id);
@@ -435,8 +435,7 @@ app.delete('/admin/promociones/:id', async (req, res) => {
     }
 
     const resultado = await pool.query(`
-      UPDATE promociones
-      SET habilitada = FALSE
+      DELETE FROM promociones
       WHERE id = $1
       RETURNING id
     `, [id]);
@@ -448,17 +447,17 @@ app.delete('/admin/promociones/:id', async (req, res) => {
     }
 
     res.json({
-      mensaje: 'Promoción desactivada correctamente'
+      mensaje: 'Promoción eliminada correctamente'
     });
 
   } catch (error) {
     console.error('Error al eliminar promoción:', error);
+
     res.status(500).json({
-      error: 'No se pudo desactivar la promoción'
+      error: 'No se pudo eliminar la promoción'
     });
   }
 });
-
 
 /* ==========================================
    🎁 CÁLCULO AUTOMÁTICO DE PROMOCIONES
