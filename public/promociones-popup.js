@@ -85,8 +85,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       if (titulo) {
-        titulo.textContent = "¡MÁS QUINIELAS POR MENOS!";
-      }
+        titulo.textContent = "🎁 ¡QUINIELAS A PRECIO ESPECIAL!";
+    }
 
       const cantidadQuinielas =
         Number(promo.cantidad_paquete);
