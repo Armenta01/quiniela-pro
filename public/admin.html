@@ -15,7 +15,6 @@ if (sessionStorage.getItem("admin") !== "true") {
 
 </head>
 <body>
-<body>
 
 <div class="admin-header">
 
@@ -1780,6 +1779,8 @@ if (esIOS) {
 
             <img src="${imagen}">
 
+
+
         </body>
 
         </html>
@@ -2792,6 +2793,116 @@ async function guardarCambiosPronosticos(){
 
 <script src="ui.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<!-- =====================================
+     ADMINISTRADOR DE PROMOCIONES
+===================================== -->
+
+<section id="administradorPromociones"
+  style="max-width:1000px;margin:35px auto;padding:25px;
+  background:#121b31;border:1px solid #344767;
+  border-radius:15px;color:white;">
+
+  <h2 style="color:#FFC107;text-align:center;">
+    🎁 Administrar Promociones
+  </h2>
+
+  <p style="text-align:center;color:#cbd5e1;">
+    Configura descuentos, paquetes y fechas de vigencia.
+  </p>
+
+  <form id="formPromocion">
+
+    <label>Nombre de la promoción</label>
+    <input id="promoNombre" type="text"
+      placeholder="Ej. Buen Fin 2026"
+      maxlength="100" required
+      style="width:100%;padding:12px;margin:8px 0 16px;">
+
+    <label>Tipo de promoción</label>
+    <select id="promoTipo"
+      style="width:100%;padding:12px;margin:8px 0 16px;">
+      <option value="porcentaje">
+        Descuento porcentual
+      </option>
+      <option value="paquete">
+        Precio especial por paquete
+      </option>
+    </select>
+
+    <div id="camposPorcentaje">
+
+      <label>Porcentaje de descuento (%)</label>
+      <input id="promoDescuento" type="number"
+        min="0.01" max="100" step="0.01"
+        value="20"
+        style="width:100%;padding:12px;margin:8px 0 16px;">
+
+      <label>Cantidad mínima de quinielas</label>
+      <input id="promoCantidadMin" type="number"
+        min="1" step="1" value="2"
+        style="width:100%;padding:12px;margin:8px 0 16px;">
+
+    </div>
+
+    <div id="camposPaquete" hidden>
+
+      <label>Cantidad de quinielas del paquete</label>
+      <input id="promoCantidadPaquete" type="number"
+        min="1" step="1" value="3"
+        style="width:100%;padding:12px;margin:8px 0 16px;">
+
+      <label>Precio total del paquete ($ MXN)</label>
+      <input id="promoPrecioPaquete" type="number"
+        min="0" step="0.01" value="100"
+        style="width:100%;padding:12px;margin:8px 0 16px;">
+
+    </div>
+
+    <label>Fecha y hora de inicio</label>
+    <input id="promoInicio" type="datetime-local"
+      required
+      style="width:100%;padding:12px;margin:8px 0 16px;">
+
+    <label>Fecha y hora de finalización</label>
+    <input id="promoFin" type="datetime-local"
+      required
+      style="width:100%;padding:12px;margin:8px 0 16px;">
+
+    <button type="submit" id="btnGuardarPromocion"
+      style="background:#28a745;color:white;
+      padding:13px 24px;border:0;border-radius:9px;
+      cursor:pointer;font-weight:bold;width:100%;">
+      💾 Guardar promoción
+    </button>
+
+    <p id="mensajePromocion" role="status"
+      style="text-align:center;"></p>
+
+  </form>
+
+  <h3 style="color:#FFC107;margin-top:30px;">
+    📋 Promociones registradas
+  </h3>
+
+  <div style="overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr>
+          <th>Promoción</th>
+          <th>Descuento / Paquete</th>
+          <th>Vigencia</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tablaPromociones"></tbody>
+    </table>
+  </div>
+
+</section>
+
+<script src="promociones-admin.js"></script>
 
 </body>
 </html>

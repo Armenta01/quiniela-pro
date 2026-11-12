@@ -247,6 +247,219 @@ app.use('/admin', (req, res, next) => {
 });
 
 
+/* ==========================================
+   🎁 ADMINISTRADOR DE PROMOCIONES
+   QUINIELAS EL INGE
+========================================== */
+
+// Consultar todas las promociones
+app.get('/admin/promociones', async (req, res) => {
+  try {
+    const resultado = await pool.query(`
+      SELECT *
+      FROM promociones
+      ORDER BY inicio DESC, id DESC
+    `);
+
+    res.json(resultado.rows);
+  } catch (error) {
+    console.error('Error al consultar promociones:', error);
+    res.status(500).json({
+      error: 'No se pudieron consultar las promociones'
+    });
+  }
+});
+
+// Crear promoción
+app.post('/admin/promociones', async (req, res) => {
+  try {
+    const {
+      nombre,
+      tipo,
+      descuento,
+      cantidad_min,
+      cantidad_paquete,
+      precio_paquete,
+      inicio,
+      fin
+    } = req.body;
+
+    if (!nombre || !String(nombre).trim()) {
+      return res.status(400).json({
+        error: 'Escribe el nombre de la promoción'
+      });
+    }
+
+    if (!['porcentaje', 'paquete'].includes(tipo)) {
+      return res.status(400).json({
+        error: 'Tipo de promoción no válido'
+      });
+    }
+
+    const inicioFecha = new Date(inicio);
+    const finFecha = new Date(fin);
+
+    if (
+      !inicio || !fin ||
+      Number.isNaN(inicioFecha.getTime()) ||
+      Number.isNaN(finFecha.getTime()) ||
+      finFecha <= inicioFecha
+    ) {
+      return res.status(400).json({
+        error: 'Las fechas de la promoción no son válidas'
+      });
+    }
+
+    let descuentoFinal = 0;
+    let cantidadMinima = 1;
+    let cantidadPaquete = null;
+    let precioPaquete = null;
+
+    if (tipo === 'porcentaje') {
+      descuentoFinal = Number(descuento);
+      cantidadMinima = Number(cantidad_min);
+
+      if (
+        !Number.isFinite(descuentoFinal) ||
+        descuentoFinal <= 0 ||
+        descuentoFinal > 100 ||
+        !Number.isInteger(cantidadMinima) ||
+        cantidadMinima < 1
+      ) {
+        return res.status(400).json({
+          error: 'Porcentaje o cantidad mínima no válidos'
+        });
+      }
+    }
+
+    if (tipo === 'paquete') {
+      cantidadPaquete = Number(cantidad_paquete);
+      precioPaquete = Number(precio_paquete);
+
+      if (
+        !Number.isInteger(cantidadPaquete) ||
+        cantidadPaquete < 1 ||
+        !Number.isFinite(precioPaquete) ||
+        precioPaquete < 0
+      ) {
+        return res.status(400).json({
+          error: 'Cantidad o precio del paquete no válidos'
+        });
+      }
+    }
+
+    const resultado = await pool.query(`
+      INSERT INTO promociones (
+        nombre, tipo, descuento, cantidad_min,
+        cantidad_paquete, precio_paquete,
+        inicio, fin, habilitada
+      )
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,TRUE)
+      RETURNING *
+    `, [
+      String(nombre).trim(),
+      tipo,
+      descuentoFinal,
+      cantidadMinima,
+      cantidadPaquete,
+      precioPaquete,
+      inicioFecha.toISOString(),
+      finFecha.toISOString()
+    ]);
+
+    res.status(201).json({
+      mensaje: 'Promoción creada correctamente',
+      promocion: resultado.rows[0]
+    });
+
+  } catch (error) {
+    console.error('Error al crear promoción:', error);
+    res.status(500).json({
+      error: 'No se pudo crear la promoción'
+    });
+  }
+});
+
+// Activar o desactivar promoción
+app.patch('/admin/promociones/:id/estado', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id) || id < 1) {
+      return res.status(400).json({
+        error: 'Identificador no válido'
+      });
+    }
+
+    if (typeof req.body.habilitada !== 'boolean') {
+      return res.status(400).json({
+        error: 'El estado debe ser verdadero o falso'
+      });
+    }
+
+    const resultado = await pool.query(`
+      UPDATE promociones
+      SET habilitada = $1
+      WHERE id = $2
+      RETURNING *
+    `, [req.body.habilitada, id]);
+
+    if (!resultado.rows.length) {
+      return res.status(404).json({
+        error: 'Promoción no encontrada'
+      });
+    }
+
+    res.json({
+      mensaje: 'Estado actualizado correctamente',
+      promocion: resultado.rows[0]
+    });
+
+  } catch (error) {
+    console.error('Error al cambiar promoción:', error);
+    res.status(500).json({
+      error: 'No se pudo actualizar el estado'
+    });
+  }
+});
+
+// Eliminar promoción (desactivación permanente)
+app.delete('/admin/promociones/:id', async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id) || id < 1) {
+      return res.status(400).json({
+        error: 'Identificador no válido'
+      });
+    }
+
+    const resultado = await pool.query(`
+      UPDATE promociones
+      SET habilitada = FALSE
+      WHERE id = $1
+      RETURNING id
+    `, [id]);
+
+    if (!resultado.rows.length) {
+      return res.status(404).json({
+        error: 'Promoción no encontrada'
+      });
+    }
+
+    res.json({
+      mensaje: 'Promoción desactivada correctamente'
+    });
+
+  } catch (error) {
+    console.error('Error al eliminar promoción:', error);
+    res.status(500).json({
+      error: 'No se pudo desactivar la promoción'
+    });
+  }
+});
+
+
 // 🔥 INIT DB + ÍNDICES
 async function initDB() {
   await pool.query(`
@@ -315,6 +528,59 @@ await pool.query(`
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_partidos_jornada ON partidos(jornada);`);
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_predicciones_jornada ON predicciones(jornada);`);
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_users_nombre ON users(nombre);`);
+
+
+  // ==========================================
+  // 🎁 PROMOCIONES - QUINIELAS EL INGE
+  // ==========================================
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS promociones (
+      id SERIAL PRIMARY KEY,
+      nombre TEXT NOT NULL,
+      tipo TEXT NOT NULL
+        CHECK (tipo IN ('porcentaje', 'paquete')),
+
+      descuento NUMERIC(5,2) DEFAULT 0,
+      cantidad_min INTEGER DEFAULT 1,
+      cantidad_paquete INTEGER,
+      precio_paquete NUMERIC(10,2),
+
+      inicio TIMESTAMPTZ NOT NULL,
+      fin TIMESTAMPTZ NOT NULL,
+
+      habilitada BOOLEAN DEFAULT TRUE,
+      fecha_creacion TIMESTAMPTZ DEFAULT NOW(),
+
+      CONSTRAINT promocion_fechas_validas
+        CHECK (fin > inicio),
+
+      CONSTRAINT promocion_descuento_valido
+        CHECK (descuento >= 0 AND descuento <= 100),
+
+      CONSTRAINT promocion_cantidad_valida
+        CHECK (cantidad_min >= 1),
+
+      CONSTRAINT promocion_paquete_valido
+        CHECK (
+          cantidad_paquete IS NULL
+          OR cantidad_paquete >= 1
+        ),
+
+      CONSTRAINT promocion_precio_valido
+        CHECK (
+          precio_paquete IS NULL
+          OR precio_paquete >= 0
+        )
+    );
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_promociones_vigencia
+    ON promociones (habilitada, inicio, fin);
+  `);
+
+  console.log("🎁 Sistema de promociones preparado");
 
   console.log("🔥 DB + índices listos");
 }
