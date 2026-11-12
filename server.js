@@ -467,6 +467,55 @@ app.delete('/admin/promociones/:id', async (req, res) => {
 
 const PRECIO_BASE_QUINIELA = 50;
 
+
+async function calcularBolsaPremios(jornada) {
+
+  const compras = await pool.query(`
+    SELECT
+      COALESCE(SUM(precio_final), 0) AS recaudado,
+      COALESCE(SUM(
+        CASE
+          WHEN ahorro > 0 THEN 0
+          ELSE precio_final * 0.20
+        END
+      ), 0) AS administracion
+    FROM compras_quinielas
+    WHERE jornada = $1
+  `, [jornada]);
+
+  const anteriores = await pool.query(`
+    SELECT COUNT(DISTINCT pr.envio_id) AS total
+    FROM predicciones pr
+    LEFT JOIN compras_quinielas_envios ce
+      ON ce.envio_id = pr.envio_id
+    WHERE pr.jornada = $1
+      AND ce.envio_id IS NULL
+  `, [jornada]);
+
+  const totalAnteriores = Number(anteriores.rows[0].total) || 0;
+
+  const recaudado = Math.round((
+    Number(compras.rows[0].recaudado) +
+    totalAnteriores * 50
+  ) * 100) / 100;
+
+  const administracion = Math.round((
+    Number(compras.rows[0].administracion) +
+    totalAnteriores * 10
+  ) * 100) / 100;
+
+  const bolsaPremios = Math.round(
+    (recaudado - administracion) * 100
+  ) / 100;
+
+  return {
+    recaudado,
+    administracion,
+    bolsaPremios
+  };
+}
+
+
 async function calcularPrecioPromocional(cantidad, db = pool) {
 
   const cantidadQuinielas = Number(cantidad);
@@ -2298,7 +2347,13 @@ app.get("/tabla-imagen", async (req, res) => {
             (totalCompras + totalAnteriores * 50) * 100
         ) / 100;
 
-        const bolsa = Math.round(recaudado * 0.80 * 100) / 100;
+
+        // 💰 Bolsa de premios con promociones
+        const {
+            bolsaPremios
+        } = await calcularBolsaPremios(jornada);
+
+        const bolsa = bolsaPremios;
 
 
         const premio =
@@ -2866,47 +2921,18 @@ app.get('/bolsa', async (req, res) => {
   parseInt(result.rows[0].participantes || 0);
 
 
-    // 💰 Recaudación de todas las compras registradas
-    // Incluye pagadas y pendientes, con descuentos aplicados.
 
-    const ingresos = await pool.query(`
-        SELECT
-            COALESCE(SUM(precio_final), 0) AS total
-        FROM compras_quinielas
-        WHERE jornada = $1
-    `, [jornada]);
-
-    // Quinielas antiguas o administrativas
-    // que no están vinculadas a una compra.
-    const anteriores = await pool.query(`
-        SELECT COUNT(DISTINCT pr.envio_id) AS total
-        FROM predicciones pr
-        LEFT JOIN compras_quinielas_envios ce
-            ON ce.envio_id = pr.envio_id
-        WHERE pr.jornada = $1
-          AND ce.envio_id IS NULL
-    `, [jornada]);
-
-    const totalCompras = Number(ingresos.rows[0].total) || 0;
-
-    const totalAnteriores =
-        Number(anteriores.rows[0].total) || 0;
-
-    const recaudado = Math.round(
-        (totalCompras + totalAnteriores * 50) * 100
-    ) / 100;
-
-    const administracion = Math.round(
-        recaudado * 0.20 * 100
-    ) / 100;
-
-    const bolsaPremios = Math.round(
-        (recaudado - administracion) * 100
-    ) / 100;
+    // 💰 Bolsa de premios según compras normales y promocionales
+    const {
+      recaudado,
+      administracion,
+      bolsaPremios
+    } = await calcularBolsaPremios(jornada);
 
 
 let primerLugar = 0;
 let segundoLugar = 0;
+
 
 // 👥 Hasta 750 participantes: un solo premio
 if (participantes <= 750) {
@@ -3238,36 +3264,14 @@ app.get('/admin/exportar-pdf', verificarAdmin, async (req, res) => {
 
     const tabla = [...participantes.values()];
 
+
     // CALCULAR BOLSA DE PREMIOS
+    // Compras normales: 80% a premios
+    // Compras promocionales: 100% a premios
 
-const cantidadQuinielas = participantes.size;
-const porcentajePremios = 0.80;
-
-// Compras registradas con sus descuentos
-const comprasPDF = await pool.query(`
-    SELECT COALESCE(SUM(precio_final), 0) AS total
-    FROM compras_quinielas
-    WHERE jornada = $1
-`, [jornada]);
-
-// Quinielas antiguas o administrativas
-const anterioresPDF = await pool.query(`
-    SELECT COUNT(DISTINCT pr.envio_id) AS total
-    FROM predicciones pr
-    LEFT JOIN compras_quinielas_envios ce
-        ON ce.envio_id = pr.envio_id
-    WHERE pr.jornada = $1
-      AND ce.envio_id IS NULL
-`, [jornada]);
-
-const recaudadoPDF = Math.round((
-    Number(comprasPDF.rows[0].total || 0) +
-    Number(anterioresPDF.rows[0].total || 0) * 50
-) * 100) / 100;
-
-const bolsaPremiosPDF = Math.round(
-    recaudadoPDF * porcentajePremios * 100
-) / 100;
+    const {
+      bolsaPremios: bolsaPremiosPDF
+    } = await calcularBolsaPremios(jornada);
 
 
 
@@ -3883,34 +3887,14 @@ const participantes = parseInt(
 );
 
 
-const ingresosExcel = await pool.query(`
-    SELECT COALESCE(SUM(precio_final), 0) AS total
-    FROM compras_quinielas
-    WHERE jornada = $1
-`, [jornada]);
 
-const anterioresExcel = await pool.query(`
-    SELECT COUNT(DISTINCT pr.envio_id) AS total
-    FROM predicciones pr
-    LEFT JOIN compras_quinielas_envios ce
-        ON ce.envio_id = pr.envio_id
-    WHERE pr.jornada = $1
-      AND ce.envio_id IS NULL
-`, [jornada]);
+// 💰 Bolsa de premios con promociones
+// Precio normal: 80% a premios
+// Con promoción: 100% a premios
 
-const totalComprasExcel =
-    Number(ingresosExcel.rows[0].total) || 0;
-
-const totalAnterioresExcel =
-    Number(anterioresExcel.rows[0].total) || 0;
-
-const recaudado = Math.round(
-    (totalComprasExcel + totalAnterioresExcel * 50) * 100
-) / 100;
-
-const bolsaPremios = Math.round(
-    recaudado * 0.80 * 100
-) / 100;
+const {
+  bolsaPremios
+} = await calcularBolsaPremios(jornada);
 
 
 let premioPrimerLugar = 0;
