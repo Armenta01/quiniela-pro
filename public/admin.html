@@ -106,6 +106,91 @@ if (sessionStorage.getItem("admin") !== "true") {
 }
 </style>
 
+<style>
+/* 📱 PROMOCIONES EN TARJETAS PARA CELULAR */
+@media (max-width: 700px) {
+
+  #administradorPromociones table {
+    display: block;
+    width: 100% !important;
+    min-width: 0 !important;
+    border-collapse: separate !important;
+  }
+
+  #administradorPromociones thead {
+    display: none;
+  }
+
+  #administradorPromociones tbody {
+    display: block;
+    width: 100%;
+  }
+
+  #administradorPromociones tbody tr {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 18px;
+    padding: 14px;
+    background: #1b2944;
+    border: 1px solid #405477;
+    border-radius: 14px;
+  }
+
+  #administradorPromociones tbody td {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    padding: 10px 0;
+    text-align: left !important;
+    font-size: 14px !important;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+    white-space: normal;
+    border-bottom: 1px solid #344767;
+  }
+
+  #administradorPromociones tbody td::before {
+    display: block;
+    margin-bottom: 5px;
+    color: #ffc107;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  #administradorPromociones tbody td:nth-child(1)::before {
+    content: "🎁 PROMOCIÓN";
+  }
+
+  #administradorPromociones tbody td:nth-child(2)::before {
+    content: "💰 DESCUENTO / PAQUETE";
+  }
+
+  #administradorPromociones tbody td:nth-child(3)::before {
+    content: "📅 VIGENCIA";
+  }
+
+  #administradorPromociones tbody td:nth-child(4)::before {
+    content: "📌 ESTADO";
+  }
+
+  #administradorPromociones tbody td:nth-child(5)::before {
+    content: "⚙️ ACCIONES";
+  }
+
+  #administradorPromociones tbody td:last-child {
+    border-bottom: none;
+  }
+
+  #administradorPromociones tbody td button {
+    max-width: 100%;
+    white-space: normal;
+    margin: 4px;
+    font-size: 13px;
+  }
+}
+</style>
+
 
 </head>
 
@@ -1871,8 +1956,9 @@ if (esIOS) {
                     padding:12px;
                     border-radius:10px;
                     font-size:16px;
-                }
-            
+              
+                                    }
+            </style>
 
         </head>
 
