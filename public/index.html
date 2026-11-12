@@ -245,10 +245,54 @@
 
   <div id="listaQuinielas"></div>
 
-  <div class="total-quinielas">
-    <strong id="resumenQuinielas">0 quinielas</strong>
-    <strong id="precioQuinielas">$0 MXN</strong>
-  </div>
+  
+<div class="total-quinielas">
+  <strong id="resumenQuinielas">0 quinielas</strong>
+  <strong id="precioQuinielas">$0 MXN</strong>
+</div>
+
+<!-- PROMOCIÓN DISPONIBLE -->
+<div id="promocionDisponible" hidden
+     style="
+       margin-top:15px;
+       padding:18px;
+       background:#102b25;
+       border:1px solid #22c55e;
+       border-radius:14px;
+       color:white;
+       text-align:center;
+     ">
+
+  <h3 style="color:#4ade80; margin:0 0 10px;">
+    🎁 ¡Tienes una promoción disponible!
+  </h3>
+
+  <p id="promocionDescripcion"></p>
+
+  <button
+    type="button"
+    id="btnAceptarPromocion"
+    style="
+      width:100%;
+      padding:13px;
+      border:0;
+      border-radius:10px;
+      background:#16a34a;
+      color:white;
+      font-weight:bold;
+      cursor:pointer;
+    ">
+    🎉 Aceptar promoción
+  </button>
+
+  <p id="promocionConfirmada"
+     hidden
+     style="color:#86efac; font-weight:bold;">
+    ✅ ✅ ¡Descuento confirmado! Ya está incluido en tu total.
+  </p>
+
+</div>
+
 
 </section>
 

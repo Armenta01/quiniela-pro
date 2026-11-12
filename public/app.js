@@ -1637,6 +1637,138 @@ let quinielasAgregadas = [];
 let editandoQuiniela = null;
 let enviandoMultiples = false;
 
+
+let promocionAceptada = false;
+let precioPromocionActual = null;
+
+async function actualizarPromocionDisponible(cantidad) {
+  const caja = document.getElementById("promocionDisponible");
+  const descripcion = document.getElementById("promocionDescripcion");
+  const boton = document.getElementById("btnAceptarPromocion");
+  const confirmacion = document.getElementById("promocionConfirmada");
+  const precioElemento = document.getElementById("precioQuinielas");
+
+  if (!caja || !descripcion || !boton || !confirmacion) return;
+
+
+  // Conservar la aceptación si la promoción y cantidad no cambian
+  const promocionAnterior = precioPromocionActual;
+  const aceptacionAnterior = promocionAceptada;
+
+  promocionAceptada = false;
+  precioPromocionActual = null;
+
+  caja.hidden = true;
+  boton.hidden = false;
+  confirmacion.hidden = true;
+
+  if (cantidad === 0) return;
+
+  try {
+    const respuesta = await fetch(
+      `/promocion/precio?cantidad=${cantidad}`,
+      { cache: "no-store" }
+    );
+
+    if (!respuesta.ok) throw new Error("No se pudo consultar la promoción");
+
+    const precio = await respuesta.json();
+
+    // Evitar respuestas antiguas si cambia la cantidad.
+    if (cantidad !== quinielasAgregadas.length) return;
+
+  
+if (!precio.ok || !precio.promocion || Number(precio.ahorro) <= 0) {
+  if (precioElemento) {
+    const precioNormal = Number(precio.precio_normal);
+
+    precioElemento.textContent =
+      Number.isFinite(precioNormal)
+        ? `$${precioNormal.toLocaleString("es-MX")} MXN`
+        : "Precio no disponible";
+  }
+
+  return;
+}
+
+
+    precioPromocionActual = precio;
+
+
+    // 🎁 Conservar la aceptación si la oferta sigue siendo la misma
+    const mismaPromocion =
+      promocionAnterior &&
+      Number(promocionAnterior.cantidad) === Number(precio.cantidad) &&
+      Number(promocionAnterior.promocion?.id) === Number(precio.promocion?.id) &&
+      Number(promocionAnterior.precio_final) === Number(precio.precio_final);
+
+    if (mismaPromocion && aceptacionAnterior) {
+      promocionAceptada = true;
+      boton.hidden = true;
+      confirmacion.hidden = false;
+    }
+
+
+    const dinero = valor =>
+      Number(valor).toLocaleString("es-MX", {
+        maximumFractionDigits: 2
+      });
+
+    descripcion.textContent =
+      `${precio.promocion.nombre}: ahorra $${dinero(precio.ahorro)} MXN. ` +
+      `Total promocional: $${dinero(precio.precio_final)} MXN.`;
+
+    caja.hidden = false;
+
+    
+   
+if (precioElemento) {
+  precioElemento.textContent =
+    `$${dinero(precio.precio_final)} MXN`;
+}
+
+
+ 
+
+} catch (error) {
+  console.error("Error consultando promoción:", error);
+
+  if (cantidad === quinielasAgregadas.length && precioElemento) {
+    precioElemento.textContent =
+      "⚠️ No se pudo consultar el precio";
+  }
+}
+
+}
+
+
+function aceptarPromocion() {
+  if (!precioPromocionActual) return;
+
+  promocionAceptada = true;
+
+  const precio = precioPromocionActual;
+  const precioElemento = document.getElementById("precioQuinielas");
+
+  if (precioElemento) {
+    precioElemento.textContent =
+      `$${Number(precio.precio_final).toLocaleString("es-MX", {
+        maximumFractionDigits: 2
+      })} MXN`;
+  }
+
+  document.getElementById("btnAceptarPromocion").hidden = true;
+  document.getElementById("promocionConfirmada").hidden = false;
+
+
+mostrarToast("¡Descuento confirmado! Ya está aplicado a tu total.", "🎁");
+
+}
+
+document.getElementById("btnAceptarPromocion")
+  ?.addEventListener("click", aceptarPromocion);
+
+
 function escaparHTML(valor) {
   return String(valor ?? "").replace(/[&<>"']/g, c => ({
     "&": "&amp;",
@@ -1869,75 +2001,20 @@ if (botonIndividual) {
     `${cantidad} quiniela${cantidad === 1 ? "" : "s"}`;
 
 
-  // ==========================================
-  // 🎁 MOSTRAR PRECIO CON PROMOCIONES
-  // ==========================================
+const precioElemento =
+  document.getElementById("precioQuinielas");
 
-  const precioElemento =
-    document.getElementById("precioQuinielas");
 
-  if (precioElemento) {
+if (precioElemento) {
+  precioElemento.textContent =
+    cantidad > 0
+      ? "⏳ Calculando precio..."
+      : "$0 MXN";
+}
 
-    if (cantidad === 0) {
 
-      precioElemento.textContent = "$0 MXN";
-
-    } else {
-
-      precioElemento.textContent = "⏳ Calculando precio...";
-
-      try {
-
-        const respuesta = await fetch(
-          `/promocion/precio?cantidad=${cantidad}`,
-          { cache: "no-store" }
-        );
-
-        if (!respuesta.ok) {
-          throw new Error("No se pudo consultar el precio");
-        }
-
-        const precio = await respuesta.json();
-
-        if (!precio.ok) {
-          throw new Error("Respuesta de precio inválida");
-        }
-
-        // Evitar mostrar un cálculo antiguo si cambió la cantidad
-        if (cantidad !== quinielasAgregadas.length) return;
-
-        const formato = valor =>
-          Number(valor).toLocaleString("es-MX", {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 2
-          });
-
-        if (precio.promocion && precio.ahorro > 0) {
-
-          precioElemento.textContent =
-            `$${formato(precio.precio_final)} MXN ` +
-            `🎁 Ahorras $${formato(precio.ahorro)} ` +
-            `(${precio.promocion.nombre})`;
-
-        } else {
-
-          precioElemento.textContent =
-            `$${formato(precio.precio_final)} MXN`;
-
-        }
-
-      } catch (error) {
-
-        console.error("Error consultando promoción:", error);
-
-        // No presentar un precio no verificado como definitivo
-        precioElemento.textContent =
-          "⚠️ Precio no disponible";
-
-      }
-    }
-  }
-
+  // 🎁 Consultar promoción disponible
+  await actualizarPromocionDisponible(cantidad);
 
   boton.textContent = `📲 Guardar y enviar ${cantidad} quiniela${cantidad === 1 ? "" : "s"}`;
 
@@ -2065,7 +2142,46 @@ async function guardarMultiples() {
 
   const boton = document.getElementById("btnGuardarMultiples");
 
+  // 🔒 Identificar si el servidor confirmó el registro
+let registroConfirmado = false;
+
+
   try {
+
+    // 💰 Verificar el precio antes de registrar la compra
+    const cantidadCompra = quinielasAgregadas.length;
+
+    const respuestaPrecio = await fetch(
+      `/promocion/precio?cantidad=${cantidadCompra}`,
+      { cache: "no-store" }
+    );
+
+    if (!respuestaPrecio.ok) {
+      throw new Error(
+        "No se pudo verificar el precio. Inténtalo nuevamente."
+      );
+    }
+
+    const precioVerificado = await respuestaPrecio.json();
+
+    // 🔒 Comprobar que la cantidad no cambió durante la consulta
+    if (cantidadCompra !== quinielasAgregadas.length) {
+      throw new Error(
+        "La cantidad de quinielas cambió. Revisa tu compra e inténtalo nuevamente."
+      );
+    }
+
+    if (
+      !precioVerificado.ok ||
+      !Number.isFinite(Number(precioVerificado.precio_final)) ||
+      Number(precioVerificado.precio_final) < 0
+    ) {
+      throw new Error(
+        "El servidor no devolvió un precio válido."
+      );
+    }
+
+
     if (editandoQuiniela !== null) {
       throw new Error(
         "Primero pulsa Actualizar quiniela para guardar tus cambios."
@@ -2120,12 +2236,14 @@ const todas = quinielasAgregadas.map(q =>
     const res = await fetch("/guardar-multiples", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+     
       body: JSON.stringify({
-        nombre,
-        telefono,
-        jornada: jornadaActual,
-        quinielas: todas
-      })
+      nombre,
+      telefono,
+      jornada: jornadaActual,
+      quinielas: todas,
+    })
+
     });
 
     const data = await res.json();
@@ -2133,6 +2251,30 @@ const todas = quinielasAgregadas.map(q =>
     if (!res.ok || !data.ok) {
       throw new Error(data.error || "No fue posible guardar.");
     }
+
+
+ registroConfirmado = true;
+
+
+
+
+    // 💰 Comprobar el importe definitivo del servidor
+    const totalRegistrado = Number(data.total);
+    const totalConsultado = Number(precioVerificado.precio_final);
+
+    if (!Number.isFinite(totalRegistrado) || totalRegistrado < 0) {
+      throw new Error(
+        "El servidor registró la compra, pero no devolvió un importe válido. Contacta al administrador antes de repetir el envío."
+      );
+    }
+
+    if (Math.abs(totalRegistrado - totalConsultado) > 0.009) {
+      console.warn(
+        "El precio cambió durante el registro:",
+        { totalConsultado, totalRegistrado }
+      );
+    }
+
 
     localStorage.setItem("miNombre", nombre);
 
@@ -2161,9 +2303,24 @@ const todas = quinielasAgregadas.map(q =>
       window.open(url, "_blank");
     }
 
-  } catch (error) {
+  
+} catch (error) {
+  if (registroConfirmado) {
+    quinielasAgregadas = [];
+    editandoQuiniela = null;
+
+    mostrarMensaje(
+      "Registro confirmado",
+      "Tus quinielas ya fueron registradas. No vuelvas a enviarlas. Si WhatsApp no se abrió, contacta al administrador.",
+      "✅"
+    );
+  } else {
     mostrarErrorQuiniela(error.message);
-  } finally {
+  }
+} finally {
+
+
+
     enviandoMultiples = false;
     boton.disabled = quinielaCerrada;
     if (!quinielaCerrada && quinielasAgregadas.length) {

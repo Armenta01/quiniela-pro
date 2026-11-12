@@ -1185,10 +1185,12 @@ VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)
 
     const precioCompra = await calcularPrecioPromocional(1, client);
 
-    const compraId =
-      Date.now().toString() +
-      "_COMPRA_" +
-      require("crypto").randomBytes(8).toString("hex");
+  
+const compraId =
+  Date.now().toString() +
+  "_COMPRA_" +
+  require("crypto").randomBytes(8).toString("hex");
+
 
     await client.query(`
       INSERT INTO compras_quinielas (
@@ -1273,8 +1275,14 @@ await client.query("COMMIT");
 // ==========================================
 // 🏆 GUARDAR VARIAS QUINIELAS
 // ==========================================
+
 app.post("/guardar-multiples", async (req, res) => {
-  const { nombre, telefono, jornada, quinielas } = req.body || {};
+  const {
+  nombre,
+  telefono,
+  jornada,
+  quinielas
+} = req.body || {};
 
   const nombreLimpio = typeof nombre === "string" ? nombre.trim() : "";
   const telefonoLimpio = String(telefono ?? "").trim();
