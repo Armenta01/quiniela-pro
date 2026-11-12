@@ -13,7 +13,103 @@ if (sessionStorage.getItem("admin") !== "true") {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Centro de Control</title>
 
+  
+<style>
+/* 🎁 PROMOCIONES - DISEÑO RESPONSIVO */
+
+#administradorPromociones {
+  max-width: 1000px;
+  box-sizing: border-box;
+}
+
+#administradorPromociones *,
+#administradorPromociones *::before,
+#administradorPromociones *::after {
+  box-sizing: border-box;
+}
+
+#administradorPromociones input,
+#administradorPromociones select {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  border: 1px solid #435475;
+  border-radius: 10px;
+  background: #1d2b45;
+  color: #ffffff;
+  font-size: 16px;
+  min-height: 48px;
+}
+
+#administradorPromociones label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+#administradorPromociones table {
+  min-width: 650px;
+}
+
+#administradorPromociones th,
+#administradorPromociones td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #344767;
+}
+
+@media (max-width: 600px) {
+  #administradorPromociones {
+    margin: 12px auto !important;
+    padding: 16px !important;
+    border-radius: 14px;
+  }
+
+  #administradorPromociones h2 {
+    font-size: 22px;
+  }
+
+  #administradorPromociones h3 {
+    font-size: 18px;
+  }
+
+  #administradorPromociones input,
+  #administradorPromociones select {
+    font-size: 16px;
+  }
+
+  #administradorPromociones button {
+    min-height: 48px;
+    max-width: 100%;
+  }
+}
+
+.btn-promociones-admin {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 17px 20px;
+  border: 1px solid #ffe08a;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #ffe08a, #f5bc39, #ce8d16);
+  color: #111c32;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 5px 18px rgba(218, 160, 31, 0.25);
+}
+
+.btn-promociones-admin:hover {
+  filter: brightness(1.07);
+}
+</style>
+
+
 </head>
+
+
 <body>
 
 <div class="admin-header">
@@ -162,6 +258,15 @@ if (sessionStorage.getItem("admin") !== "true") {
   onclick="window.location.href='recordatorios.html'">
   📲 Recordatorios
 </button>
+
+
+<button
+  type="button"
+  class="btn-promociones-admin"
+  onclick="abrirPromocionesAdmin()">
+  🎁 Administrar Promociones
+</button>
+
 
 <button class="btn-rojo" onclick="logout()">
 🚪 Cerrar sesión
@@ -1767,7 +1872,8 @@ if (esIOS) {
                     border-radius:10px;
                     font-size:16px;
                 }
-            </style>
+            
+
         </head>
 
         <body>
@@ -2798,10 +2904,40 @@ async function guardarCambiosPronosticos(){
      ADMINISTRADOR DE PROMOCIONES
 ===================================== -->
 
+
 <section id="administradorPromociones"
-  style="max-width:1000px;margin:35px auto;padding:25px;
-  background:#121b31;border:1px solid #344767;
-  border-radius:15px;color:white;">
+  style="
+    display:none;
+    width:calc(100% - 24px);
+    max-width:1000px;
+    box-sizing:border-box;
+    margin:25px auto;
+    padding:clamp(15px, 4vw, 30px);
+    background:#121b31;
+    border:1px solid #344767;
+    border-radius:18px;
+    color:white;
+    overflow-wrap:anywhere;
+  ">
+
+<button
+  type="button"
+  onclick="volverPanelAdmin()"
+  style="
+    width:100%;
+    padding:15px;
+    margin-bottom:25px;
+    background:#243b60;
+    color:white;
+    border:1px solid #47638c;
+    border-radius:12px;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+  ">
+  ← Volver al panel administrativo
+</button>
+
 
   <h2 style="color:#FFC107;text-align:center;">
     🎁 Administrar Promociones
@@ -2901,6 +3037,40 @@ async function guardarCambiosPronosticos(){
   </div>
 
 </section>
+
+
+<script>
+function abrirPromocionesAdmin() {
+  const panel = document.querySelector(".admin-container");
+  const promociones = document.getElementById("administradorPromociones");
+
+  if (!panel || !promociones) return;
+
+  panel.style.display = "none";
+  promociones.style.display = "block";
+
+  window.scrollTo({
+    top: 0,
+    behavior: "instant"
+  });
+}
+
+function volverPanelAdmin() {
+  const panel = document.querySelector(".admin-container");
+  const promociones = document.getElementById("administradorPromociones");
+
+  if (!panel || !promociones) return;
+
+  promociones.style.display = "none";
+  panel.style.display = "";
+
+  window.scrollTo({
+    top: 0,
+    behavior: "instant"
+  });
+}
+</script>
+
 
 <script src="promociones-admin.js"></script>
 
