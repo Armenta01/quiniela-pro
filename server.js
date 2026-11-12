@@ -2147,6 +2147,7 @@ function calcularPuntos(p, pr) {
   return 0;
 }
 
+
 async function limpiarSemanaCiclo(jornada) {
 
   const MAX_SEMANAS = 20;
@@ -2157,12 +2158,19 @@ async function limpiarSemanaCiclo(jornada) {
 
   console.log("🧹 Eliminando semana:", semanaEliminar);
 
-  await pool.query(`DELETE FROM predicciones WHERE jornada = $1`, [semanaEliminar]);
+  await pool.query(
+    `DELETE FROM predicciones WHERE jornada = $1`,
+    [semanaEliminar]
+  );
 
-  await pool.query(`DELETE FROM partidos WHERE jornada = $1`, [semanaEliminar]);
+  await pool.query(
+    `DELETE FROM partidos WHERE jornada = $1`,
+    [semanaEliminar]
+  );
 
   // ❗ NO borres campeones (historial)
 }
+
 
 async function fetchTabla(jornada) {
   const result = await pool.query(`
@@ -2892,7 +2900,7 @@ app.get('/bolsa', async (req, res) => {
 let primerLugar = 0;
 let segundoLugar = 0;
 
-// 👥 Hasta 200 participantes: un solo premio
+// 👥 Hasta 750 participantes: un solo premio
 if (participantes <= 750) {
 
   primerLugar = bolsaPremios;
@@ -2900,7 +2908,7 @@ if (participantes <= 750) {
 
 }
 
-// 👥 Desde 201 participantes: dos premios
+// 👥 Desde 751 participantes: dos premios
 else {
 
   primerLugar = bolsaPremios * 0.65;
@@ -3107,6 +3115,8 @@ const ordenResult = await pool.query(
 );
 
 const orden = Number(ordenResult.rows[0].siguiente);
+
+
 
 if (!Number.isInteger(orden) || orden <= 0) {
   throw new Error("No se pudo calcular el orden del partido.");
