@@ -6688,3 +6688,93 @@ body {
   color: #facc15 !important;
   transform: scale(1.1);
 }
+
+
+
+/* ==========================================
+   🎁 DISEÑO POR TIPO DE PROMOCIÓN
+========================================== */
+
+/* PORCENTAJE: DORADO */
+
+.promo-tipo-porcentaje .promo-oferta {
+  border: 2px solid #d4af37;
+  background: linear-gradient(135deg, #102747, #193b61);
+}
+
+.promo-tipo-porcentaje .promo-valor {
+  color: #facc15;
+  font-size: clamp(38px, 9vw, 55px);
+  font-weight: 900;
+  line-height: 1.2;
+  margin: 12px 0;
+}
+
+.promo-condicion {
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.5;
+  margin: 12px 0 0;
+}
+
+/* PAQUETE: VERDE */
+
+.promo-tipo-paquete {
+  border-color: #22c55e;
+  box-shadow:
+    0 0 35px rgba(34, 197, 94, 0.2),
+    0 20px 60px rgba(0, 0, 0, 0.65);
+}
+
+.promo-tipo-paquete .promo-etiqueta {
+  color: #86efac;
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.12);
+}
+
+.promo-tipo-paquete .promo-oferta {
+  border: 2px solid #22c55e;
+  background: linear-gradient(135deg, #102b2a, #17423a);
+}
+
+.promo-tipo-paquete #popupPromoNombre {
+  color: #86efac;
+}
+
+.promo-cantidad {
+  color: #ffffff;
+  font-size: clamp(25px, 7vw, 36px);
+  font-weight: 900;
+  margin: 12px 0;
+}
+
+.promo-precio {
+  color: #86efac;
+  font-size: clamp(32px, 8vw, 46px);
+  font-weight: 900;
+  margin: 12px 0;
+}
+
+.promo-ahorro {
+  display: inline-block;
+  padding: 8px 15px;
+  margin: 10px 0 0;
+  border-radius: 25px;
+  background: rgba(34, 197, 94, 0.15);
+  color: #86efac;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+/* ADAPTACIÓN MÓVIL */
+
+@media (max-width: 480px) {
+  .promo-condicion {
+    font-size: 15px;
+  }
+
+  .promo-ahorro {
+    font-size: 14px;
+  }
+}
