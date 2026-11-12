@@ -630,6 +630,47 @@ async function calcularPrecioPromocional(cantidad, db = pool) {
   };
 }
 
+// ==========================================
+// 🎁 PROMOCIONES VIGENTES PARA EL INDEX
+// ==========================================
+
+app.get('/promociones/activas', async (req, res) => {
+  try {
+
+    const resultado = await pool.query(`
+      SELECT
+        id,
+        nombre,
+        tipo,
+        descuento,
+        cantidad_min,
+        cantidad_paquete,
+        precio_paquete,
+        fin
+      FROM promociones
+      WHERE habilitada = TRUE
+        AND inicio <= NOW()
+        AND fin > NOW()
+      ORDER BY id DESC
+    `);
+
+    res.set('Cache-Control', 'no-store');
+
+    res.json(resultado.rows);
+
+  } catch (error) {
+
+    console.error(
+      'Error consultando promociones activas:',
+      error
+    );
+
+    res.status(500).json({
+      error: 'No se pudieron consultar las promociones'
+    });
+
+  }
+});
 
 // ==========================================
 // 🎁 CONSULTAR PRECIO PROMOCIONAL
