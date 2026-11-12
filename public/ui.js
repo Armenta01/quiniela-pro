@@ -20,7 +20,12 @@ function mostrarConfirmacion(titulo, mensaje){
 
         const btnCancelar = document.getElementById("btnCancelar");
 
-        icono.innerHTML = "🗑️";
+    icono.innerHTML = titulo.toLowerCase().includes("eliminar")
+    ? "🗑️"
+    : titulo.toLowerCase().includes("activar")
+    ? "✅"
+    : "⚠️";
+    
 
         tituloModal.innerHTML = titulo;
 

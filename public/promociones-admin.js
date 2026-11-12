@@ -21,10 +21,29 @@ document.addEventListener("DOMContentLoaded", () => {
       currency: "MXN"
     }).format(Number(valor));
 
-  const mostrarMensaje = (texto, error = false) => {
-    mensaje.textContent = texto;
-    mensaje.style.color = error ? "#ff6b6b" : "#4ade80";
-  };
+  
+const mostrarMensaje = (texto, error = false) => {
+
+  // Utilizar las notificaciones de ui.js
+  if (typeof mostrarToast === "function") {
+
+    mostrarToast(
+      texto,
+      error ? "error" : "exito"
+    );
+
+  } else {
+
+    // Respaldo si ui.js no está disponible
+    if (mensaje) {
+      mensaje.textContent = texto;
+      mensaje.style.color = error ? "#ff6b6b" : "#4ade80";
+    }
+
+  }
+
+};
+
 
   // Las fechas del formulario se interpretan
   // como horario de Ciudad de México (UTC-6
@@ -214,10 +233,12 @@ document.addEventListener("DOMContentLoaded", () => {
         boton.addEventListener("click", async () => {
           const nuevoEstado = !promo.habilitada;
 
-          const confirmar = confirm(
-            `¿Deseas ${nuevoEstado ? "activar" : "desactivar"} ` +
-            `la promoción "${promo.nombre}"?`
-          );
+          
+const confirmar = await mostrarConfirmacion(
+  nuevoEstado ? "Activar promoción" : "Desactivar promoción",
+  `¿Deseas ${nuevoEstado ? "activar" : "desactivar"} la promoción "${promo.nombre}"?`
+);
+
 
           if (!confirmar) return;
 
@@ -261,9 +282,12 @@ botonEliminar.style.margin = "4px";
 
 botonEliminar.addEventListener("click", async () => {
 
-  const confirmar = confirm(
-    `⚠️ ¿Estás seguro de eliminar permanentemente la promoción "${promo.nombre}"?\n\nEsta acción no se puede deshacer.`
-  );
+ 
+const confirmar = await mostrarConfirmacion(
+  "Eliminar promoción",
+  `¿Estás seguro de eliminar permanentemente la promoción "${promo.nombre}"? Esta acción no se puede deshacer.`
+);
+
 
   if (!confirmar) return;
 
