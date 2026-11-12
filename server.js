@@ -460,6 +460,173 @@ app.delete('/admin/promociones/:id', async (req, res) => {
 });
 
 
+/* ==========================================
+   🎁 CÁLCULO AUTOMÁTICO DE PROMOCIONES
+   QUINIELAS EL INGE
+========================================== */
+
+const PRECIO_BASE_QUINIELA = 50;
+
+async function calcularPrecioPromocional(cantidad) {
+
+  const cantidadQuinielas = Number(cantidad);
+
+  if (
+    !Number.isSafeInteger(cantidadQuinielas) ||
+    cantidadQuinielas < 1 ||
+    cantidadQuinielas > 1000
+  ) {
+    throw new Error("Cantidad de quinielas no válida");
+  }
+
+  const precioNormal =
+    cantidadQuinielas * PRECIO_BASE_QUINIELA;
+
+  const resultado = await pool.query(`
+    SELECT *
+    FROM promociones
+    WHERE habilitada = TRUE
+      AND inicio <= NOW()
+      AND fin > NOW()
+    ORDER BY id DESC
+  `);
+
+  let mejorPrecio = precioNormal;
+  let mejorPromocion = null;
+
+  for (const promo of resultado.rows) {
+
+    let precioCalculado = precioNormal;
+
+    // =====================================
+    // DESCUENTO POR PORCENTAJE
+    // =====================================
+
+    if (promo.tipo === "porcentaje") {
+
+      const minimo = Number(promo.cantidad_min);
+      const descuento = Number(promo.descuento);
+
+      if (
+        cantidadQuinielas >= minimo &&
+        descuento > 0 &&
+        descuento <= 100
+      ) {
+
+        precioCalculado =
+          precioNormal * (1 - descuento / 100);
+
+      }
+    }
+
+    // =====================================
+    // PRECIO ESPECIAL POR PAQUETE
+    // =====================================
+
+    if (promo.tipo === "paquete") {
+
+      const cantidadPaquete =
+        Number(promo.cantidad_paquete);
+
+      const precioPaquete =
+        Number(promo.precio_paquete);
+
+      if (
+        Number.isInteger(cantidadPaquete) &&
+        cantidadPaquete >= 1 &&
+        Number.isFinite(precioPaquete) &&
+        precioPaquete >= 0 &&
+        cantidadQuinielas >= cantidadPaquete
+      ) {
+
+        const paquetesCompletos =
+          Math.floor(cantidadQuinielas / cantidadPaquete);
+
+        const quinielasRestantes =
+          cantidadQuinielas % cantidadPaquete;
+
+        precioCalculado =
+          paquetesCompletos * precioPaquete +
+          quinielasRestantes * PRECIO_BASE_QUINIELA;
+
+      }
+    }
+
+    // Redondear a centavos
+    precioCalculado =
+      Math.round((precioCalculado + Number.EPSILON) * 100) / 100;
+
+    // Elegir la promoción que más ahorre
+    if (precioCalculado < mejorPrecio) {
+
+      mejorPrecio = precioCalculado;
+
+      mejorPromocion = {
+        id: promo.id,
+        nombre: promo.nombre,
+        tipo: promo.tipo
+      };
+
+    }
+  }
+
+  return {
+    cantidad: cantidadQuinielas,
+    precio_unitario: PRECIO_BASE_QUINIELA,
+    precio_normal: precioNormal,
+    precio_final: mejorPrecio,
+    ahorro: Math.round(
+      (precioNormal - mejorPrecio) * 100
+    ) / 100,
+    promocion: mejorPromocion
+  };
+}
+
+
+// ==========================================
+// 🎁 CONSULTAR PRECIO PROMOCIONAL
+// ==========================================
+
+app.get("/promocion/precio", async (req, res) => {
+
+  try {
+
+    const cantidad = Number(req.query.cantidad);
+
+    const resultado =
+      await calcularPrecioPromocional(cantidad);
+
+    res.set("Cache-Control", "no-store");
+
+    res.json({
+      ok: true,
+      ...resultado
+    });
+
+  } catch (error) {
+
+    console.error(
+      "❌ Error calculando promoción:",
+      error
+    );
+
+    if (error.message === "Cantidad de quinielas no válida") {
+      return res.status(400).json({
+        ok: false,
+        error: error.message
+      });
+    }
+
+    res.status(500).json({
+      ok: false,
+      error: "No fue posible calcular el precio"
+    });
+
+  }
+
+});
+
+
 // 🔥 INIT DB + ÍNDICES
 async function initDB() {
   await pool.query(`
