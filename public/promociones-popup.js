@@ -128,8 +128,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (mensaje) {
         mensaje.textContent =
-          "⚽ ¡Más oportunidades de ganar por menos!";
-      }
+         "🎟️ ¡Aprovecha el precio especial y juega más quinielas!";
+        }
 
     } else {
       // No mostrar tipos desconocidos
