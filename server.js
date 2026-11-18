@@ -362,6 +362,210 @@ app.get('/admin/liguilla/comprobante/:id',
 
 
 /* ==========================================
+   ⚽ EDITAR Y ELIMINAR EQUIPOS DE LIGUILLA
+========================================== */
+
+async function modificarEquipoLiguilla(req, res, eliminar = false) {
+
+  const origen = req.get("Origin");
+
+  if (origen) {
+    try {
+      if (new URL(origen).origin !==
+          `${req.protocol}://${req.get("host")}`) {
+        return res.status(403).json({
+          ok: false,
+          error: "Origen no autorizado."
+        });
+      }
+    } catch {
+      return res.status(403).json({
+        ok: false,
+        error: "Origen inválido."
+      });
+    }
+  }
+
+  const id = Number(req.params.id);
+
+  if (!Number.isSafeInteger(id) || id <= 0) {
+    return res.status(400).json({
+      ok: false,
+      error: "ID de equipo inválido."
+    });
+  }
+
+  let nombre;
+  let logoUrl;
+
+  if (!eliminar) {
+
+    nombre = typeof req.body?.nombre === "string"
+      ? req.body.nombre.trim().replace(/\s+/g, " ")
+      : "";
+
+    logoUrl = typeof req.body?.logo_url === "string"
+      ? req.body.logo_url.trim()
+      : "";
+
+    if (nombre.length < 2 || nombre.length > 80) {
+      return res.status(400).json({
+        ok: false,
+        error: "El nombre debe tener entre 2 y 80 caracteres."
+      });
+    }
+
+    if (logoUrl.length > 500) {
+      return res.status(400).json({
+        ok: false,
+        error: "La URL del escudo es demasiado larga."
+      });
+    }
+
+    if (logoUrl) {
+      try {
+        const url = new URL(logoUrl);
+
+        if (
+          url.protocol !== "https:" ||
+          url.username ||
+          url.password
+        ) {
+          throw new Error("URL inválida");
+        }
+      } catch {
+        return res.status(400).json({
+          ok: false,
+          error: "El escudo debe tener una URL HTTPS válida."
+        });
+      }
+    }
+  }
+
+  let client;
+
+  try {
+    client = await pool.connect();
+    await client.query("BEGIN");
+
+    const grupo = await client.query(`
+      SELECT estado
+      FROM liguilla_grupos
+      WHERE id = 1
+      FOR UPDATE
+    `);
+
+    if (!grupo.rows.length) {
+      await client.query("ROLLBACK");
+
+      return res.status(404).json({
+        ok: false,
+        error: "Grupo no encontrado."
+      });
+    }
+
+    if (
+      ["sorteado", "finalizado"].includes(grupo.rows[0].estado)
+    ) {
+      await client.query("ROLLBACK");
+
+      return res.status(409).json({
+        ok: false,
+        error: "No puedes modificar equipos después del sorteo."
+      });
+    }
+
+    const existente = await client.query(`
+      SELECT id
+      FROM liguilla_equipos
+      WHERE id = $1 AND grupo_id = 1
+      FOR UPDATE
+    `, [id]);
+
+    if (!existente.rows.length) {
+      await client.query("ROLLBACK");
+
+      return res.status(404).json({
+        ok: false,
+        error: "Equipo no encontrado."
+      });
+    }
+
+    let resultado;
+
+    if (eliminar) {
+
+      resultado = await client.query(`
+        DELETE FROM liguilla_equipos
+        WHERE id = $1 AND grupo_id = 1
+        RETURNING id, nombre
+      `, [id]);
+
+    } else {
+
+      resultado = await client.query(`
+        UPDATE liguilla_equipos
+        SET nombre = $1,
+            logo_url = $2
+        WHERE id = $3 AND grupo_id = 1
+        RETURNING id, nombre, logo_url
+      `, [nombre, logoUrl || null, id]);
+
+    }
+
+    await client.query("COMMIT");
+
+    return res.json({
+      ok: true,
+      mensaje: eliminar
+        ? "Equipo eliminado correctamente."
+        : "Equipo actualizado correctamente.",
+      equipo: resultado.rows[0]
+    });
+
+  } catch (error) {
+
+    if (client) {
+      try {
+        await client.query("ROLLBACK");
+      } catch (e) {
+        console.error("Error al revertir equipo:", e);
+      }
+    }
+
+    if (error.code === "23505") {
+      return res.status(409).json({
+        ok: false,
+        error: "Ya existe un equipo con ese nombre."
+      });
+    }
+
+    console.error("Error modificando equipo:", error);
+
+    return res.status(500).json({
+      ok: false,
+      error: "No se pudo modificar el equipo."
+    });
+
+  } finally {
+    if (client) client.release();
+  }
+}
+
+app.patch(
+  "/admin/liguilla/equipos/:id",
+  verificarAdmin,
+  (req, res) => modificarEquipoLiguilla(req, res, false)
+);
+
+app.delete(
+  "/admin/liguilla/equipos/:id",
+  verificarAdmin,
+  (req, res) => modificarEquipoLiguilla(req, res, true)
+);
+
+
+/* ==========================================
    ⚽ LIGUILLA EL INGE
    REGISTRO MANUAL DE EQUIPOS
 ========================================== */
