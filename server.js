@@ -362,6 +362,156 @@ app.get('/admin/liguilla/comprobante/:id',
 
 
 /* ==========================================
+   🧹 REINICIAR LIGUILLA - GRUPO 1
+   SOLO ADMINISTRADOR
+========================================== */
+
+app.post(
+  "/admin/liguilla/reiniciar",
+  verificarAdmin,
+  async (req, res) => {
+
+    // Protección contra solicitudes de otros sitios
+    const origen = req.get("Origin");
+
+    if (!origen) {
+      return res.status(403).json({
+        ok: false,
+        error: "Origen requerido."
+      });
+    }
+
+    try {
+      if (
+        new URL(origen).origin !==
+        `${req.protocol}://${req.get("host")}`
+      ) {
+        return res.status(403).json({
+          ok: false,
+          error: "Origen no autorizado."
+        });
+      }
+    } catch {
+      return res.status(403).json({
+        ok: false,
+        error: "Origen inválido."
+      });
+    }
+
+    if (req.body?.confirmacion !== "REINICIAR LIGUILLA") {
+      return res.status(400).json({
+        ok: false,
+        error: "Confirmación incorrecta."
+      });
+    }
+
+    let client;
+
+    try {
+      client = await pool.connect();
+      await client.query("BEGIN");
+
+      // Bloquear el grupo durante la operación
+      const grupo = await client.query(`
+        SELECT id, estado
+        FROM liguilla_grupos
+        WHERE id = 1
+        FOR UPDATE
+      `);
+
+      if (!grupo.rows.length) {
+        await client.query("ROLLBACK");
+
+        return res.status(404).json({
+          ok: false,
+          error: "Grupo no encontrado."
+        });
+      }
+
+      // Evitar borrar una Liguilla finalizada
+      if (grupo.rows[0].estado === "finalizado") {
+        await client.query("ROLLBACK");
+
+        return res.status(409).json({
+          ok: false,
+          error: "No se puede reiniciar una Liguilla finalizada."
+        });
+      }
+
+      // Eliminar historial de pagos de prueba
+      await client.query(`
+        DELETE FROM liguilla_pagos_auditoria
+        WHERE participante_id IN (
+          SELECT id
+          FROM liguilla_participantes
+          WHERE grupo_id = 1
+        )
+      `);
+
+      // Eliminar comprobantes de prueba
+      await client.query(`
+        DELETE FROM liguilla_comprobantes
+        WHERE participante_id IN (
+          SELECT id
+          FROM liguilla_participantes
+          WHERE grupo_id = 1
+        )
+      `);
+
+      // Eliminar participantes y asignaciones
+      await client.query(`
+        DELETE FROM liguilla_participantes
+        WHERE grupo_id = 1
+      `);
+
+      // Eliminar sorteo anterior
+      await client.query(`
+        DELETE FROM liguilla_sorteos
+        WHERE grupo_id = 1
+      `);
+
+      // Preparar el grupo para nuevas inscripciones
+      await client.query(`
+        UPDATE liguilla_grupos
+        SET estado = 'preparacion'
+        WHERE id = 1
+      `);
+
+      await client.query("COMMIT");
+
+      res.set("Cache-Control", "no-store");
+
+      return res.json({
+        ok: true,
+        mensaje: "Liguilla reiniciada correctamente.",
+        estado: "preparacion"
+      });
+
+    } catch (error) {
+
+      if (client) {
+        try {
+          await client.query("ROLLBACK");
+        } catch (e) {
+          console.error("Error en rollback:", e);
+        }
+      }
+
+      console.error("Error reiniciando Liguilla:", error);
+
+      return res.status(500).json({
+        ok: false,
+        error: "No se pudo reiniciar la Liguilla."
+      });
+
+    } finally {
+      if (client) client.release();
+    }
+  }
+);
+
+
+/* ==========================================
    🏆 CONSULTAR RESULTADOS DEL SORTEO
 ========================================== */
 

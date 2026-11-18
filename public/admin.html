@@ -3356,8 +3356,52 @@ function volverPanelAdmin() {
   </button>
 
   <div id="liguillaMensaje" role="status"></div>
-  
 
+  <!-- 🧹 RESTABLECER LIGUILLA -->
+<div style="
+  background:#102344;
+  border:1px solid #dc2626;
+  border-radius:14px;
+  padding:20px;
+  margin:25px 0;
+  text-align:center;
+">
+
+  <h3 style="color:#f5c451;">
+    ⚙️ Mantenimiento de Liguilla
+  </h3>
+
+  <p style="color:#d1dcef;">
+    Elimina los participantes, comprobantes
+    y resultados del sorteo anterior.
+    Conserva los ocho equipos y sus escudos.
+  </p>
+
+  <button
+    type="button"
+    id="btnReiniciarLiguilla"
+    onclick="reiniciarLiguillaAdmin()"
+    style="
+      width:100%;
+      padding:15px;
+      background:#dc2626;
+      color:white;
+      border:none;
+      border-radius:10px;
+      font-size:16px;
+      font-weight:bold;
+      opacity:0.6;
+      cursor:not-allowed;
+    ">
+    🧹 Reiniciar Liguilla
+  </button>
+
+  <p style="color:#fca5a5;font-size:13px;">
+    ⚠️ Esta operación eliminará los registros
+    de la Liguilla actual.
+  </p>
+
+</div>
 
 
 <!-- ==========================================
@@ -5108,6 +5152,92 @@ try {
       // las verificaciones del siguiente paso.
       boton.disabled = true;
     }
+  }
+}
+
+// ==========================================
+// 🧹 REINICIAR LIGUILLA DESDE ADMIN
+// ==========================================
+
+async function reiniciarLiguillaAdmin() {
+
+  const confirmar = prompt(
+    "⚠️ ATENCIÓN\n\n" +
+    "Se eliminarán todos los participantes, " +
+    "comprobantes y resultados del sorteo.\n\n" +
+    "Los ocho equipos se conservarán.\n\n" +
+    "Escribe exactamente:\nREINICIAR LIGUILLA"
+  );
+
+  if (confirmar !== "REINICIAR LIGUILLA") {
+    alert("Operación cancelada.");
+    return;
+  }
+
+  const segundaConfirmacion = confirm(
+    "🚨 ÚLTIMA CONFIRMACIÓN\n\n" +
+    "¿Estás seguro de eliminar los registros " +
+    "de esta Liguilla?\n\n" +
+    "Esta acción no se puede deshacer."
+  );
+
+  if (!segundaConfirmacion) return;
+
+  const boton = document.getElementById(
+    "btnReiniciarLiguilla"
+  );
+
+  boton.disabled = true;
+  boton.textContent = "⏳ Reiniciando...";
+
+  try {
+
+    const respuesta = await fetch(
+      "/admin/liguilla/reiniciar",
+      {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          confirmacion: "REINICIAR LIGUILLA"
+        })
+      }
+    );
+
+    const data = await respuesta.json();
+
+    if (!respuesta.ok || !data.ok) {
+      throw new Error(
+        data.error || "No se pudo reiniciar."
+      );
+    }
+
+    alert(
+      "✅ LIGUILLA REINICIADA\n\n" +
+      "Participantes: 0 de 8\n" +
+      "Sorteo: eliminado\n" +
+      "Equipos: conservados\n" +
+      "Estado: preparación"
+    );
+
+    // Actualizar la información del administrador
+    if (typeof abrirLiguillaAdmin === "function") {
+      await abrirLiguillaAdmin();
+    }
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert("❌ " + error.message);
+
+  } finally {
+
+    boton.disabled = false;
+    boton.textContent = "🧹 Reiniciar Liguilla";
+
   }
 }
 
