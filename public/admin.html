@@ -3546,6 +3546,7 @@ function abrirLiguillaAdmin() {
     cargarParticipantesLiguilla();
     consultarEstadoInscripcionesLiguilla();
     cargarEquiposLiguilla();
+    consultarSorteoLiguilla();
   }
 }
 
@@ -4232,6 +4233,131 @@ async function eliminarEquipoLiguilla(id, nombre) {
 
   }
 }
+
+
+/* ==========================================
+   🎰 ESTADO DEL SORTEO - LIGUILLA EL INGE
+========================================== */
+
+let sorteoLiguillaEnProceso = false;
+let resultadosSorteoLiguilla = [];
+
+async function consultarSorteoLiguilla() {
+
+  const estado = document.getElementById("liguillaSorteoEstado");
+  const boton = document.getElementById("btnRealizarSorteoLiguilla");
+  const nombre = document.getElementById("liguillaSorteoNombre");
+  const equipo = document.getElementById("liguillaSorteoEquipo");
+  const progreso = document.getElementById("liguillaSorteoProgreso");
+
+  if (!estado || !boton) return;
+
+  boton.disabled = true;
+
+  estado.textContent = "⏳ Consultando sorteo...";
+
+  try {
+
+    const [respuestaGrupo, respuestaSorteo, respuestaEquipos] =
+      await Promise.all([
+        fetch("/liguilla/grupo/1", {
+          credentials: "same-origin",
+          cache: "no-store"
+        }),
+        fetch("/admin/liguilla/sorteo", {
+          credentials: "same-origin",
+          cache: "no-store"
+        }),
+        fetch("/admin/liguilla/equipos", {
+          credentials: "same-origin",
+          cache: "no-store"
+        })
+      ]);
+
+    if (
+      !respuestaGrupo.ok ||
+      !respuestaSorteo.ok ||
+      !respuestaEquipos.ok
+    ) {
+      throw new Error("No se pudo consultar el estado del sorteo.");
+    }
+
+    const datosGrupo = await respuestaGrupo.json();
+    const datosSorteo = await respuestaSorteo.json();
+    const datosEquipos = await respuestaEquipos.json();
+
+    if (
+      !datosGrupo.ok ||
+      !datosSorteo.ok ||
+      !datosEquipos.ok
+    ) {
+      throw new Error("La consulta devolvió un error.");
+    }
+
+    const grupo = datosGrupo.grupo;
+    const totalEquipos = datosEquipos.equipos.length;
+
+    if (datosSorteo.realizado) {
+
+      resultadosSorteoLiguilla = datosSorteo.asignaciones;
+
+      estado.textContent = "✅ Sorteo realizado y guardado.";
+
+      nombre.textContent = "🏆 Sorteo realizado";
+      equipo.textContent = "Los resultados están disponibles";
+      progreso.textContent =
+        `${resultadosSorteoLiguilla.length} de 8 asignaciones`;
+
+      boton.disabled = true;
+      boton.textContent = "🔒 Sorteo ya realizado";
+
+      return;
+    }
+
+    resultadosSorteoLiguilla = [];
+
+    const confirmados = Number(grupo.confirmados);
+
+    nombre.textContent = "Sorteo pendiente";
+    equipo.textContent = "Los equipos aparecerán aquí";
+    progreso.textContent = "0 de 8";
+
+    const listo =
+      grupo.estado === "cerrado" &&
+      confirmados === 8 &&
+      totalEquipos === 8;
+
+    if (listo) {
+
+      estado.textContent =
+        "🟢 Todo listo: 8 participantes y 8 equipos.";
+
+      boton.textContent = "🎲 Realizar sorteo automático";
+
+    } else {
+
+      estado.textContent =
+        `⏳ ${confirmados}/8 participantes confirmados · ` +
+        `${totalEquipos}/8 equipos · ` +
+        `Estado: ${grupo.estado}`;
+
+      boton.textContent = "🔒 Sorteo no disponible";
+
+    }
+
+    // Por seguridad, no activamos el botón todavía.
+    // Se conectará después de crear la animación.
+    boton.disabled = true;
+
+  } catch (error) {
+
+    estado.textContent = "❌ " + error.message;
+
+    boton.disabled = true;
+
+  }
+}
+
 
 
 
