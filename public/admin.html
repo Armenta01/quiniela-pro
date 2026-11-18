@@ -353,6 +353,22 @@ if (sessionStorage.getItem("admin") !== "true") {
 </button>
 
 
+<!-- 🏆 ADMINISTRACIÓN DE LIGUILLA -->
+<button
+  type="button"
+  class="btn-promociones-admin"
+  onclick="abrirLiguillaAdmin()"
+  style="
+    margin-top:12px;
+    background:linear-gradient(135deg,#193b67,#102344);
+    color:#f5c451;
+    border:1px solid #f5c451;
+  ">
+  🏆 Administrar Liguilla
+</button>
+
+
+
 <button class="btn-rojo" onclick="logout()">
 🚪 Cerrar sesión
 </button>
@@ -3207,6 +3223,183 @@ function volverPanelAdmin() {
 
 <script src="ui.js"></script>
 <script src="promociones-admin.js"></script>
+
+<!-- ==========================================
+     🏆 PANEL ADMINISTRATIVO LIGUILLA
+========================================== -->
+
+<section id="panelLiguillaAdmin"
+  hidden
+  style="
+    max-width:1000px;
+    margin:25px auto;
+    padding:20px;
+    border-radius:18px;
+    border:1px solid #d4a83d;
+    background:#0c1c38;
+    color:white;
+    box-sizing:border-box;
+  ">
+
+  <h2 style="text-align:center;color:#f5c451;">
+    🏆 Liguilla El Inge
+  </h2>
+
+  <p style="text-align:center;">
+    Administración — Grupo 1
+  </p>
+
+  <div style="
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:12px;
+    margin:20px 0;
+  ">
+
+    <div style="background:#193458;padding:16px;border-radius:12px;">
+      <small>Confirmados</small>
+      <h2 id="liguillaConfirmados">0 / 8</h2>
+    </div>
+
+    <div style="background:#193458;padding:16px;border-radius:12px;">
+      <small>Pendientes</small>
+      <h2 id="liguillaPendientes">0</h2>
+    </div>
+
+    <div style="background:#193458;padding:16px;border-radius:12px;">
+      <small>Premio único</small>
+      <h2 style="color:#f5c451;">$1,600</h2>
+    </div>
+
+  </div>
+
+  <button type="button"
+    onclick="cargarParticipantesLiguilla()"
+    style="padding:12px;margin-bottom:15px;">
+    🔄 Actualizar participantes
+  </button>
+
+  <div id="liguillaMensaje" role="status"></div>
+  <div id="liguillaLista"></div>
+
+</section>
+
+<script>
+function abrirLiguillaAdmin() {
+  const panel = document.getElementById("panelLiguillaAdmin");
+
+  panel.hidden = !panel.hidden;
+
+  if (!panel.hidden) {
+    panel.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+    cargarParticipantesLiguilla();
+  }
+}
+
+async function cargarParticipantesLiguilla() {
+  const lista = document.getElementById("liguillaLista");
+  const mensaje = document.getElementById("liguillaMensaje");
+
+  lista.replaceChildren();
+  mensaje.textContent = "⏳ Consultando participantes...";
+
+  try {
+    const respuesta = await fetch(
+      "/admin/liguilla/participantes",
+      { credentials: "same-origin", cache: "no-store" }
+    );
+
+    if (!respuesta.ok) {
+      throw new Error(
+        respuesta.status === 401
+          ? "Inicia sesión como administrador."
+          : "No se pudo consultar la Liguilla."
+      );
+    }
+
+    const datos = await respuesta.json();
+
+    if (!datos.ok || !Array.isArray(datos.participantes)) {
+      throw new Error("Respuesta inválida del servidor.");
+    }
+
+    const participantes = datos.participantes;
+
+    const confirmados = participantes.filter(
+      p => p.estado_pago === "aprobado"
+    ).length;
+
+    const pendientes = participantes.filter(
+      p => p.estado_pago === "pendiente"
+    ).length;
+
+    document.getElementById("liguillaConfirmados")
+      .textContent = `${confirmados} / 8`;
+
+    document.getElementById("liguillaPendientes")
+      .textContent = pendientes;
+
+    mensaje.textContent = "";
+
+    if (participantes.length === 0) {
+      mensaje.textContent =
+        "👥 Todavía no hay solicitudes de inscripción.";
+      return;
+    }
+
+    participantes.forEach(p => {
+      const tarjeta = document.createElement("div");
+
+      tarjeta.style.cssText = `
+        background:#193458;
+        border:1px solid #355071;
+        border-radius:12px;
+        padding:15px;
+        margin-bottom:12px;
+        overflow-wrap:anywhere;
+      `;
+
+      const titulo = document.createElement("h3");
+      titulo.textContent = p.nombre || "Sin nombre";
+
+      const folio = document.createElement("p");
+      folio.textContent = `Folio: ${p.folio || p.id}`;
+
+      const telefono = document.createElement("p");
+      telefono.textContent = `WhatsApp: ${p.telefono || "No registrado"}`;
+
+      const estado = document.createElement("p");
+      estado.textContent = `Pago: ${p.estado_pago || "Sin estado"}`;
+
+      tarjeta.append(titulo, folio, telefono, estado);
+
+      if (p.tiene_comprobante) {
+        const enlace = document.createElement("a");
+
+        enlace.href =
+          `/admin/liguilla/comprobante/${encodeURIComponent(p.id)}`;
+
+        enlace.target = "_blank";
+        enlace.rel = "noopener";
+        enlace.textContent = "🧾 Ver comprobante";
+        enlace.style.color = "#f5c451";
+
+        tarjeta.appendChild(enlace);
+      }
+
+      lista.appendChild(tarjeta);
+    });
+
+  } catch (error) {
+    console.error(error);
+    mensaje.textContent = "❌ " + error.message;
+  }
+}
+</script>
 
 </body>
 </html>
