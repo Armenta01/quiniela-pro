@@ -3345,6 +3345,109 @@ function volverPanelAdmin() {
   </button>
 
   <div id="liguillaMensaje" role="status"></div>
+  
+
+<!-- ==========================================
+     ⚽ ADMINISTRACIÓN DE EQUIPOS LIGUILLA
+========================================== -->
+
+<div id="liguillaEquiposPanel" style="
+  background:#102344;
+  border:1px solid #36547c;
+  border-radius:15px;
+  padding:20px;
+  margin:25px 0;
+">
+
+  <h3 style="color:#f5c451;margin-top:0;">
+    ⚽ Equipos participantes
+  </h3>
+
+  <p id="liguillaEquiposContador"
+     style="color:white;">
+    Cargando equipos...
+  </p>
+
+  <form id="formEquipoLiguilla"
+        onsubmit="registrarEquipoLiguilla(event)"
+        style="display:grid;gap:12px;">
+
+    <label for="liguillaNombreEquipo"
+           style="color:#d1dcef;">
+      Nombre del equipo
+    </label>
+
+    <input
+      id="liguillaNombreEquipo"
+      type="text"
+      placeholder="Ej. Toluca"
+      maxlength="80"
+      required
+      style="
+        width:100%;
+        box-sizing:border-box;
+        padding:13px;
+        border:1px solid #36547c;
+        border-radius:10px;
+        background:#091b34;
+        color:white;
+      "
+    >
+
+    <label for="liguillaLogoEquipo"
+           style="color:#d1dcef;">
+      URL del escudo (opcional)
+    </label>
+
+    <input
+      id="liguillaLogoEquipo"
+      type="url"
+      placeholder="https://ejemplo.com/escudo.png"
+      maxlength="500"
+      style="
+        width:100%;
+        box-sizing:border-box;
+        padding:13px;
+        border:1px solid #36547c;
+        border-radius:10px;
+        background:#091b34;
+        color:white;
+      "
+    >
+
+    <button
+      id="btnRegistrarEquipoLiguilla"
+      type="submit"
+      style="
+        background:#16a34a;
+        color:white;
+        border:none;
+        border-radius:10px;
+        padding:14px;
+        font-weight:bold;
+        cursor:pointer;
+      ">
+      ➕ Agregar equipo
+    </button>
+
+  </form>
+
+  <p id="liguillaEquiposMensaje"
+     role="status"
+     style="color:#f5c451;">
+  </p>
+
+  <div id="liguillaEquiposLista"
+       style="
+         display:grid;
+         gap:12px;
+         margin-top:20px;
+       ">
+  </div>
+
+</div>
+
+
   <div id="liguillaLista"></div>
 
 </section>
@@ -3364,6 +3467,7 @@ function abrirLiguillaAdmin() {
 
     cargarParticipantesLiguilla();
     consultarEstadoInscripcionesLiguilla();
+    cargarEquiposLiguilla();
   }
 }
 
@@ -3715,6 +3819,197 @@ async function cambiarEstadoInscripcionesLiguilla(estado) {
 
   }
 }
+
+
+/* ==========================================
+   ⚽ EQUIPOS LIGUILLA EL INGE
+========================================== */
+
+async function cargarEquiposLiguilla() {
+
+  const lista = document.getElementById(
+    "liguillaEquiposLista"
+  );
+
+  const contador = document.getElementById(
+    "liguillaEquiposContador"
+  );
+
+  const mensaje = document.getElementById(
+    "liguillaEquiposMensaje"
+  );
+
+  const boton = document.getElementById(
+    "btnRegistrarEquipoLiguilla"
+  );
+
+  if (!lista || !contador) return;
+
+  try {
+
+    const respuesta = await fetch(
+      "/admin/liguilla/equipos",
+      {
+        credentials:"same-origin",
+        cache:"no-store"
+      }
+    );
+
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok || !datos.ok) {
+      throw new Error(
+        datos.error || "No se pudieron cargar los equipos."
+      );
+    }
+
+    lista.replaceChildren();
+
+    contador.textContent =
+      `${datos.equipos.length} de 8 equipos registrados`;
+
+    boton.disabled = datos.equipos.length >= 8;
+
+    boton.textContent = boton.disabled
+      ? "✅ Ocho equipos registrados"
+      : "➕ Agregar equipo";
+
+    datos.equipos.forEach((equipo, indice) => {
+
+      const tarjeta = document.createElement("div");
+
+      tarjeta.style.cssText = `
+        display:flex;
+        align-items:center;
+        gap:15px;
+        padding:14px;
+        background:#1b3659;
+        border-radius:12px;
+        color:white;
+      `;
+
+      const numero = document.createElement("strong");
+
+      numero.textContent = `${indice + 1}.`;
+
+      const nombre = document.createElement("strong");
+
+      nombre.textContent = equipo.nombre;
+
+      tarjeta.append(numero);
+
+      if (equipo.logo_url) {
+
+        const escudo = document.createElement("img");
+
+        escudo.src = equipo.logo_url;
+        escudo.alt = `Escudo de ${equipo.nombre}`;
+
+        escudo.style.cssText = `
+          width:45px;
+          height:45px;
+          object-fit:contain;
+        `;
+
+        tarjeta.append(escudo);
+      }
+
+      tarjeta.append(nombre);
+
+      lista.append(tarjeta);
+
+    });
+
+    mensaje.textContent = "";
+
+  } catch (error) {
+
+    contador.textContent = "Error al cargar equipos";
+    mensaje.textContent = "❌ " + error.message;
+
+  }
+}
+
+let registrandoEquipoLiguilla = false;
+
+async function registrarEquipoLiguilla(event) {
+
+  event.preventDefault();
+
+  if (registrandoEquipoLiguilla) return;
+
+  const nombre = document.getElementById(
+    "liguillaNombreEquipo"
+  ).value.trim();
+
+  const logo_url = document.getElementById(
+    "liguillaLogoEquipo"
+  ).value.trim();
+
+  const mensaje = document.getElementById(
+    "liguillaEquiposMensaje"
+  );
+
+  const boton = document.getElementById(
+    "btnRegistrarEquipoLiguilla"
+  );
+
+  if (!nombre) return;
+
+  registrandoEquipoLiguilla = true;
+  boton.disabled = true;
+
+  mensaje.textContent = "⏳ Registrando equipo...";
+
+  try {
+
+    const respuesta = await fetch(
+      "/admin/liguilla/equipos",
+      {
+        method:"POST",
+        credentials:"same-origin",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          nombre,
+          logo_url
+        })
+      }
+    );
+
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok || !datos.ok) {
+      throw new Error(
+        datos.error || "No se pudo registrar el equipo."
+      );
+    }
+
+    document.getElementById(
+      "formEquipoLiguilla"
+    ).reset();
+
+    await cargarEquiposLiguilla();
+
+    mensaje.textContent =
+      "✅ Equipo registrado correctamente.";
+
+  } catch (error) {
+
+    mensaje.textContent = "❌ " + error.message;
+
+  } finally {
+
+    registrandoEquipoLiguilla = false;
+
+    if (!boton.textContent.includes("Ocho equipos")) {
+      boton.disabled = false;
+    }
+
+  }
+}
+
 
 
 </script>
