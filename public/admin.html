@@ -4601,10 +4601,10 @@ datosJugador.style.cssText = `
 `;
 
 const jugador = document.createElement("strong");
-jugador.textContent = asignacion.nombre;
+jugador.textContent = participantes[i];
 
 const folio = document.createElement("small");
-folio.textContent = `Folio: ${asignacion.folio ?? "Sin folio"}`;
+folio.textContent = "🎬 Participante de demostración";
 folio.style.color = "#b9cbe0";
 
 datosJugador.append(jugador, folio);
@@ -4623,15 +4623,14 @@ datosEquipo.style.cssText = `
 `;
 
 const club = document.createElement("strong");
-club.textContent = asignacion.equipo;
+club.textContent = elegido.nombre;
 club.style.cssText = `
   color:#f5c451;
   text-align:right;
   overflow-wrap:anywhere;
 `;
 
-if (asignacion.logo_url) {
-
+if (false) {
   const logo = document.createElement("img");
 
   logo.src = asignacion.logo_url;
