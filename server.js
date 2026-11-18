@@ -1918,6 +1918,67 @@ await pool.query(`
   // Cada equipo asignado debe pertenecer al grupo.
   // Una vez sorteado, no se permitirá repetir el sorteo.
 
+
+
+  // ==========================================
+  // 🔒 INTEGRIDAD DE EQUIPOS Y ASIGNACIONES
+  // ==========================================
+
+  // Un equipo debe identificarse por ID y grupo.
+  await pool.query(`
+    CREATE UNIQUE INDEX IF NOT EXISTS
+      idx_liguilla_equipo_id_grupo
+    ON liguilla_equipos(id, grupo_id);
+  `);
+
+  // Impedir asignar equipos de otros grupos
+  // o equipos que no existan.
+  await pool.query(`
+    DO $$
+    BEGIN
+      IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'fk_liguilla_participante_equipo_grupo'
+          AND conrelid =
+            'liguilla_participantes'::regclass
+      ) THEN
+        ALTER TABLE liguilla_participantes
+        ADD CONSTRAINT
+          fk_liguilla_participante_equipo_grupo
+        FOREIGN KEY (equipo_id, grupo_id)
+        REFERENCES liguilla_equipos(id, grupo_id)
+        ON DELETE RESTRICT;
+      END IF;
+    END $$;
+  `);
+
+  // Un equipo solamente puede estar asignado
+  // a un participante con pago aprobado.
+  await pool.query(`
+    DO $$
+    BEGIN
+      IF NOT EXISTS (
+        SELECT 1
+        FROM pg_constraint
+        WHERE conname = 'chk_liguilla_equipo_pago_aprobado'
+          AND conrelid =
+            'liguilla_participantes'::regclass
+      ) THEN
+        ALTER TABLE liguilla_participantes
+        ADD CONSTRAINT
+          chk_liguilla_equipo_pago_aprobado
+        CHECK (
+          equipo_id IS NULL
+          OR estado_pago = 'aprobado'
+        );
+      END IF;
+    END $$;
+  `);
+
+  console.log("🔒 Integridad de asignaciones preparada");
+
+
   console.log("🎲 Registro de sorteos preparado");
 
 
