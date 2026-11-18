@@ -955,6 +955,44 @@ await pool.query(`
     );
   `);
 
+
+  // ==========================================
+  // 🧾 COMPROBANTES DE PAGO - LIGUILLA
+  // Almacenamiento privado en PostgreSQL
+  // ==========================================
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS liguilla_comprobantes (
+      id BIGSERIAL PRIMARY KEY,
+
+      participante_id BIGINT NOT NULL UNIQUE
+        REFERENCES liguilla_participantes(id)
+        ON DELETE CASCADE,
+
+      imagen BYTEA NOT NULL,
+
+      tipo_archivo TEXT NOT NULL
+        CHECK (
+          tipo_archivo IN (
+            'image/jpeg',
+            'image/png',
+            'image/webp'
+          )
+        ),
+
+      tamano_bytes INTEGER NOT NULL
+        CHECK (
+          tamano_bytes > 0
+          AND tamano_bytes <= 3145728
+        ),
+
+      creado_en TIMESTAMPTZ
+        NOT NULL DEFAULT NOW()
+    );
+  `);
+
+  console.log("🧾 Almacenamiento de comprobantes preparado");
+
   console.log("🏆 Base de datos Liguilla preparada");
 
 
