@@ -362,6 +362,348 @@ app.get('/admin/liguilla/comprobante/:id',
 
 
 /* ==========================================
+   🏆 CONSULTAR RESULTADOS DEL SORTEO
+========================================== */
+
+app.get(
+  "/admin/liguilla/sorteo",
+  verificarAdmin,
+  async (req, res) => {
+
+    try {
+
+      const sorteo = await pool.query(`
+        SELECT id, realizado_en, algoritmo
+        FROM liguilla_sorteos
+        WHERE grupo_id = 1
+      `);
+
+      res.set("Cache-Control", "no-store");
+
+      if (!sorteo.rows.length) {
+        return res.json({
+          ok: true,
+          realizado: false,
+          asignaciones: []
+        });
+      }
+
+      const resultado = await pool.query(`
+        SELECT
+          p.id AS participante_id,
+          p.folio,
+          p.nombre,
+          e.id AS equipo_id,
+          e.nombre AS equipo,
+          e.logo_url
+        FROM liguilla_participantes p
+        INNER JOIN liguilla_equipos e
+          ON e.id = p.equipo_id
+         AND e.grupo_id = p.grupo_id
+        WHERE p.grupo_id = 1
+          AND p.estado_pago = 'aprobado'
+        ORDER BY p.id ASC
+      `);
+
+      return res.json({
+        ok: true,
+        realizado: true,
+        sorteo_id: sorteo.rows[0].id,
+        realizado_en: sorteo.rows[0].realizado_en,
+        algoritmo: sorteo.rows[0].algoritmo,
+        asignaciones: resultado.rows
+      });
+
+    } catch (error) {
+
+      console.error(
+        "Error consultando sorteo:",
+        error
+      );
+
+      return res.status(500).json({
+        ok: false,
+        error: "No se pudo consultar el sorteo."
+      });
+
+    }
+  }
+);
+
+/* ==========================================
+   🎲 SORTEO AUTOMÁTICO - LIGUILLA EL INGE
+   GRUPO 1
+========================================== */
+
+app.post(
+  "/admin/liguilla/sortear",
+  verificarAdmin,
+  async (req, res) => {
+
+    const origen = req.get("Origin");
+
+    if (origen) {
+      try {
+        if (
+          new URL(origen).origin !==
+          `${req.protocol}://${req.get("host")}`
+        ) {
+          return res.status(403).json({
+            ok: false,
+            error: "Origen no autorizado."
+          });
+        }
+      } catch {
+        return res.status(403).json({
+          ok: false,
+          error: "Origen inválido."
+        });
+      }
+    }
+
+    let client;
+
+    try {
+      client = await pool.connect();
+      await client.query("BEGIN");
+
+      // 1. Bloquear el grupo para evitar
+      // sorteos y modificaciones simultáneas.
+
+      const grupoResultado = await client.query(`
+        SELECT id, estado, cupos
+        FROM liguilla_grupos
+        WHERE id = 1
+        FOR UPDATE
+      `);
+
+      if (!grupoResultado.rows.length) {
+        await client.query("ROLLBACK");
+
+        return res.status(404).json({
+          ok: false,
+          error: "Grupo no encontrado."
+        });
+      }
+
+      const grupo = grupoResultado.rows[0];
+
+      // El sorteo exige cerrar inscripciones.
+      if (grupo.estado !== "cerrado") {
+        await client.query("ROLLBACK");
+
+        return res.status(409).json({
+          ok: false,
+          error: "Primero debes cerrar las inscripciones."
+        });
+      }
+
+      if (Number(grupo.cupos) !== 8) {
+        await client.query("ROLLBACK");
+
+        return res.status(409).json({
+          ok: false,
+          error: "El grupo debe tener exactamente ocho cupos."
+        });
+      }
+
+      // 2. Impedir repetir el sorteo.
+
+      const sorteoExistente = await client.query(`
+        SELECT id
+        FROM liguilla_sorteos
+        WHERE grupo_id = 1
+      `);
+
+      if (sorteoExistente.rows.length) {
+        await client.query("ROLLBACK");
+
+        return res.status(409).json({
+          ok: false,
+          error: "Este grupo ya fue sorteado."
+        });
+      }
+
+      // 3. Verificar que nadie tenga
+      // un equipo asignado previamente.
+
+      const asignacionesExistentes = await client.query(`
+        SELECT COUNT(*)::INTEGER AS total
+        FROM liguilla_participantes
+        WHERE grupo_id = 1
+          AND equipo_id IS NOT NULL
+      `);
+
+      if (asignacionesExistentes.rows[0].total !== 0) {
+        await client.query("ROLLBACK");
+
+        return res.status(409).json({
+          ok: false,
+          error: "Ya existen asignaciones de equipos."
+        });
+      }
+
+      // 4. Obtener exactamente ocho
+      // participantes aprobados.
+
+      const participantesResultado = await client.query(`
+        SELECT id, folio, nombre
+        FROM liguilla_participantes
+        WHERE grupo_id = 1
+          AND estado_pago = 'aprobado'
+        ORDER BY id ASC
+        FOR UPDATE
+      `);
+
+      const participantes = participantesResultado.rows;
+
+      if (participantes.length !== 8) {
+        await client.query("ROLLBACK");
+
+        return res.status(409).json({
+          ok: false,
+          error:
+            "Se necesitan exactamente ocho pagos aprobados."
+        });
+      }
+
+      // 5. Obtener los ocho equipos.
+
+      const equiposResultado = await client.query(`
+        SELECT id, nombre, logo_url
+        FROM liguilla_equipos
+        WHERE grupo_id = 1
+        ORDER BY id ASC
+        FOR UPDATE
+      `);
+
+      const equipos = equiposResultado.rows;
+
+      if (equipos.length !== 8) {
+        await client.query("ROLLBACK");
+
+        return res.status(409).json({
+          ok: false,
+          error:
+            "Debes registrar exactamente ocho equipos."
+        });
+      }
+
+      // 6. Mezclar equipos utilizando
+      // aleatoriedad criptográfica.
+      // Fisher-Yates.
+
+      const mezclados = [...equipos];
+
+      for (let i = mezclados.length - 1; i > 0; i--) {
+
+        const j = crypto.randomInt(i + 1);
+
+        [mezclados[i], mezclados[j]] =
+          [mezclados[j], mezclados[i]];
+
+      }
+
+      // 7. Guardar las ocho asignaciones
+      // dentro de la misma transacción.
+
+      const asignaciones = [];
+
+      for (let i = 0; i < 8; i++) {
+
+        const participante = participantes[i];
+        const equipo = mezclados[i];
+
+        await client.query(`
+          UPDATE liguilla_participantes
+          SET equipo_id = $1
+          WHERE id = $2
+            AND grupo_id = 1
+            AND estado_pago = 'aprobado'
+            AND equipo_id IS NULL
+        `, [
+          equipo.id,
+          participante.id
+        ]);
+
+        asignaciones.push({
+          participante_id: participante.id,
+          folio: participante.folio,
+          nombre: participante.nombre,
+          equipo_id: equipo.id,
+          equipo: equipo.nombre,
+          logo_url: equipo.logo_url
+        });
+
+      }
+
+      // 8. Registrar el sorteo oficial.
+
+      const sorteo = await client.query(`
+        INSERT INTO liguilla_sorteos (
+          grupo_id,
+          algoritmo,
+          total_participantes,
+          total_equipos
+        )
+        VALUES (1, 'crypto-shuffle-v1', 8, 8)
+        RETURNING id, realizado_en
+      `);
+
+      // 9. Marcar el grupo como sorteado.
+
+      await client.query(`
+        UPDATE liguilla_grupos
+        SET estado = 'sorteado'
+        WHERE id = 1
+      `);
+
+      // 10. Confirmar todos los cambios juntos.
+
+      await client.query("COMMIT");
+
+      res.set("Cache-Control", "no-store");
+
+      return res.json({
+        ok: true,
+        mensaje: "Sorteo realizado correctamente.",
+        sorteo_id: sorteo.rows[0].id,
+        realizado_en: sorteo.rows[0].realizado_en,
+        asignaciones
+      });
+
+    } catch (error) {
+
+      if (client) {
+        try {
+          await client.query("ROLLBACK");
+        } catch (e) {
+          console.error(
+            "Error revirtiendo sorteo:",
+            e
+          );
+        }
+      }
+
+      console.error(
+        "Error realizando sorteo Liguilla:",
+        error
+      );
+
+      return res.status(500).json({
+        ok: false,
+        error: "No se pudo realizar el sorteo."
+      });
+
+    } finally {
+      if (client) client.release();
+    }
+
+  }
+);
+
+
+/* ==========================================
    ⚽ EDITAR Y ELIMINAR EQUIPOS DE LIGUILLA
 ========================================== */
 
