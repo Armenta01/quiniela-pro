@@ -1,0 +1,649 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <title>Liguilla El Inge | Grupo 1</title>
+
+  <style>
+    :root {
+      --fondo: #07152e;
+      --tarjeta: #102344;
+      --tarjeta2: #162e53;
+      --borde: #29456c;
+      --dorado: #f1c45b;
+      --blanco: #f5f7ff;
+      --gris: #a9b9d2;
+      --verde: #56d6a2;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--fondo);
+      color: var(--blanco);
+      font-family: Arial, sans-serif;
+    }
+
+    .contenedor {
+      width: min(100% - 28px, 1050px);
+      margin: auto;
+    }
+
+    header {
+      padding: 18px 0;
+      background: #0a1b38;
+      border-bottom: 1px solid var(--borde);
+    }
+
+    .encabezado {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .marca {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: .5px;
+    }
+
+    .volver {
+      color: var(--dorado);
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .hero {
+      padding: 42px 0 28px;
+      text-align: center;
+    }
+
+    .subtitulo {
+      color: var(--dorado);
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 3px;
+    }
+
+    h1 {
+      font-size: clamp(29px, 6vw, 49px);
+      margin: 13px 0;
+    }
+
+    .descripcion {
+      color: var(--gris);
+      line-height: 1.6;
+      max-width: 550px;
+      margin: auto;
+    }
+
+    .premio {
+      margin: 28px auto;
+      max-width: 600px;
+      padding: 28px;
+      border: 1px solid #947334;
+      border-radius: 20px;
+      background: linear-gradient(
+        135deg,
+        #1c365c,
+        #0b1c38
+      );
+    }
+
+    .premio small {
+      color: var(--gris);
+      letter-spacing: 2px;
+    }
+
+    .cantidad {
+      font-size: clamp(39px, 9vw, 65px);
+      font-weight: 900;
+      color: var(--dorado);
+      margin: 12px 0;
+    }
+
+    .datos {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+      color: var(--gris);
+      font-size: 14px;
+    }
+
+    .datos strong {
+      color: white;
+    }
+
+    .seccion {
+      background: var(--tarjeta);
+      border: 1px solid var(--borde);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 22px;
+    }
+
+    .titulo-seccion {
+      font-size: 20px;
+      margin: 0 0 20px;
+    }
+
+    .estado {
+      color: var(--dorado);
+      font-size: 13px;
+    }
+
+    .barra {
+      height: 9px;
+      border-radius: 20px;
+      background: #263c5e;
+      overflow: hidden;
+      margin: 18px 0 24px;
+    }
+
+    .progreso {
+      height: 100%;
+      width: 0%;
+      background: var(--dorado);
+      transition: width .4s;
+    }
+
+    .lugares {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .lugar {
+      padding: 19px 8px;
+      border: 1px solid var(--borde);
+      border-radius: 13px;
+      background: var(--tarjeta2);
+      text-align: center;
+    }
+
+    .lugar .icono {
+      font-size: 26px;
+      margin-bottom: 12px;
+    }
+
+    .lugar strong {
+      display: block;
+      font-size: 13px;
+    }
+
+    .lugar span {
+      display: block;
+      color: var(--verde);
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    .lugar.pendiente span {
+      color: var(--dorado);
+    }
+
+    .lugar.ocupado span {
+      color: var(--gris);
+    }
+
+    .formulario {
+      display: grid;
+      gap: 16px;
+    }
+
+    label {
+      display: block;
+      color: var(--gris);
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    input {
+      width: 100%;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid var(--borde);
+      background: #091b36;
+      color: white;
+      font-size: 15px;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--dorado);
+    }
+
+    input[type="file"] {
+      padding: 13px;
+    }
+
+    button {
+      padding: 16px;
+      border: none;
+      border-radius: 11px;
+      background: var(--dorado);
+      color: #07152e;
+      font-weight: 800;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .aviso {
+      font-size: 13px;
+      color: var(--gris);
+      line-height: 1.6;
+    }
+
+    .mensaje {
+      padding: 14px;
+      border-radius: 10px;
+      background: #1b3558;
+      line-height: 1.6;
+    }
+
+    .mensaje:empty {
+      display: none;
+    }
+
+    .reglas {
+      color: var(--gris);
+      line-height: 1.9;
+      padding-left: 22px;
+    }
+
+    footer {
+      padding: 28px 0;
+      text-align: center;
+      color: var(--gris);
+      font-size: 12px;
+    }
+
+    @media (max-width: 600px) {
+      .marca {
+        font-size: 14px;
+      }
+
+      .lugares {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .seccion {
+        padding: 18px;
+      }
+
+      .hero {
+        padding-top: 30px;
+      }
+
+      .datos {
+        gap: 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="contenedor encabezado">
+    <div class="marca">🏆 QUINIELAS EL INGE</div>
+
+    <a href="/" class="volver">
+      ← Volver al inicio
+    </a>
+  </div>
+</header>
+
+<main class="contenedor">
+
+  <section class="hero">
+    <div class="subtitulo">
+      NUEVA MODALIDAD
+    </div>
+
+    <h1>LIGUILLA EL INGE</h1>
+
+    <p class="descripcion">
+      Ocho participantes. Ocho equipos.
+      Un solo campeón y un gran ganador.
+    </p>
+
+    <div class="premio">
+      <small>PREMIO ÚNICO</small>
+
+      <div class="cantidad" id="premio">
+        $1,600
+      </div>
+
+      <div class="datos">
+        <div>
+          Inscripción:
+          <strong id="precio">$200</strong>
+        </div>
+
+        <div>
+          Participantes:
+          <strong>8</strong>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="seccion">
+    <h2 class="titulo-seccion">
+      🎟️ Lugares del Grupo 1
+    </h2>
+
+    <div class="estado" id="estadoGrupo">
+      Consultando grupo...
+    </div>
+
+    <div class="barra">
+      <div class="progreso" id="progreso"></div>
+    </div>
+
+    <div class="lugares" id="lugares"></div>
+
+    <p class="aviso" id="resumenLugares"></p>
+  </section>
+
+  <section class="seccion">
+    <h2 class="titulo-seccion">
+      📝 Inscripción
+    </h2>
+
+    <form id="formulario" class="formulario">
+
+      <div>
+        <label for="nombre">
+          Nombre completo
+        </label>
+
+        <input
+          id="nombre"
+          name="nombre"
+          type="text"
+          maxlength="80"
+          placeholder="Escribe tu nombre"
+          autocomplete="name"
+          required
+        >
+      </div>
+
+      <div>
+        <label for="telefono">
+          Número de WhatsApp
+        </label>
+
+        <input
+          id="telefono"
+          name="telefono"
+          type="tel"
+          inputmode="numeric"
+          maxlength="10"
+          placeholder="10 dígitos"
+          required
+        >
+      </div>
+
+      <div>
+        <label for="comprobante">
+          Comprobante de pago
+        </label>
+
+        <input
+          id="comprobante"
+          name="comprobante"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          required
+        >
+      </div>
+
+      <p class="aviso">
+        Costo de inscripción: $200 MXN.
+        Tu participación quedará pendiente
+        hasta que el administrador valide
+        el comprobante.
+      </p>
+
+      <button type="submit" id="btnInscribir" disabled>
+        INSCRIPCIONES PRÓXIMAMENTE
+      </button>
+
+      <div
+        id="mensaje"
+        class="mensaje"
+        role="status"
+        aria-live="polite"
+      ></div>
+
+    </form>
+  </section>
+
+  <section class="seccion">
+    <h2 class="titulo-seccion">
+      📋 ¿Cómo funciona?
+    </h2>
+
+    <ol class="reglas">
+      <li>Se inscriben ocho participantes.</li>
+      <li>Cada participación cuesta $200.</li>
+      <li>Se valida cada comprobante de pago.</li>
+      <li>
+        Al completarse el grupo, se realizará
+        un sorteo verificable de los ocho equipos.
+      </li>
+      <li>
+        Cada participante recibirá un equipo
+        diferente.
+      </li>
+      <li>
+        Quien tenga al campeón de la Liga MX
+        ganará los $1,600.
+      </li>
+    </ol>
+  </section>
+
+</main>
+
+<footer>
+  © Quinielas El Inge
+</footer>
+
+<script>
+  const lugaresElemento =
+    document.getElementById('lugares');
+
+  const estadoElemento =
+    document.getElementById('estadoGrupo');
+
+  const progresoElemento =
+    document.getElementById('progreso');
+
+  const resumenElemento =
+    document.getElementById('resumenLugares');
+
+  const boton =
+    document.getElementById('btnInscribir');
+
+  const formulario =
+    document.getElementById('formulario');
+
+  const mensaje =
+    document.getElementById('mensaje');
+
+  let grupoAbierto = false;
+  let enviando = false;
+
+  function actualizarBoton() {
+    boton.disabled = !grupoAbierto || enviando;
+
+    boton.textContent = enviando
+      ? 'ENVIANDO SOLICITUD...'
+      : grupoAbierto
+        ? 'ENVIAR INSCRIPCIÓN'
+        : 'INSCRIPCIONES NO DISPONIBLES';
+  }
+
+  function dibujarLugares(cupos, confirmados, pendientes) {
+    lugaresElemento.replaceChildren();
+
+    for (let i = 0; i < cupos; i++) {
+      const tarjeta = document.createElement('div');
+
+      const estado = i < confirmados
+        ? 'ocupado'
+        : i < confirmados + pendientes
+          ? 'pendiente'
+          : 'libre';
+
+      tarjeta.className = 'lugar ' + estado;
+
+      const icono = document.createElement('div');
+      icono.className = 'icono';
+      icono.textContent = estado === 'ocupado'
+        ? '🔒'
+        : estado === 'pendiente'
+          ? '⏳'
+          : '👤';
+
+      const titulo = document.createElement('strong');
+      titulo.textContent = 'Lugar ' + (i + 1);
+
+      const etiqueta = document.createElement('span');
+      etiqueta.textContent = estado === 'ocupado'
+        ? 'Confirmado'
+        : estado === 'pendiente'
+          ? 'En revisión'
+          : 'Disponible';
+
+      tarjeta.append(icono, titulo, etiqueta);
+      lugaresElemento.appendChild(tarjeta);
+    }
+  }
+
+  async function cargarGrupo() {
+    try {
+      const respuesta = await fetch('/liguilla/grupo/1', {
+        cache: 'no-store'
+      });
+
+      if (!respuesta.ok) {
+        throw new Error('No se pudo consultar el grupo.');
+      }
+
+      const datos = await respuesta.json();
+      const grupo = datos.grupo;
+
+      const cupos = Number(grupo.cupos);
+      const confirmados = Number(grupo.confirmados);
+      const pendientes = Number(grupo.pendientes);
+      const disponibles = Number(grupo.disponibles);
+
+      document.getElementById('precio').textContent =
+        '$' + Number(grupo.precio).toLocaleString('es-MX');
+
+      document.getElementById('premio').textContent =
+        '$' + Number(grupo.premio).toLocaleString('es-MX');
+
+      progresoElemento.style.width =
+        ((confirmados + pendientes) / cupos * 100) + '%';
+
+      dibujarLugares(cupos, confirmados, pendientes);
+
+      estadoElemento.textContent =
+        grupo.estado === 'preparacion'
+          ? 'Próximamente'
+          : grupo.estado === 'abierto'
+            ? 'Inscripciones abiertas'
+            : 'Inscripciones cerradas';
+
+      resumenElemento.textContent =
+        confirmados + ' confirmados · ' +
+        pendientes + ' en revisión · ' +
+        disponibles + ' disponibles';
+
+      grupoAbierto =
+        grupo.estado === 'abierto' &&
+        disponibles > 0;
+
+    } catch (error) {
+      grupoAbierto = false;
+      estadoElemento.textContent =
+        'No fue posible cargar la información.';
+
+      mensaje.textContent = error.message;
+    }
+
+    actualizarBoton();
+  }
+
+  formulario.addEventListener('submit', async evento => {
+    evento.preventDefault();
+
+    if (!grupoAbierto || enviando) return;
+
+    const archivo =
+      document.getElementById('comprobante').files[0];
+
+    if (!archivo || archivo.size > 3 * 1024 * 1024) {
+      mensaje.textContent =
+        'Selecciona una imagen de máximo 3 MB.';
+      return;
+    }
+
+    enviando = true;
+    actualizarBoton();
+    mensaje.textContent = '';
+
+    try {
+      const datos = new FormData(formulario);
+
+      const respuesta = await fetch('/liguilla/inscribir', {
+        method: 'POST',
+        body: datos
+      });
+
+      const resultado = await respuesta.json();
+
+      if (!respuesta.ok || !resultado.ok) {
+        throw new Error(
+          resultado.error || 'No se pudo enviar la solicitud.'
+        );
+      }
+
+      mensaje.textContent =
+        'Solicitud recibida. Guarda tu folio: ' +
+        resultado.folio +
+        '. Tu pago está pendiente de validación.';
+
+      formulario.reset();
+
+    } catch (error) {
+      mensaje.textContent = error.message;
+    } finally {
+      enviando = false;
+      await cargarGrupo();
+    }
+  });
+
+  cargarGrupo();
+</script>
+
+</body>
+</html>
