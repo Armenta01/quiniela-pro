@@ -3916,6 +3916,57 @@ async function cargarEquiposLiguilla() {
 
       tarjeta.append(nombre);
 
+
+      // =====================================
+      // BOTONES EDITAR Y ELIMINAR EQUIPO
+      // =====================================
+
+      const acciones = document.createElement("div");
+
+      acciones.style.cssText = `
+        display:flex;
+        flex-wrap:wrap;
+        gap:8px;
+        margin-left:auto;
+      `;
+
+      const btnEditar = document.createElement("button");
+      btnEditar.type = "button";
+      btnEditar.textContent = "✏️ Editar";
+
+      btnEditar.style.cssText = `
+        background:#d4a017;
+        color:#091b34;
+        border:none;
+        border-radius:8px;
+        padding:10px 14px;
+        font-weight:bold;
+        cursor:pointer;
+      `;
+
+      btnEditar.onclick = () => editarEquipoLiguilla(equipo);
+
+      const btnEliminar = document.createElement("button");
+      btnEliminar.type = "button";
+      btnEliminar.textContent = "🗑️ Eliminar";
+
+      btnEliminar.style.cssText = `
+        background:#dc2626;
+        color:white;
+        border:none;
+        border-radius:8px;
+        padding:10px 14px;
+        font-weight:bold;
+        cursor:pointer;
+      `;
+
+      btnEliminar.onclick = () =>
+        eliminarEquipoLiguilla(equipo.id, equipo.nombre);
+
+      acciones.append(btnEditar, btnEliminar);
+      tarjeta.append(acciones);
+
+
       lista.append(tarjeta);
 
     });
@@ -4009,6 +4060,101 @@ async function registrarEquipoLiguilla(event) {
 
   }
 }
+
+
+/* ==========================================
+   ⚽ EDITAR Y ELIMINAR EQUIPOS
+========================================== */
+
+async function editarEquipoLiguilla(equipo) {
+
+  const nombre = prompt(
+    "Nuevo nombre del equipo:",
+    equipo.nombre
+  );
+
+  if (nombre === null) return;
+
+  const logo = prompt(
+    "URL HTTPS del escudo (puedes dejarla vacía):",
+    equipo.logo_url || ""
+  );
+
+  if (logo === null) return;
+
+  try {
+
+    const respuesta = await fetch(
+      `/admin/liguilla/equipos/${encodeURIComponent(equipo.id)}`,
+      {
+        method:"PATCH",
+        credentials:"same-origin",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          nombre:nombre.trim(),
+          logo_url:logo.trim()
+        })
+      }
+    );
+
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok || !datos.ok) {
+      throw new Error(
+        datos.error || "No se pudo editar el equipo."
+      );
+    }
+
+    await cargarEquiposLiguilla();
+
+    alert("✅ Equipo actualizado correctamente.");
+
+  } catch (error) {
+
+    alert("❌ " + error.message);
+
+  }
+}
+
+async function eliminarEquipoLiguilla(id, nombre) {
+
+  const confirmado = confirm(
+    `¿Estás seguro de eliminar al equipo ${nombre}?`
+  );
+
+  if (!confirmado) return;
+
+  try {
+
+    const respuesta = await fetch(
+      `/admin/liguilla/equipos/${encodeURIComponent(id)}`,
+      {
+        method:"DELETE",
+        credentials:"same-origin"
+      }
+    );
+
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok || !datos.ok) {
+      throw new Error(
+        datos.error || "No se pudo eliminar el equipo."
+      );
+    }
+
+    await cargarEquiposLiguilla();
+
+    alert("✅ Equipo eliminado correctamente.");
+
+  } catch (error) {
+
+    alert("❌ " + error.message);
+
+  }
+}
+
 
 
 
