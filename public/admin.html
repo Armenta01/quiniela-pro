@@ -3437,6 +3437,7 @@ function volverPanelAdmin() {
 
   <button
     id="btnRealizarSorteoLiguilla"
+    onclick="ejecutarSorteoOficialLiguilla()"
     type="button"
     disabled
     style="
@@ -4895,6 +4896,30 @@ async function comprobarRequisitosSorteoLiguilla() {
 
     const resultado = await validarSorteoOficialLiguilla();
 
+
+const botonSorteo = document.getElementById(
+  "btnRealizarSorteoLiguilla"
+);
+
+if (botonSorteo) {
+
+  botonSorteo.disabled = !resultado.listo;
+
+  botonSorteo.textContent = resultado.listo
+    ? "🏆 Realizar sorteo oficial"
+    : "🔒 Sorteo no disponible";
+
+  botonSorteo.style.opacity = resultado.listo
+    ? "1"
+    : "0.6";
+
+  botonSorteo.style.cursor = resultado.listo
+    ? "pointer"
+    : "not-allowed";
+}
+
+
+
     if (resultado.listo) {
       alert(
         "✅ SORTEO LISTO\n\n" +
@@ -4921,6 +4946,97 @@ async function comprobarRequisitosSorteoLiguilla() {
     }
   }
 }
+
+
+/* ==========================================
+   🏆 EJECUTAR SORTEO OFICIAL
+   Requiere validación y confirmación.
+========================================== */
+
+async function ejecutarSorteoOficialLiguilla() {
+
+  if (sorteoLiguillaEnProceso) return;
+
+  const validacion = await validarSorteoOficialLiguilla();
+
+  if (!validacion.listo) {
+    alert(
+      "⚠️ NO SE PUEDE REALIZAR EL SORTEO\n\n" +
+      validacion.mensaje
+    );
+    return;
+  }
+
+  const confirmado = confirm(
+    "🏆 SORTEO OFICIAL DE LIGUILLA\n\n" +
+    "Se asignará aleatoriamente un equipo a cada " +
+    "uno de los ocho participantes.\n\n" +
+    "Los resultados quedarán guardados " +
+    "definitivamente y no podrán repetirse.\n\n" +
+    "¿CONFIRMAS REALIZAR EL SORTEO OFICIAL?"
+  );
+
+  if (!confirmado) return;
+
+  const boton = document.getElementById(
+    "btnRealizarSorteoLiguilla"
+  );
+
+  sorteoLiguillaEnProceso = true;
+
+  if (boton) {
+    boton.disabled = true;
+    boton.textContent = "⏳ Realizando sorteo oficial...";
+  }
+
+  try {
+
+    const respuesta = await fetch(
+      "/admin/liguilla/sortear",
+      {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({})
+      }
+    );
+
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok || !datos.ok) {
+      throw new Error(
+        datos.error || "No se pudo realizar el sorteo."
+      );
+    }
+
+    alert("✅ Sorteo oficial guardado correctamente.");
+
+    await consultarSorteoLiguilla();
+
+  } catch (error) {
+
+    console.error("Error en sorteo oficial:", error);
+
+    alert(
+      "❌ " +
+      (error.message || "Error al realizar el sorteo.")
+    );
+
+  } finally {
+
+    sorteoLiguillaEnProceso = false;
+
+    if (boton) {
+      boton.textContent = "🏆 Realizar sorteo oficial";
+      // El botón sigue bloqueado hasta completar
+      // las verificaciones del siguiente paso.
+      boton.disabled = true;
+    }
+  }
+}
+
 
 
 </script>
