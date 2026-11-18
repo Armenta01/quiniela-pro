@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
+const multer = require('multer');
+const crypto = require('crypto');
 const { Pool, types } = require('pg');
 const enviosEnProceso = new Set();
 
@@ -1005,6 +1007,278 @@ await pool.query(`
 initDB().catch(err => {
   console.error("🔥 ERROR INIT DB:", err);
 });
+
+
+/* ==========================================
+   🏆 LIGUILLA EL INGE
+   REGISTRO DE PARTICIPANTES
+========================================== */
+
+// Recibir imágenes en memoria, sin guardarlas
+// en la carpeta pública del servidor.
+const subirComprobanteLiguilla = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 3 * 1024 * 1024,
+    files: 1,
+    fields: 2,
+    parts: 3
+  },
+  fileFilter: (req, file, cb) => {
+    const permitidos = [
+      'image/jpeg',
+      'image/png',
+      'image/webp'
+    ];
+
+    if (!permitidos.includes(file.mimetype)) {
+      return cb(new Error(
+        'Solo se permiten imágenes JPG, PNG o WebP.'
+      ));
+    }
+
+    cb(null, true);
+  }
+}).single('comprobante');
+
+// Verificar la firma real del archivo.
+function validarImagenLiguilla(buffer, tipo) {
+  if (!Buffer.isBuffer(buffer)) return false;
+
+  if (tipo === 'image/jpeg') {
+    return buffer.length >= 4 &&
+      buffer[0] === 0xFF &&
+      buffer[1] === 0xD8 &&
+      buffer[2] === 0xFF;
+  }
+
+  if (tipo === 'image/png') {
+    return buffer.length >= 8 &&
+      buffer.subarray(0, 8).equals(
+        Buffer.from('89504e470d0a1a0a', 'hex')
+      );
+  }
+
+  if (tipo === 'image/webp') {
+    return buffer.length >= 12 &&
+      buffer.toString('ascii', 0, 4) === 'RIFF' &&
+      buffer.toString('ascii', 8, 12) === 'WEBP';
+  }
+
+  return false;
+}
+
+// Middleware de subida y manejo de errores.
+function recibirComprobanteLiguilla(req, res, next) {
+  subirComprobanteLiguilla(req, res, error => {
+    if (error) {
+      return res.status(400).json({
+        ok: false,
+        error: error.code === 'LIMIT_FILE_SIZE'
+          ? 'El comprobante no puede superar 3 MB.'
+          : 'No se pudo recibir el comprobante. ' +
+            error.message
+      });
+    }
+
+    next();
+  });
+}
+
+app.post(
+  '/liguilla/inscribir',
+  recibirComprobanteLiguilla,
+  async (req, res) => {
+
+    const nombre = typeof req.body?.nombre === 'string'
+      ? req.body.nombre.trim().replace(/\s+/g, ' ')
+      : '';
+
+    const telefono = typeof req.body?.telefono === 'string'
+      ? req.body.telefono.trim()
+      : '';
+
+    if (nombre.length < 2 || nombre.length > 80) {
+      return res.status(400).json({
+        ok: false,
+        error: 'Escribe un nombre válido.'
+      });
+    }
+
+    // Primera versión: números mexicanos de 10 dígitos.
+    if (!/^\d{10}$/.test(telefono)) {
+      return res.status(400).json({
+        ok: false,
+        error: 'Ingresa un WhatsApp mexicano de 10 dígitos.'
+      });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({
+        ok: false,
+        error: 'Debes adjuntar tu comprobante.'
+      });
+    }
+
+    if (!validarImagenLiguilla(
+      req.file.buffer,
+      req.file.mimetype
+    )) {
+      return res.status(400).json({
+        ok: false,
+        error: 'El archivo no es una imagen válida.'
+      });
+    }
+
+    let client;
+
+    try {
+      client = await pool.connect();
+      await client.query('BEGIN');
+
+      // Bloquear el grupo mientras se asigna el cupo.
+      // Esto evita inscripciones simultáneas que
+      // excedan los ocho lugares.
+      const grupoResultado = await client.query(`
+        SELECT id, cupos, estado
+        FROM liguilla_grupos
+        WHERE id = 1
+        FOR UPDATE
+      `);
+
+      if (!grupoResultado.rows.length) {
+        await client.query('ROLLBACK');
+
+        return res.status(404).json({
+          ok: false,
+          error: 'Grupo no encontrado.'
+        });
+      }
+
+      const grupo = grupoResultado.rows[0];
+
+      if (grupo.estado !== 'abierto') {
+        await client.query('ROLLBACK');
+
+        return res.status(403).json({
+          ok: false,
+          error: 'Las inscripciones aún no están abiertas.'
+        });
+      }
+
+      const cuposResultado = await client.query(`
+        SELECT COUNT(*)::INTEGER AS ocupados
+        FROM liguilla_participantes
+        WHERE grupo_id = 1
+          AND estado_pago IN ('pendiente', 'aprobado')
+      `);
+
+      const ocupados = cuposResultado.rows[0].ocupados;
+
+      if (ocupados >= grupo.cupos) {
+        await client.query('ROLLBACK');
+
+        return res.status(409).json({
+          ok: false,
+          error: 'Los ocho lugares están ocupados.'
+        });
+      }
+
+      // Folio aleatorio, difícil de adivinar.
+      const folio = 'LIG1-' +
+        crypto.randomBytes(12)
+          .toString('hex')
+          .toUpperCase();
+
+      const participante = await client.query(`
+        INSERT INTO liguilla_participantes (
+          grupo_id,
+          folio,
+          nombre,
+          telefono,
+          estado_pago
+        )
+        VALUES (1, $1, $2, $3, 'pendiente')
+        RETURNING id, folio
+      `, [folio, nombre, telefono]);
+
+      const participanteId = participante.rows[0].id;
+
+      // Guardar el comprobante en PostgreSQL.
+      await client.query(`
+        INSERT INTO liguilla_comprobantes (
+          participante_id,
+          imagen,
+          tipo_archivo,
+          tamano_bytes
+        )
+        VALUES ($1, $2, $3, $4)
+      `, [
+        participanteId,
+        req.file.buffer,
+        req.file.mimetype,
+        req.file.size
+      ]);
+
+      await client.query(`
+        UPDATE liguilla_participantes
+        SET comprobante_clave = $1
+        WHERE id = $2
+      `, [
+        'postgresql:' + participanteId,
+        participanteId
+      ]);
+
+      await client.query(`
+        INSERT INTO liguilla_pagos_auditoria (
+          participante_id,
+          estado_anterior,
+          estado_nuevo
+        )
+        VALUES ($1, NULL, 'pendiente')
+      `, [participanteId]);
+
+      await client.query('COMMIT');
+
+      res.set('Cache-Control', 'no-store');
+
+      return res.status(201).json({
+        ok: true,
+        mensaje: 'Solicitud recibida correctamente.',
+        folio,
+        estado_pago: 'pendiente',
+        precio: 200,
+        aviso: 'Tu lugar está pendiente de validar el pago.'
+      });
+
+    } catch (error) {
+      if (client) {
+        try {
+          await client.query('ROLLBACK');
+        } catch (rollbackError) {
+          console.error('Error al revertir:', rollbackError);
+        }
+      }
+
+      if (error.code === '23505') {
+        return res.status(409).json({
+          ok: false,
+          error: 'Ya existe una inscripción activa con este WhatsApp.'
+        });
+      }
+
+      console.error('Error de inscripción Liguilla:', error);
+
+      return res.status(500).json({
+        ok: false,
+        error: 'No se pudo registrar la solicitud.'
+      });
+
+    } finally {
+      if (client) client.release();
+    }
+  }
+);
 
 
 /* ==========================================
