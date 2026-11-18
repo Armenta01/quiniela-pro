@@ -189,6 +189,18 @@ if (sessionStorage.getItem("admin") !== "true") {
     font-size: 13px;
   }
 }
+
+@keyframes aparecerDemoLiguilla {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 </style>
 
 
@@ -3418,6 +3430,28 @@ function volverPanelAdmin() {
     🎲 Realizar sorteo automático
   </button>
 
+
+<!-- 🎬 DEMOSTRACIÓN DEL SORTEO -->
+<button
+  id="btnDemoSorteoLiguilla"
+  type="button"
+  onclick="iniciarDemoSorteoLiguilla()"
+  style="
+    width:100%;
+    padding:15px;
+    margin-top:12px;
+    background:linear-gradient(135deg,#183e70,#2763a0);
+    color:#ffffff;
+    border:1px solid #f5c451;
+    border-radius:10px;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+  ">
+  ▶️ Probar animación del sorteo
+</button>
+
+
   <div id="liguillaSorteoResultados"
        style="display:grid;gap:10px;margin-top:20px;">
   </div>
@@ -4359,6 +4393,161 @@ async function consultarSorteoLiguilla() {
 }
 
 
+
+/* ==========================================
+   🎬 DEMOSTRACIÓN ANIMADA - LIGUILLA EL INGE
+   No realiza peticiones al servidor.
+========================================== */
+
+const esperarDemoLiguilla = ms =>
+  new Promise(resolve => setTimeout(resolve, ms));
+
+async function iniciarDemoSorteoLiguilla() {
+
+  if (sorteoLiguillaEnProceso) return;
+
+  const boton = document.getElementById("btnDemoSorteoLiguilla");
+  const escudo = document.getElementById("liguillaSorteoEscudo");
+  const nombre = document.getElementById("liguillaSorteoNombre");
+  const equipo = document.getElementById("liguillaSorteoEquipo");
+  const progreso = document.getElementById("liguillaSorteoProgreso");
+  const resultados = document.getElementById("liguillaSorteoResultados");
+  const escenario = document.getElementById("liguillaSorteoEscenario");
+
+  if (!boton || !escudo || !nombre ||
+      !equipo || !progreso || !resultados || !escenario) {
+    alert("No se encontró el panel del sorteo.");
+    return;
+  }
+
+  const participantes = [
+    "Carlos", "María", "José", "Ana",
+    "Luis", "Sofía", "Diego", "Valeria"
+  ];
+
+  const equipos = [
+    { nombre: "América", simbolo: "🟡" },
+    { nombre: "Cruz Azul", simbolo: "🔵" },
+    { nombre: "Toluca", simbolo: "🔴" },
+    { nombre: "Tigres", simbolo: "🐯" },
+    { nombre: "Monterrey", simbolo: "🔷" },
+    { nombre: "Pumas", simbolo: "🐾" },
+    { nombre: "Chivas", simbolo: "🔴" },
+    { nombre: "Pachuca", simbolo: "⚽" }
+  ];
+
+  // Mezclar equipos para esta demostración.
+  const mezclados = [...equipos];
+
+  for (let i = mezclados.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [mezclados[i], mezclados[j]] =
+      [mezclados[j], mezclados[i]];
+  }
+
+  sorteoLiguillaEnProceso = true;
+  boton.disabled = true;
+  boton.textContent = "🎬 Animación en curso...";
+  resultados.replaceChildren();
+
+  try {
+
+    escenario.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+
+    // CUENTA REGRESIVA
+    nombre.textContent = "¡PREPÁRATE!";
+    equipo.textContent = "El sorteo está por comenzar";
+
+    for (let numero = 3; numero >= 1; numero--) {
+      escudo.textContent = numero;
+      escudo.style.transform = "scale(1.25)";
+      escudo.style.transition = "transform .35s ease";
+
+      await esperarDemoLiguilla(400);
+      escudo.style.transform = "scale(1)";
+      await esperarDemoLiguilla(600);
+    }
+
+    // REVELAR LOS 8 PARTICIPANTES
+    for (let i = 0; i < participantes.length; i++) {
+
+      nombre.textContent = participantes[i];
+      equipo.textContent = "🎰 Buscando equipo...";
+      progreso.textContent = `${i} de 8 asignaciones`;
+
+      // Ruleta visual
+      for (let vuelta = 0; vuelta < 18; vuelta++) {
+
+        const temporal =
+          equipos[(vuelta + i * 3) % equipos.length];
+
+        escudo.textContent = temporal.simbolo;
+        equipo.textContent = temporal.nombre;
+
+        escudo.style.transform =
+          `rotate(${vuelta % 2 === 0 ? -12 : 12}deg) scale(1.1)`;
+
+        await esperarDemoLiguilla(65 + vuelta * 8);
+      }
+
+      const elegido = mezclados[i];
+
+      // Revelación
+      escudo.textContent = elegido.simbolo;
+      escudo.style.transform = "rotate(0deg) scale(1.3)";
+      equipo.textContent = `🏆 ${elegido.nombre}`;
+      nombre.textContent = participantes[i];
+      progreso.textContent = `${i + 1} de 8 asignaciones`;
+
+      await esperarDemoLiguilla(450);
+      escudo.style.transform = "scale(1)";
+
+      // Agregar resultado sin insertar HTML de usuarios.
+      const tarjeta = document.createElement("div");
+      tarjeta.style.cssText = `
+        background:#18375f;
+        border:1px solid #d4a017;
+        border-radius:10px;
+        padding:13px;
+        color:white;
+        display:flex;
+        justify-content:space-between;
+        gap:10px;
+        flex-wrap:wrap;
+        animation:aparecerDemoLiguilla .5s ease;
+      `;
+
+      const jugador = document.createElement("strong");
+      jugador.textContent = participantes[i];
+
+      const club = document.createElement("strong");
+      club.style.color = "#f5c451";
+      club.textContent =
+        `${elegido.simbolo} ${elegido.nombre}`;
+
+      tarjeta.append(jugador, club);
+      resultados.appendChild(tarjeta);
+
+      await esperarDemoLiguilla(850);
+    }
+
+    escudo.textContent = "🏆";
+    nombre.textContent = "¡SORTEO COMPLETADO!";
+    equipo.textContent = "8 participantes · 8 equipos";
+    progreso.textContent = "8 de 8 asignaciones";
+
+  } catch (error) {
+    console.error("Error en demostración:", error);
+    alert("No se pudo completar la animación.");
+  } finally {
+    sorteoLiguillaEnProceso = false;
+    boton.disabled = false;
+    boton.textContent = "🔁 Repetir demostración";
+  }
+}
 
 
 
