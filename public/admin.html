@@ -3273,6 +3273,71 @@ function volverPanelAdmin() {
 
   </div>
 
+
+<!-- =====================================
+     🏆 CONTROL DE INSCRIPCIONES LIGUILLA
+===================================== -->
+
+<div style="
+  background:#102344;
+  border:1px solid #36547c;
+  border-radius:14px;
+  padding:20px;
+  margin:20px 0;
+">
+
+  <h3 style="color:#f5c451;margin:0 0 12px;">
+    🔐 Control de inscripciones
+  </h3>
+
+  <p id="liguillaEstadoInscripciones"
+     style="color:#fff;font-weight:bold;">
+    Consultando estado...
+  </p>
+
+  <div style="
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-top:15px;
+  ">
+
+    <button
+      type="button"
+      id="btnAbrirLiguilla"
+      onclick="cambiarEstadoInscripcionesLiguilla('abierto')"
+      style="
+        background:#16a34a;
+        color:white;
+        border:none;
+        padding:13px 20px;
+        border-radius:10px;
+        cursor:pointer;
+        font-weight:bold;
+      ">
+      🔓 Abrir inscripciones
+    </button>
+
+    <button
+      type="button"
+      id="btnCerrarLiguilla"
+      onclick="cambiarEstadoInscripcionesLiguilla('cerrado')"
+      style="
+        background:#dc2626;
+        color:white;
+        border:none;
+        padding:13px 20px;
+        border-radius:10px;
+        cursor:pointer;
+        font-weight:bold;
+      ">
+      🔒 Cerrar inscripciones
+    </button>
+
+  </div>
+</div>
+
+
   <button type="button"
     onclick="cargarParticipantesLiguilla()"
     style="padding:12px;margin-bottom:15px;">
@@ -3285,6 +3350,7 @@ function volverPanelAdmin() {
 </section>
 
 <script>
+
 function abrirLiguillaAdmin() {
   const panel = document.getElementById("panelLiguillaAdmin");
 
@@ -3297,6 +3363,7 @@ function abrirLiguillaAdmin() {
     });
 
     cargarParticipantesLiguilla();
+    consultarEstadoInscripcionesLiguilla();
   }
 }
 
@@ -3520,6 +3587,135 @@ async function cambiarPagoLiguilla(id, estadoPago) {
 
   }
 }
+
+
+/* ==========================================
+   🏆 CONTROL DE INSCRIPCIONES LIGUILLA
+========================================== */
+
+let cambiandoEstadoLiguilla = false;
+
+async function consultarEstadoInscripcionesLiguilla() {
+
+  const texto = document.getElementById(
+    "liguillaEstadoInscripciones"
+  );
+
+  const btnAbrir = document.getElementById("btnAbrirLiguilla");
+  const btnCerrar = document.getElementById("btnCerrarLiguilla");
+
+  if (!texto) return;
+
+  btnAbrir.disabled = true;
+  btnCerrar.disabled = true;
+
+  try {
+
+    const respuesta = await fetch("/liguilla/grupo/1", {
+      credentials: "same-origin",
+      cache: "no-store"
+    });
+
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok || !datos.ok) {
+      throw new Error(datos.error || "Error consultando grupo.");
+    }
+
+    const grupo = datos.grupo;
+
+    const nombres = {
+      preparacion: "🟡 En preparación",
+      abierto: "🟢 Inscripciones abiertas",
+      cerrado: "🔴 Inscripciones cerradas",
+      sorteado: "🏆 Sorteo realizado",
+      finalizado: "🏁 Liguilla finalizada"
+    };
+
+    texto.textContent =
+      `${nombres[grupo.estado] || grupo.estado} — ` +
+      `${grupo.disponibles} lugares disponibles`;
+
+    const puedeCambiar =
+      !["sorteado", "finalizado"].includes(grupo.estado);
+
+    btnAbrir.disabled =
+      !puedeCambiar ||
+      grupo.estado === "abierto" ||
+      grupo.disponibles <= 0;
+
+    btnCerrar.disabled =
+      !puedeCambiar ||
+      grupo.estado === "cerrado";
+
+  } catch (error) {
+
+    texto.textContent = "❌ " + error.message;
+
+  }
+}
+
+async function cambiarEstadoInscripcionesLiguilla(estado) {
+
+  if (cambiandoEstadoLiguilla) return;
+
+  const abrir = estado === "abierto";
+
+  const confirmar = confirm(
+    abrir
+      ? "¿Deseas ABRIR las inscripciones del Grupo 1?"
+      : "¿Deseas CERRAR las inscripciones del Grupo 1?"
+  );
+
+  if (!confirmar) return;
+
+  cambiandoEstadoLiguilla = true;
+
+  const btnAbrir = document.getElementById("btnAbrirLiguilla");
+  const btnCerrar = document.getElementById("btnCerrarLiguilla");
+
+  btnAbrir.disabled = true;
+  btnCerrar.disabled = true;
+
+  try {
+
+    const respuesta = await fetch(
+      "/admin/liguilla/grupo/1/estado",
+      {
+        method: "PATCH",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ estado })
+      }
+    );
+
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok || !datos.ok) {
+      throw new Error(
+        datos.error || "No se pudo cambiar el estado."
+      );
+    }
+
+    alert("✅ " + datos.mensaje);
+
+    await cargarParticipantesLiguilla();
+
+  } catch (error) {
+
+    alert("❌ " + error.message);
+
+  } finally {
+
+    cambiandoEstadoLiguilla = false;
+
+    await consultarEstadoInscripcionesLiguilla();
+
+  }
+}
+
 
 </script>
 
