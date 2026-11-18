@@ -871,6 +871,94 @@ await pool.query(`
   `);
 
 
+  // ==========================================
+  // 🏆 LIGUILLA EL INGE - GRUPO 1
+  // ==========================================
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS liguilla_grupos (
+      id INTEGER PRIMARY KEY,
+      nombre TEXT NOT NULL,
+      cupos INTEGER NOT NULL DEFAULT 8
+        CHECK (cupos = 8),
+      precio NUMERIC(10,2) NOT NULL DEFAULT 200
+        CHECK (precio = 200),
+      premio NUMERIC(10,2) NOT NULL DEFAULT 1600
+        CHECK (premio = 1600),
+      estado TEXT NOT NULL DEFAULT 'preparacion'
+        CHECK (estado IN (
+          'preparacion',
+          'abierto',
+          'cerrado',
+          'sorteado',
+          'finalizado'
+        )),
+      creado_en TIMESTAMPTZ DEFAULT NOW()
+    );
+  `);
+
+  await pool.query(`
+    INSERT INTO liguilla_grupos
+      (id, nombre, cupos, precio, premio)
+    VALUES
+      (1, 'Liguilla El Inge - Grupo 1', 8, 200, 1600)
+    ON CONFLICT (id) DO NOTHING;
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS liguilla_participantes (
+      id BIGSERIAL PRIMARY KEY,
+      grupo_id INTEGER NOT NULL
+        REFERENCES liguilla_grupos(id),
+      folio TEXT UNIQUE NOT NULL,
+      nombre TEXT NOT NULL,
+      telefono TEXT NOT NULL,
+      estado_pago TEXT NOT NULL DEFAULT 'pendiente'
+        CHECK (estado_pago IN (
+          'pendiente',
+          'aprobado',
+          'rechazado'
+        )),
+      comprobante_clave TEXT,
+      equipo_id INTEGER,
+      creado_en TIMESTAMPTZ DEFAULT NOW(),
+      aprobado_en TIMESTAMPTZ,
+      CHECK (
+        estado_pago <> 'aprobado'
+        OR aprobado_en IS NOT NULL
+      )
+    );
+  `);
+
+  await pool.query(`
+    CREATE UNIQUE INDEX IF NOT EXISTS
+      idx_liguilla_telefono_activo
+    ON liguilla_participantes(grupo_id, telefono)
+    WHERE estado_pago IN ('pendiente', 'aprobado');
+  `);
+
+  await pool.query(`
+    CREATE UNIQUE INDEX IF NOT EXISTS
+      idx_liguilla_equipo_unico
+    ON liguilla_participantes(grupo_id, equipo_id)
+    WHERE equipo_id IS NOT NULL;
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS liguilla_pagos_auditoria (
+      id BIGSERIAL PRIMARY KEY,
+      participante_id BIGINT NOT NULL
+        REFERENCES liguilla_participantes(id),
+      estado_anterior TEXT,
+      estado_nuevo TEXT NOT NULL,
+      registrado_en TIMESTAMPTZ DEFAULT NOW()
+    );
+  `);
+
+  console.log("🏆 Base de datos Liguilla preparada");
+
+
+
   console.log("🎁 Sistema de promociones preparado");
 
   console.log("🔥 DB + índices listos");
