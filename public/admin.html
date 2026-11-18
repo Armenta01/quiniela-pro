@@ -3378,18 +3378,73 @@ async function cargarParticipantesLiguilla() {
       tarjeta.append(titulo, folio, telefono, estado);
 
       if (p.tiene_comprobante) {
-        const enlace = document.createElement("a");
+  const enlace = document.createElement("a");
 
-        enlace.href =
-          `/admin/liguilla/comprobante/${encodeURIComponent(p.id)}`;
+  enlace.href =
+    `/admin/liguilla/comprobante/${encodeURIComponent(p.id)}`;
 
-        enlace.target = "_blank";
-        enlace.rel = "noopener";
-        enlace.textContent = "🧾 Ver comprobante";
-        enlace.style.color = "#f5c451";
+  enlace.target = "_blank";
+  enlace.rel = "noopener";
+  enlace.textContent = "🧾 Ver comprobante";
+  enlace.style.color = "#f5c451";
 
-        tarjeta.appendChild(enlace);
+  tarjeta.appendChild(enlace);
+}
+
+
+      // =====================================
+      // 🏆 BOTONES DE VALIDACIÓN DE PAGOS
+      // =====================================
+
+      if (p.estado_pago === "pendiente") {
+
+        const acciones = document.createElement("div");
+
+        acciones.style.cssText = `
+          display:flex;
+          flex-wrap:wrap;
+          gap:10px;
+          margin-top:15px;
+        `;
+
+        const btnAprobar = document.createElement("button");
+        btnAprobar.type = "button";
+        btnAprobar.textContent = "✅ Aprobar pago";
+
+        btnAprobar.style.cssText = `
+          background:#16a34a;
+          color:white;
+          border:none;
+          border-radius:10px;
+          padding:12px 16px;
+          cursor:pointer;
+          font-weight:bold;
+        `;
+
+        const btnRechazar = document.createElement("button");
+        btnRechazar.type = "button";
+        btnRechazar.textContent = "❌ Rechazar pago";
+
+        btnRechazar.style.cssText = `
+          background:#dc2626;
+          color:white;
+          border:none;
+          border-radius:10px;
+          padding:12px 16px;
+          cursor:pointer;
+          font-weight:bold;
+        `;
+
+        btnAprobar.onclick = () =>
+          cambiarPagoLiguilla(p.id, "aprobado");
+
+        btnRechazar.onclick = () =>
+          cambiarPagoLiguilla(p.id, "rechazado");
+
+        acciones.append(btnAprobar, btnRechazar);
+        tarjeta.appendChild(acciones);
       }
+
 
       lista.appendChild(tarjeta);
     });
@@ -3399,6 +3454,73 @@ async function cargarParticipantesLiguilla() {
     mensaje.textContent = "❌ " + error.message;
   }
 }
+
+
+/* ==========================================
+   🏆 APROBAR / RECHAZAR PAGO LIGUILLA
+========================================== */
+
+let procesandoPagoLiguilla = false;
+
+async function cambiarPagoLiguilla(id, estadoPago) {
+
+  if (procesandoPagoLiguilla) return;
+
+  const accion = estadoPago === "aprobado"
+    ? "APROBAR"
+    : "RECHAZAR";
+
+  const confirmado = confirm(
+    `¿Estás seguro de ${accion} el pago del participante #${id}?`
+  );
+
+  if (!confirmado) return;
+
+  procesandoPagoLiguilla = true;
+
+  const mensaje = document.getElementById("liguillaMensaje");
+
+  try {
+
+    mensaje.textContent = "⏳ Procesando pago...";
+
+    const respuesta = await fetch(
+      `/admin/liguilla/participantes/${encodeURIComponent(id)}/pago`,
+      {
+        method: "PATCH",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          estado_pago: estadoPago
+        })
+      }
+    );
+
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok || !datos.ok) {
+      throw new Error(
+        datos.error || "No se pudo actualizar el pago."
+      );
+    }
+
+    alert("✅ " + datos.mensaje);
+
+    await cargarParticipantesLiguilla();
+
+  } catch (error) {
+
+    mensaje.textContent = "❌ " + error.message;
+
+  } finally {
+
+    procesandoPagoLiguilla = false;
+
+  }
+}
+
 </script>
 
 </body>
