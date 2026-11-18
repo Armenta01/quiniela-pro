@@ -3535,7 +3535,7 @@ function volverPanelAdmin() {
     font-weight:bold;
     cursor:pointer;
   ">
-  ▶️ Reproducir sorteo oficial
+  ▶️  Iniciar Sorteo oficial
 </button>
 
 
@@ -4440,13 +4440,34 @@ const botonReproducir = document.getElementById(
 );
 
 if (botonReproducir) {
-  botonReproducir.style.display =
+
+  const sorteoDisponible =
     datosSorteo.ok === true &&
     datosSorteo.realizado === true &&
     Array.isArray(datosSorteo.asignaciones) &&
-    datosSorteo.asignaciones.length === 8
-      ? "block"
-      : "none";
+    datosSorteo.asignaciones.length === 8;
+
+  const reproduccionFinalizada =
+    localStorage.getItem("liguillaSorteoReproducido") === "true";
+
+  botonReproducir.style.display =
+    sorteoDisponible ? "block" : "none";
+
+  botonReproducir.disabled =
+    reproduccionFinalizada;
+
+  botonReproducir.textContent =
+    reproduccionFinalizada
+      ? "🔒 Sorteo Finalizado"
+      : "▶️ Reproducir sorteo oficial";
+
+  botonReproducir.style.opacity =
+    reproduccionFinalizada ? "0.5" : "1";
+
+  botonReproducir.style.cursor =
+    reproduccionFinalizada
+      ? "not-allowed"
+      : "pointer";
 }
 
 
@@ -4902,6 +4923,19 @@ async function reproducirSorteoOficialLiguilla() {
     equipo.textContent = "Las ocho asignaciones son definitivas.";
     progreso.textContent = "8 de 8 asignaciones";
 
+        // 🔒 BLOQUEAR REPRODUCCIÓN AL FINALIZAR
+        localStorage.setItem("liguillaSorteoReproducido", "true");
+    const botonReproducir = document.getElementById(
+      "btnReproducirSorteoOficial"
+    );
+
+    if (botonReproducir) {
+      botonReproducir.disabled = true;
+      botonReproducir.textContent = "🔒 Sorteo Finalizado";
+      botonReproducir.style.opacity = "0.5";
+      botonReproducir.style.cursor = "not-allowed";
+    }
+
   } catch (error) {
     console.error("Error reproduciendo sorteo oficial:", error);
     alert(error.message || "No se pudo reproducir el sorteo.");
@@ -5245,6 +5279,9 @@ async function reiniciarLiguillaAdmin() {
       "Equipos: conservados\n" +
       "Estado: preparación"
     );
+
+    // 🧹 LIMPIAR ESTADO DE REPRODUCCIÓN
+localStorage.removeItem("liguillaSorteoReproducido");
 
     // Actualizar la información del administrador
     if (typeof abrirLiguillaAdmin === "function") {
