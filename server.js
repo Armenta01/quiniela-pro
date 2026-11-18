@@ -614,17 +614,28 @@ app.post(
         const participante = participantes[i];
         const equipo = mezclados[i];
 
-        await client.query(`
-          UPDATE liguilla_participantes
-          SET equipo_id = $1
-          WHERE id = $2
-            AND grupo_id = 1
-            AND estado_pago = 'aprobado'
-            AND equipo_id IS NULL
-        `, [
-          equipo.id,
-          participante.id
-        ]);
+        
+const asignacionGuardada = await client.query(`
+  UPDATE liguilla_participantes
+  SET equipo_id = $1
+  WHERE id = $2
+    AND grupo_id = 1
+    AND estado_pago = 'aprobado'
+    AND equipo_id IS NULL
+  RETURNING id, equipo_id
+`, [
+  equipo.id,
+  participante.id
+]);
+
+// 🔒 Confirmar que realmente se guardó
+// la asignación correspondiente.
+if (asignacionGuardada.rowCount !== 1) {
+  throw new Error(
+    `No se pudo guardar la asignación del participante ${participante.id}.`
+  );
+}
+
 
         asignaciones.push({
           participante_id: participante.id,

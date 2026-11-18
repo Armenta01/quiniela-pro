@@ -3413,6 +3413,28 @@ function volverPanelAdmin() {
 
   </div>
 
+
+<!-- 🔒 VERIFICAR REQUISITOS DEL SORTEO -->
+<button
+  type="button"
+  id="btnValidarSorteoLiguilla"
+  onclick="comprobarRequisitosSorteoLiguilla()"
+  style="
+    width:100%;
+    margin:12px 0;
+    padding:14px;
+    background:#18375f;
+    color:#f5c451;
+    border:1px solid #f5c451;
+    border-radius:10px;
+    font-size:15px;
+    font-weight:bold;
+    cursor:pointer;
+  ">
+  🔍 Verificar requisitos del sorteo
+</button>
+
+
   <button
     id="btnRealizarSorteoLiguilla"
     type="button"
@@ -3450,6 +3472,29 @@ function volverPanelAdmin() {
   ">
   ▶️ Probar animación del sorteo
 </button>
+
+
+<!-- 🏆 REPRODUCIR SORTEO OFICIAL -->
+<button
+  id="btnReproducirSorteoOficial"
+  type="button"
+  onclick="reproducirSorteoOficialLiguilla()"
+  style="
+    display:none;
+    width:100%;
+    margin-top:12px;
+    padding:15px;
+    background:linear-gradient(135deg,#b8860b,#f5c451);
+    color:#102344;
+    border:1px solid #d4a017;
+    border-radius:10px;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+  ">
+  ▶️ Reproducir sorteo oficial
+</button>
+
 
 
   <div id="liguillaSorteoResultados"
@@ -4320,6 +4365,23 @@ async function consultarSorteoLiguilla() {
     const datosSorteo = await respuestaSorteo.json();
     const datosEquipos = await respuestaEquipos.json();
 
+
+
+const botonReproducir = document.getElementById(
+  "btnReproducirSorteoOficial"
+);
+
+if (botonReproducir) {
+  botonReproducir.style.display =
+    datosSorteo.ok === true &&
+    datosSorteo.realizado === true &&
+    Array.isArray(datosSorteo.asignaciones) &&
+    datosSorteo.asignaciones.length === 8
+      ? "block"
+      : "none";
+}
+
+
     if (
       !datosGrupo.ok ||
       !datosSorteo.ok ||
@@ -4490,13 +4552,19 @@ async function iniciarDemoSorteoLiguilla() {
         escudo.style.transform =
           `rotate(${vuelta % 2 === 0 ? -12 : 12}deg) scale(1.1)`;
 
-        await esperarDemoLiguilla(65 + vuelta * 8);
-      }
+        // 🎰 Desaceleración progresiva de la ruleta
+        const velocidad = 45 + Math.pow(vuelta / 17, 3) * 350;
+
+        await esperarDemoLiguilla(velocidad);
+        
+        }
 
       const elegido = mezclados[i];
 
       // Revelación
       escudo.textContent = elegido.simbolo;
+      escudo.style.transition =
+      "transform 0.65s cubic-bezier(0.2, 1.6, 0.4, 1)";
       escudo.style.transform = "rotate(0deg) scale(1.3)";
       equipo.textContent = `🏆 ${elegido.nombre}`;
       nombre.textContent = participantes[i];
@@ -4548,6 +4616,305 @@ async function iniciarDemoSorteoLiguilla() {
     boton.textContent = "🔁 Repetir demostración";
   }
 }
+
+
+/* ==========================================
+   🏆 CONSULTAR ASIGNACIONES OFICIALES
+   Solo lectura: NO ejecuta el sorteo.
+========================================== */
+
+async function obtenerAsignacionesOficialesLiguilla() {
+
+  const respuesta = await fetch(
+    "/admin/liguilla/sorteo",
+    {
+      method: "GET",
+      credentials: "same-origin",
+      cache: "no-store"
+    }
+  );
+
+  if (!respuesta.ok) {
+    throw new Error(
+      "No fue posible consultar el sorteo oficial."
+    );
+  }
+
+  const datos = await respuesta.json();
+
+  if (!datos.ok) {
+    throw new Error(
+      datos.error || "Error al consultar el sorteo."
+    );
+  }
+
+  if (!datos.realizado) {
+    return [];
+  }
+
+  if (
+    !Array.isArray(datos.asignaciones) ||
+    datos.asignaciones.length !== 8
+  ) {
+    throw new Error(
+      "El sorteo no contiene ocho asignaciones válidas."
+    );
+  }
+
+  return datos.asignaciones;
+}
+
+
+/* ==========================================
+   🏆 REPRODUCIR RESULTADOS OFICIALES
+   No realiza sorteos ni modifica la BD.
+========================================== */
+
+async function reproducirSorteoOficialLiguilla() {
+
+  if (sorteoLiguillaEnProceso) return;
+
+  const escudo = document.getElementById("liguillaSorteoEscudo");
+  const nombre = document.getElementById("liguillaSorteoNombre");
+  const equipo = document.getElementById("liguillaSorteoEquipo");
+  const progreso = document.getElementById("liguillaSorteoProgreso");
+  const resultados = document.getElementById("liguillaSorteoResultados");
+
+  if (!escudo || !nombre || !equipo || !progreso || !resultados) {
+    alert("No se encontró el escenario del sorteo.");
+    return;
+  }
+
+  sorteoLiguillaEnProceso = true;
+
+  try {
+
+    const asignaciones =
+      await obtenerAsignacionesOficialesLiguilla();
+
+    if (asignaciones.length !== 8) {
+      alert("Todavía no existe un sorteo oficial completo.");
+      return;
+    }
+
+    resultados.replaceChildren();
+
+    // Cuenta regresiva
+    nombre.textContent = "¡SORTEO OFICIAL!";
+    equipo.textContent = "Preparando revelación";
+
+    for (let n = 3; n >= 1; n--) {
+      escudo.textContent = n;
+      progreso.textContent = "Comenzando...";
+      await esperarDemoLiguilla(1000);
+    }
+
+    // Mostrar asignaciones ya guardadas
+    for (let i = 0; i < asignaciones.length; i++) {
+
+      const asignacion = asignaciones[i];
+
+      nombre.textContent = asignacion.nombre;
+      equipo.textContent = "🎰 Revelando equipo...";
+      escudo.textContent = "⚽";
+
+      await esperarDemoLiguilla(800);
+
+      escudo.replaceChildren();
+
+      if (asignacion.logo_url) {
+        const imagen = document.createElement("img");
+        imagen.src = asignacion.logo_url;
+        imagen.alt = asignacion.equipo;
+        imagen.style.cssText = `
+          width:130px;
+          height:130px;
+          object-fit:contain;
+          display:block;
+          margin:auto;
+          filter:drop-shadow(0 0 18px rgba(245,196,81,.6));
+        `;
+        imagen.onerror = () => {
+          escudo.textContent = "⚽";
+        };
+        escudo.appendChild(imagen);
+      } else {
+        escudo.textContent = "⚽";
+      }
+
+      equipo.textContent = asignacion.equipo;
+      progreso.textContent = `${i + 1} de 8 asignaciones`;
+
+      const tarjeta = document.createElement("div");
+      tarjeta.style.cssText = `
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+        padding:12px;
+        border:1px solid #d4a017;
+        border-radius:10px;
+        background:#18375f;
+        color:white;
+      `;
+
+      const jugador = document.createElement("strong");
+      jugador.textContent = asignacion.nombre;
+
+      const club = document.createElement("strong");
+      club.textContent = asignacion.equipo;
+      club.style.color = "#f5c451";
+
+      tarjeta.append(jugador, club);
+      resultados.appendChild(tarjeta);
+
+      await esperarDemoLiguilla(1400);
+    }
+
+    escudo.textContent = "🏆";
+    nombre.textContent = "¡SORTEO COMPLETADO!";
+    equipo.textContent = "Las ocho asignaciones son definitivas.";
+    progreso.textContent = "8 de 8 asignaciones";
+
+  } catch (error) {
+    console.error("Error reproduciendo sorteo oficial:", error);
+    alert(error.message || "No se pudo reproducir el sorteo.");
+  } finally {
+    sorteoLiguillaEnProceso = false;
+  }
+}
+
+
+/* ==========================================
+   🔒 VALIDAR SORTEO OFICIAL
+   Solo consulta, no modifica la BD.
+========================================== */
+
+async function validarSorteoOficialLiguilla() {
+
+  try {
+
+    const [resGrupo, resParticipantes, resEquipos, resSorteo] =
+      await Promise.all([
+        fetch("/liguilla/grupo/1", { cache: "no-store" }),
+        fetch("/admin/liguilla/participantes", { cache: "no-store" }),
+        fetch("/admin/liguilla/equipos", { cache: "no-store" }),
+        fetch("/admin/liguilla/sorteo", { cache: "no-store" })
+      ]);
+
+    if (![resGrupo, resParticipantes, resEquipos, resSorteo]
+        .every(res => res.ok)) {
+      throw new Error("No se pudo verificar la información.");
+    }
+
+    const grupo = await resGrupo.json();
+    const participantes = await resParticipantes.json();
+    const equipos = await resEquipos.json();
+    const sorteo = await resSorteo.json();
+
+    if (
+      participantes.ok !== true ||
+      equipos.ok !== true ||
+      sorteo.ok !== true
+    ) {
+      throw new Error("La información recibida no es válida.");
+    }
+
+    if (sorteo.realizado) {
+      return {
+        listo: false,
+        mensaje: "Este grupo ya tiene un sorteo oficial."
+      };
+    }
+
+    if (grupo.grupo?.estado !== "cerrado") {
+      return {
+        listo: false,
+        mensaje: "Primero debes cerrar las inscripciones."
+      };
+    }
+
+    const aprobados = participantes.participantes.filter(
+      p => p.estado_pago === "aprobado"
+    );
+
+    if (aprobados.length !== 8) {
+      return {
+        listo: false,
+        mensaje: `Hay ${aprobados.length} de 8 pagos aprobados.`
+      };
+    }
+
+    if (equipos.equipos.length !== 8) {
+      return {
+        listo: false,
+        mensaje: `Hay ${equipos.equipos.length} de 8 equipos registrados.`
+      };
+    }
+
+    return {
+      listo: true,
+      mensaje: "Todo está listo para realizar el sorteo oficial."
+    };
+
+  } catch (error) {
+
+    console.error("Error validando sorteo:", error);
+
+    return {
+      listo: false,
+      mensaje: error.message || "Error de validación."
+    };
+  }
+}
+
+
+/* ==========================================
+   🔍 COMPROBAR REQUISITOS DEL SORTEO
+========================================== */
+
+async function comprobarRequisitosSorteoLiguilla() {
+
+  const boton = document.getElementById(
+    "btnValidarSorteoLiguilla"
+  );
+
+  if (boton) {
+    boton.disabled = true;
+    boton.textContent = "⏳ Verificando requisitos...";
+  }
+
+  try {
+
+    const resultado = await validarSorteoOficialLiguilla();
+
+    if (resultado.listo) {
+      alert(
+        "✅ SORTEO LISTO\n\n" +
+        resultado.mensaje +
+        "\n\nTodavía no se ha ejecutado ningún sorteo."
+      );
+    } else {
+      alert(
+        "⚠️ SORTEO NO DISPONIBLE\n\n" +
+        resultado.mensaje
+      );
+    }
+
+  } catch (error) {
+
+    console.error(error);
+    alert("❌ No se pudo verificar el sorteo.");
+
+  } finally {
+
+    if (boton) {
+      boton.disabled = false;
+      boton.textContent = "🔍 Verificar requisitos del sorteo";
+    }
+  }
+}
+
 
 
 
