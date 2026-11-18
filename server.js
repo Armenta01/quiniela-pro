@@ -250,6 +250,118 @@ app.use('/admin', (req, res, next) => {
 
 
 /* ==========================================
+   🏆 LIGUILLA EL INGE
+   ADMINISTRACIÓN - GRUPO 1
+========================================== */
+
+// Consultar participantes y estados de pago
+app.get('/admin/liguilla/participantes',
+  verificarAdmin,
+  async (req, res) => {
+
+    try {
+      const resultado = await pool.query(`
+        SELECT
+          p.id,
+          p.folio,
+          p.nombre,
+          p.telefono,
+          p.estado_pago,
+          p.creado_en,
+          p.aprobado_en,
+          CASE
+            WHEN c.id IS NOT NULL THEN TRUE
+            ELSE FALSE
+          END AS tiene_comprobante
+        FROM liguilla_participantes p
+        LEFT JOIN liguilla_comprobantes c
+          ON c.participante_id = p.id
+        WHERE p.grupo_id = 1
+        ORDER BY p.creado_en ASC, p.id ASC
+      `);
+
+      res.set('Cache-Control', 'no-store');
+
+      return res.json({
+        ok: true,
+        participantes: resultado.rows
+      });
+
+    } catch (error) {
+      console.error(
+        'Error consultando participantes Liguilla:',
+        error
+      );
+
+      return res.status(500).json({
+        ok: false,
+        error: 'No se pudieron consultar los participantes.'
+      });
+    }
+  }
+);
+
+// Consultar comprobante de un participante
+app.get('/admin/liguilla/comprobante/:id',
+  verificarAdmin,
+  async (req, res) => {
+
+    const id = Number(req.params.id);
+
+    if (!Number.isSafeInteger(id) || id <= 0) {
+      return res.status(400).json({
+        ok: false,
+        error: 'Participante no válido.'
+      });
+    }
+
+    try {
+      const resultado = await pool.query(`
+        SELECT
+          c.imagen,
+          c.tipo_archivo
+        FROM liguilla_comprobantes c
+        INNER JOIN liguilla_participantes p
+          ON p.id = c.participante_id
+        WHERE c.participante_id = $1
+          AND p.grupo_id = 1
+      `, [id]);
+
+      if (!resultado.rows.length) {
+        return res.status(404).json({
+          ok: false,
+          error: 'Comprobante no encontrado.'
+        });
+      }
+
+      const comprobante = resultado.rows[0];
+
+      res.set({
+        'Content-Type': comprobante.tipo_archivo,
+        'Content-Disposition': 'inline',
+        'Cache-Control': 'no-store',
+        'X-Content-Type-Options': 'nosniff',
+        'Content-Security-Policy': "default-src 'none'; sandbox"
+      });
+
+      return res.send(comprobante.imagen);
+
+    } catch (error) {
+      console.error(
+        'Error consultando comprobante:',
+        error
+      );
+
+      return res.status(500).json({
+        ok: false,
+        error: 'No se pudo consultar el comprobante.'
+      });
+    }
+  }
+);
+
+
+/* ==========================================
    🎁 ADMINISTRADOR DE PROMOCIONES
    QUINIELAS EL INGE
 ========================================== */
