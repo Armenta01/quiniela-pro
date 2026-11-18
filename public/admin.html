@@ -4589,16 +4589,75 @@ async function iniciarDemoSorteoLiguilla() {
         animation:aparecerDemoLiguilla .5s ease;
       `;
 
-      const jugador = document.createElement("strong");
-      jugador.textContent = participantes[i];
+      // INFORMACIÓN DEL PARTICIPANTE
+const datosJugador = document.createElement("div");
 
-      const club = document.createElement("strong");
-      club.style.color = "#f5c451";
-      club.textContent =
-        `${elegido.simbolo} ${elegido.nombre}`;
+datosJugador.style.cssText = `
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  min-width:0;
+  flex:1;
+`;
 
-      tarjeta.append(jugador, club);
-      resultados.appendChild(tarjeta);
+const jugador = document.createElement("strong");
+jugador.textContent = asignacion.nombre;
+
+const folio = document.createElement("small");
+folio.textContent = `Folio: ${asignacion.folio ?? "Sin folio"}`;
+folio.style.color = "#b9cbe0";
+
+datosJugador.append(jugador, folio);
+
+
+// INFORMACIÓN DEL EQUIPO
+const datosEquipo = document.createElement("div");
+
+datosEquipo.style.cssText = `
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:10px;
+  flex:1;
+  min-width:0;
+`;
+
+const club = document.createElement("strong");
+club.textContent = asignacion.equipo;
+club.style.cssText = `
+  color:#f5c451;
+  text-align:right;
+  overflow-wrap:anywhere;
+`;
+
+if (asignacion.logo_url) {
+
+  const logo = document.createElement("img");
+
+  logo.src = asignacion.logo_url;
+  logo.alt = asignacion.equipo;
+
+  logo.style.cssText = `
+    width:45px;
+    height:45px;
+    object-fit:contain;
+    flex-shrink:0;
+  `;
+
+  logo.onerror = () => {
+    logo.remove();
+  };
+
+  datosEquipo.appendChild(logo);
+}
+
+datosEquipo.appendChild(club);
+
+
+// MOSTRAR RESULTADO OFICIAL
+tarjeta.append(datosJugador, datosEquipo);
+
+resultados.appendChild(tarjeta);
 
       await esperarDemoLiguilla(850);
     }
@@ -4903,7 +4962,11 @@ const botonSorteo = document.getElementById(
 
 if (botonSorteo) {
 
-  botonSorteo.disabled = !resultado.listo;
+  
+botonSorteo.disabled =
+  !resultado.listo ||
+  sorteoLiguillaEnProceso ||
+  resultadosSorteoLiguilla.length === 8;
 
   botonSorteo.textContent = resultado.listo
     ? "🏆 Realizar sorteo oficial"
@@ -5011,9 +5074,22 @@ async function ejecutarSorteoOficialLiguilla() {
       );
     }
 
-    alert("✅ Sorteo oficial guardado correctamente.");
-
     await consultarSorteoLiguilla();
+
+try {
+  await reproducirSorteoOficialLiguilla();
+} catch (errorAnimacion) {
+  console.error(
+    "El sorteo se guardó, pero falló la animación:",
+    errorAnimacion
+  );
+
+  alert(
+    "✅ El sorteo oficial se guardó correctamente.\n\n" +
+    "⚠️ No se pudo reproducir la animación.\n" +
+    "Puedes utilizar el botón para volver a visualizarla."
+  );
+}
 
   } catch (error) {
 
