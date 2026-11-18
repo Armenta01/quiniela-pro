@@ -3513,7 +3513,7 @@ function volverPanelAdmin() {
     font-weight:bold;
     cursor:pointer;
   ">
-  ▶️ Probar animación del sorteo
+  ▶️ Iniciar Sorteo
 </button>
 
 
@@ -4408,7 +4408,32 @@ async function consultarSorteoLiguilla() {
     const datosSorteo = await respuestaSorteo.json();
     const datosEquipos = await respuestaEquipos.json();
 
+// ==========================================
+// 🔒 BLOQUEAR INICIAR SORTEO AL FINALIZAR
+// ==========================================
 
+const botonIniciar = document.getElementById(
+  "btnDemoSorteoLiguilla"
+);
+
+if (botonIniciar) {
+
+  const finalizado =
+    datosSorteo.ok === true &&
+    datosSorteo.realizado === true;
+
+  botonIniciar.disabled = finalizado;
+
+  botonIniciar.textContent = finalizado
+    ? "🔒 Sorteo Finalizado"
+    : "▶️ Iniciar sorteo";
+
+  botonIniciar.style.opacity = finalizado ? "0.5" : "1";
+
+  botonIniciar.style.cursor = finalizado
+    ? "not-allowed"
+    : "pointer";
+}
 
 const botonReproducir = document.getElementById(
   "btnReproducirSorteoOficial"
