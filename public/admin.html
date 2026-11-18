@@ -4786,75 +4786,82 @@ async function reproducirSorteoOficialLiguilla() {
 
 
 /* ==========================================
-   🔒 VALIDAR SORTEO OFICIAL
-   Solo consulta, no modifica la BD.
+   🔍 DIAGNÓSTICO COMPLETO DEL SORTEO
+   No modifica la base de datos
 ========================================== */
 
 async function validarSorteoOficialLiguilla() {
 
   try {
 
-    const [resGrupo, resParticipantes, resEquipos, resSorteo] =
-      await Promise.all([
-        fetch("/liguilla/grupo/1", { cache: "no-store" }),
-        fetch("/admin/liguilla/participantes", { cache: "no-store" }),
-        fetch("/admin/liguilla/equipos", { cache: "no-store" }),
-        fetch("/admin/liguilla/sorteo", { cache: "no-store" })
-      ]);
+    const respuestas = await Promise.all([
+      fetch("/liguilla/grupo/1", { cache: "no-store" }),
+      fetch("/admin/liguilla/participantes", { cache: "no-store" }),
+      fetch("/admin/liguilla/equipos", { cache: "no-store" }),
+      fetch("/admin/liguilla/sorteo", { cache: "no-store" })
+    ]);
 
-    if (![resGrupo, resParticipantes, resEquipos, resSorteo]
-        .every(res => res.ok)) {
-      throw new Error("No se pudo verificar la información.");
+    if (!respuestas.every(r => r.ok)) {
+      throw new Error("No se pudieron consultar los requisitos.");
     }
 
-    const grupo = await resGrupo.json();
-    const participantes = await resParticipantes.json();
-    const equipos = await resEquipos.json();
-    const sorteo = await resSorteo.json();
+    const [grupo, participantes, equipos, sorteo] =
+      await Promise.all(respuestas.map(r => r.json()));
 
     if (
+      grupo.ok !== true ||
       participantes.ok !== true ||
       equipos.ok !== true ||
-      sorteo.ok !== true
+      sorteo.ok !== true ||
+      !Array.isArray(participantes.participantes) ||
+      !Array.isArray(equipos.equipos)
     ) {
       throw new Error("La información recibida no es válida.");
     }
 
-    if (sorteo.realizado) {
-      return {
-        listo: false,
-        mensaje: "Este grupo ya tiene un sorteo oficial."
-      };
-    }
-
-    if (grupo.grupo?.estado !== "cerrado") {
-      return {
-        listo: false,
-        mensaje: "Primero debes cerrar las inscripciones."
-      };
-    }
+    const estado = grupo.grupo?.estado;
 
     const aprobados = participantes.participantes.filter(
       p => p.estado_pago === "aprobado"
-    );
+    ).length;
 
-    if (aprobados.length !== 8) {
-      return {
-        listo: false,
-        mensaje: `Hay ${aprobados.length} de 8 pagos aprobados.`
-      };
-    }
+    const cantidadEquipos = equipos.equipos.length;
 
-    if (equipos.equipos.length !== 8) {
-      return {
-        listo: false,
-        mensaje: `Hay ${equipos.equipos.length} de 8 equipos registrados.`
-      };
-    }
+    const realizado = sorteo.realizado === true;
+
+    const requisitos = [
+      {
+        correcto: estado === "cerrado",
+        texto: `Inscripciones: ${estado || "desconocido"}`
+      },
+      {
+        correcto: aprobados === 8,
+        texto: `Participantes aprobados: ${aprobados}/8`
+      },
+      {
+        correcto: cantidadEquipos === 8,
+        texto: `Equipos registrados: ${cantidadEquipos}/8`
+      },
+      {
+        correcto: !realizado,
+        texto: `Sorteo anterior: ${realizado ? "Sí" : "No"}`
+      }
+    ];
+
+    const listo = requisitos.every(r => r.correcto);
+
+    const detalle = requisitos.map(r =>
+      `${r.correcto ? "✅" : "❌"} ${r.texto}`
+    ).join("\n");
 
     return {
-      listo: true,
-      mensaje: "Todo está listo para realizar el sorteo oficial."
+      listo,
+      mensaje:
+        detalle +
+        "\n\n" +
+        (listo
+          ? "🏆 Todo listo para el sorteo oficial."
+          : "⚠️ Hay requisitos pendientes.")
     };
 
   } catch (error) {
@@ -4914,8 +4921,6 @@ async function comprobarRequisitosSorteoLiguilla() {
     }
   }
 }
-
-
 
 
 </script>
