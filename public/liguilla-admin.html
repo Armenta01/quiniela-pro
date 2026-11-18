@@ -1,0 +1,2153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Administrar Liguilla | Quinielas El Inge</title>
+
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="icon" type="image/png" href="/logo.png">
+
+  <script>
+    if (sessionStorage.getItem("admin") !== "true") {
+      window.location.href = "/login.html";
+    }
+  </script>
+
+  <style>
+    body {
+      margin: 0;
+      background: #0c1c38;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+
+    .encabezado-liguilla {
+      text-align: center;
+      padding: 25px 15px;
+    }
+
+    .encabezado-liguilla img {
+      width: 110px;
+      max-width: 100%;
+      object-fit: contain;
+    }
+
+    .volver-admin {
+      display: inline-block;
+      margin: 15px;
+      padding: 12px 20px;
+      background: #193b67;
+      border: 1px solid #f5c451;
+      border-radius: 10px;
+      color: #f5c451;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .contenedor-liguilla {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 15px;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+
+<body>
+
+  <a href="/admin" class="volver-admin">
+    ← Volver al administrador
+  </a>
+
+  <header class="encabezado-liguilla">
+    <img src="/logo2.png" alt="Quinielas El Inge"
+         onerror="this.src='/logo.png'">
+
+    <h1>🏆 Liguilla El Inge</h1>
+    <p>Panel de administración</p>
+  </header>
+
+  <main class="contenedor-liguilla" id="contenedorLiguilla">
+    <!-- Aquí integraremos el panel existente -->
+
+<!-- ==========================================
+     🏆 PANEL ADMINISTRATIVO LIGUILLA
+========================================== -->
+
+<section id="panelLiguillaAdmin"
+  style="
+    max-width:1000px;
+    margin:25px auto;
+    padding:20px;
+    border-radius:18px;
+    border:1px solid #d4a83d;
+    background:#0c1c38;
+    color:white;
+    box-sizing:border-box;
+  ">
+
+  <h2 style="text-align:center;color:#f5c451;">
+    🏆 Liguilla El Inge
+  </h2>
+
+  <p style="text-align:center;">
+    Administración — Grupo 1
+  </p>
+
+  <div style="
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:12px;
+    margin:20px 0;
+  ">
+
+    <div style="background:#193458;padding:16px;border-radius:12px;">
+      <small>Confirmados</small>
+      <h2 id="liguillaConfirmados">0 / 8</h2>
+    </div>
+
+    <div style="background:#193458;padding:16px;border-radius:12px;">
+      <small>Pendientes</small>
+      <h2 id="liguillaPendientes">0</h2>
+    </div>
+
+    <div style="background:#193458;padding:16px;border-radius:12px;">
+      <small>Premio único</small>
+      <h2 style="color:#f5c451;">$1,600</h2>
+    </div>
+
+  </div>
+
+
+<!-- =====================================
+     🏆 CONTROL DE INSCRIPCIONES LIGUILLA
+===================================== -->
+
+<div style="
+  background:#102344;
+  border:1px solid #36547c;
+  border-radius:14px;
+  padding:20px;
+  margin:20px 0;
+">
+
+  <h3 style="color:#f5c451;margin:0 0 12px;">
+    🔐 Control de inscripciones
+  </h3>
+
+  <p id="liguillaEstadoInscripciones"
+     style="color:#fff;font-weight:bold;">
+    Consultando estado...
+  </p>
+
+  <div style="
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-top:15px;
+  ">
+
+    <button
+      type="button"
+      id="btnAbrirLiguilla"
+      onclick="cambiarEstadoInscripcionesLiguilla('abierto')"
+      style="
+        background:#16a34a;
+        color:white;
+        border:none;
+        padding:13px 20px;
+        border-radius:10px;
+        cursor:pointer;
+        font-weight:bold;
+      ">
+      🔓 Abrir inscripciones
+    </button>
+
+    <button
+      type="button"
+      id="btnCerrarLiguilla"
+      onclick="cambiarEstadoInscripcionesLiguilla('cerrado')"
+      style="
+        background:#dc2626;
+        color:white;
+        border:none;
+        padding:13px 20px;
+        border-radius:10px;
+        cursor:pointer;
+        font-weight:bold;
+      ">
+      🔒 Cerrar inscripciones
+    </button>
+
+  </div>
+</div>
+
+
+  <button type="button"
+    onclick="cargarParticipantesLiguilla()"
+    style="padding:12px;margin-bottom:15px;">
+    🔄 Actualizar participantes
+  </button>
+
+  <div id="liguillaMensaje" role="status"></div>
+
+  <!-- 🧹 RESTABLECER LIGUILLA -->
+<div style="
+  background:#102344;
+  border:1px solid #dc2626;
+  border-radius:14px;
+  padding:20px;
+  margin:25px 0;
+  text-align:center;
+">
+
+  <h3 style="color:#f5c451;">
+    ⚙️ Mantenimiento de Liguilla
+  </h3>
+
+  <p style="color:#d1dcef;">
+    Elimina los participantes, comprobantes
+    y resultados del sorteo anterior.
+    Conserva los ocho equipos y sus escudos.
+  </p>
+
+  <button
+  type="button"
+  id="btnReiniciarLiguilla"
+  onclick="reiniciarLiguillaAdmin()"
+  style="
+    width:100%;
+    padding:15px;
+    background:#dc2626;
+    color:white;
+    border:none;
+    border-radius:10px;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+  ">
+  🧹 Reiniciar Liguilla
+</button>
+
+  <p style="color:#fca5a5;font-size:13px;">
+    ⚠️ Esta operación eliminará los registros
+    de la Liguilla actual.
+  </p>
+
+</div>
+
+
+<!-- ==========================================
+     🎰 SORTEO ANIMADO - LIGUILLA EL INGE
+========================================== -->
+
+<section id="liguillaSorteoPanel" style="
+  background:#102344;
+  border:1px solid #d4a017;
+  border-radius:15px;
+  padding:20px;
+  margin:25px 0;
+  color:white;
+">
+
+  <h3 style="color:#f5c451;text-align:center;">
+    🏆 Sorteo oficial — Grupo 1
+  </h3>
+
+  <p id="liguillaSorteoEstado"
+     style="text-align:center;color:#d1dcef;">
+    Consultando sorteo...
+  </p>
+
+  <div id="liguillaSorteoEscenario" style="
+    background:#091b34;
+    border-radius:14px;
+    padding:25px 15px;
+    text-align:center;
+    margin:20px 0;
+  ">
+
+    <div id="liguillaSorteoEscudo"
+         style="font-size:60px;">
+      🏆
+    </div>
+
+    <h2 id="liguillaSorteoNombre"
+        style="color:#f5c451;">
+      Sorteo pendiente
+    </h2>
+
+    <p id="liguillaSorteoEquipo"
+       style="font-size:22px;">
+      Los equipos aparecerán aquí
+    </p>
+
+    <p id="liguillaSorteoProgreso"
+       style="color:#d1dcef;">
+      0 de 8
+    </p>
+
+  </div>
+
+
+<!-- 🔒 VERIFICAR REQUISITOS DEL SORTEO -->
+<button
+  type="button"
+  id="btnValidarSorteoLiguilla"
+  onclick="comprobarRequisitosSorteoLiguilla()"
+  style="
+    width:100%;
+    margin:12px 0;
+    padding:14px;
+    background:#18375f;
+    color:#f5c451;
+    border:1px solid #f5c451;
+    border-radius:10px;
+    font-size:15px;
+    font-weight:bold;
+    cursor:pointer;
+  ">
+  🔍 Verificar requisitos del sorteo
+</button>
+
+
+  <button
+    id="btnRealizarSorteoLiguilla"
+    onclick="ejecutarSorteoOficialLiguilla()"
+    type="button"
+    disabled
+    style="
+      width:100%;
+      padding:15px;
+      background:#d4a017;
+      color:#102344;
+      border:0;
+      border-radius:10px;
+      font-weight:bold;
+      cursor:pointer;
+    ">
+    🎲 Realizar sorteo automático
+  </button>
+
+
+<!-- 🎬 DEMOSTRACIÓN DEL SORTEO -->
+<button
+  id="btnDemoSorteoLiguilla"
+  type="button"
+  onclick="iniciarDemoSorteoLiguilla()"
+  style="
+    width:100%;
+    padding:15px;
+    margin-top:12px;
+    background:linear-gradient(135deg,#183e70,#2763a0);
+    color:#ffffff;
+    border:1px solid #f5c451;
+    border-radius:10px;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+  ">
+  ▶️ Iniciar Sorteo
+</button>
+
+
+<!-- 🏆 REPRODUCIR SORTEO OFICIAL -->
+<button
+  id="btnReproducirSorteoOficial"
+  type="button"
+  onclick="reproducirSorteoOficialLiguilla()"
+  style="
+    display:none;
+    width:100%;
+    margin-top:12px;
+    padding:15px;
+    background:linear-gradient(135deg,#b8860b,#f5c451);
+    color:#102344;
+    border:1px solid #d4a017;
+    border-radius:10px;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+  ">
+  ▶️  Iniciar Sorteo oficial
+</button>
+
+
+
+  <div id="liguillaSorteoResultados"
+       style="display:grid;gap:10px;margin-top:20px;">
+  </div>
+
+</section>
+
+
+<!-- ==========================================
+     ⚽ ADMINISTRACIÓN DE EQUIPOS LIGUILLA
+========================================== -->
+
+<div id="liguillaEquiposPanel" style="
+  background:#102344;
+  border:1px solid #36547c;
+  border-radius:15px;
+  padding:20px;
+  margin:25px 0;
+">
+
+  <h3 style="color:#f5c451;margin-top:0;">
+    ⚽ Equipos participantes
+  </h3>
+
+  <p id="liguillaEquiposContador"
+     style="color:white;">
+    Cargando equipos...
+  </p>
+
+  <form id="formEquipoLiguilla"
+        onsubmit="registrarEquipoLiguilla(event)"
+        style="display:grid;gap:12px;">
+
+    <label for="liguillaNombreEquipo"
+           style="color:#d1dcef;">
+      Nombre del equipo
+    </label>
+
+    <input
+      id="liguillaNombreEquipo"
+      type="text"
+      placeholder="Ej. Toluca"
+      maxlength="80"
+      required
+      style="
+        width:100%;
+        box-sizing:border-box;
+        padding:13px;
+        border:1px solid #36547c;
+        border-radius:10px;
+        background:#091b34;
+        color:white;
+      "
+    >
+
+    <label for="liguillaLogoEquipo"
+           style="color:#d1dcef;">
+      URL del escudo (opcional)
+    </label>
+
+    <input
+      id="liguillaLogoEquipo"
+      type="url"
+      placeholder="https://ejemplo.com/escudo.png"
+      maxlength="500"
+      style="
+        width:100%;
+        box-sizing:border-box;
+        padding:13px;
+        border:1px solid #36547c;
+        border-radius:10px;
+        background:#091b34;
+        color:white;
+      "
+    >
+
+    <button
+      id="btnRegistrarEquipoLiguilla"
+      type="submit"
+      style="
+        background:#16a34a;
+        color:white;
+        border:none;
+        border-radius:10px;
+        padding:14px;
+        font-weight:bold;
+        cursor:pointer;
+      ">
+      ➕ Agregar equipo
+    </button>
+
+  </form>
+
+  <p id="liguillaEquiposMensaje"
+     role="status"
+     style="color:#f5c451;">
+  </p>
+
+  <div id="liguillaEquiposLista"
+       style="
+         display:grid;
+         gap:12px;
+         margin-top:20px;
+       ">
+  </div>
+
+</div>
+
+
+  <div id="liguillaLista"></div>
+
+</section>
+
+<script>
+
+async function abrirLiguillaAdmin() {
+  const panel = document.getElementById("panelLiguillaAdmin");
+
+  if (!panel) return;
+
+  panel.hidden = false;
+
+  await Promise.all([
+    cargarParticipantesLiguilla(),
+    consultarEstadoInscripcionesLiguilla(),
+    cargarEquiposLiguilla(),
+    consultarSorteoLiguilla()
+  ]);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  abrirLiguillaAdmin();
+});
+
+async function cargarParticipantesLiguilla() {
+  const lista = document.getElementById("liguillaLista");
+  const mensaje = document.getElementById("liguillaMensaje");
+
+  lista.replaceChildren();
+  mensaje.textContent = "⏳ Consultando participantes...";
+
+  try {
+    const respuesta = await fetch(
+      "/admin/liguilla/participantes",
+      { credentials: "same-origin", cache: "no-store" }
+    );
+
+    if (!respuesta.ok) {
+      throw new Error(
+        respuesta.status === 401
+          ? "Inicia sesión como administrador."
+          : "No se pudo consultar la Liguilla."
+      );
+    }
+
+    const datos = await respuesta.json();
+
+    if (!datos.ok || !Array.isArray(datos.participantes)) {
+      throw new Error("Respuesta inválida del servidor.");
+    }
+
+    const participantes = datos.participantes;
+
+    const confirmados = participantes.filter(
+      p => p.estado_pago === "aprobado"
+    ).length;
+
+    const pendientes = participantes.filter(
+      p => p.estado_pago === "pendiente"
+    ).length;
+
+    document.getElementById("liguillaConfirmados")
+      .textContent = `${confirmados} / 8`;
+
+    document.getElementById("liguillaPendientes")
+      .textContent = pendientes;
+
+    mensaje.textContent = "";
+
+    if (participantes.length === 0) {
+      mensaje.textContent =
+        "👥 Todavía no hay solicitudes de inscripción.";
+      return;
+    }
+
+    participantes.forEach(p => {
+      const tarjeta = document.createElement("div");
+
+      tarjeta.style.cssText = `
+        background:#193458;
+        border:1px solid #355071;
+        border-radius:12px;
+        padding:15px;
+        margin-bottom:12px;
+        overflow-wrap:anywhere;
+      `;
+
+      const titulo = document.createElement("h3");
+      titulo.textContent = p.nombre || "Sin nombre";
+
+      const folio = document.createElement("p");
+      folio.textContent = `Folio: ${p.folio || p.id}`;
+
+      const telefono = document.createElement("p");
+      telefono.textContent = `WhatsApp: ${p.telefono || "No registrado"}`;
+
+      const estado = document.createElement("p");
+      estado.textContent = `Pago: ${p.estado_pago || "Sin estado"}`;
+
+      tarjeta.append(titulo, folio, telefono, estado);
+
+      if (p.tiene_comprobante) {
+  const enlace = document.createElement("a");
+
+  enlace.href =
+    `/admin/liguilla/comprobante/${encodeURIComponent(p.id)}`;
+
+  enlace.target = "_blank";
+  enlace.rel = "noopener";
+  enlace.textContent = "🧾 Ver comprobante";
+  enlace.style.color = "#f5c451";
+
+  tarjeta.appendChild(enlace);
+}
+
+
+      // =====================================
+      // 🏆 BOTONES DE VALIDACIÓN DE PAGOS
+      // =====================================
+
+      if (p.estado_pago === "pendiente") {
+
+        const acciones = document.createElement("div");
+
+        acciones.style.cssText = `
+          display:flex;
+          flex-wrap:wrap;
+          gap:10px;
+          margin-top:15px;
+        `;
+
+        const btnAprobar = document.createElement("button");
+        btnAprobar.type = "button";
+        btnAprobar.textContent = "✅ Aprobar pago";
+
+        btnAprobar.style.cssText = `
+          background:#16a34a;
+          color:white;
+          border:none;
+          border-radius:10px;
+          padding:12px 16px;
+          cursor:pointer;
+          font-weight:bold;
+        `;
+
+        const btnRechazar = document.createElement("button");
+        btnRechazar.type = "button";
+        btnRechazar.textContent = "❌ Rechazar pago";
+
+        btnRechazar.style.cssText = `
+          background:#dc2626;
+          color:white;
+          border:none;
+          border-radius:10px;
+          padding:12px 16px;
+          cursor:pointer;
+          font-weight:bold;
+        `;
+
+        btnAprobar.onclick = () =>
+          cambiarPagoLiguilla(p.id, "aprobado");
+
+        btnRechazar.onclick = () =>
+          cambiarPagoLiguilla(p.id, "rechazado");
+
+        acciones.append(btnAprobar, btnRechazar);
+        tarjeta.appendChild(acciones);
+      }
+
+
+      lista.appendChild(tarjeta);
+    });
+
+  } catch (error) {
+    console.error(error);
+    mensaje.textContent = "❌ " + error.message;
+  }
+}
+
+
+/* ==========================================
+   🏆 APROBAR / RECHAZAR PAGO LIGUILLA
+========================================== */
+
+let procesandoPagoLiguilla = false;
+
+async function cambiarPagoLiguilla(id, estadoPago) {
+
+  if (procesandoPagoLiguilla) return;
+
+  const accion = estadoPago === "aprobado"
+    ? "APROBAR"
+    : "RECHAZAR";
+
+  const confirmado = confirm(
+    `¿Estás seguro de ${accion} el pago del participante #${id}?`
+  );
+
+  if (!confirmado) return;
+
+  procesandoPagoLiguilla = true;
+
+  const mensaje = document.getElementById("liguillaMensaje");
+
+  try {
+
+    mensaje.textContent = "⏳ Procesando pago...";
+
+    const respuesta = await fetch(
+      `/admin/liguilla/participantes/${encodeURIComponent(id)}/pago`,
+      {
+        method: "PATCH",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          estado_pago: estadoPago
+        })
+      }
+    );
+
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok || !datos.ok) {
+      throw new Error(
+        datos.error || "No se pudo actualizar el pago."
+      );
+    }
+
+    alert("✅ " + datos.mensaje);
+
+    await cargarParticipantesLiguilla();
+
+  } catch (error) {
+
+    mensaje.textContent = "❌ " + error.message;
+
+  } finally {
+
+    procesandoPagoLiguilla = false;
+
+  }
+}
+
+
+/* ==========================================
+   🏆 CONTROL DE INSCRIPCIONES LIGUILLA
+========================================== */
+
+let cambiandoEstadoLiguilla = false;
+
+async function consultarEstadoInscripcionesLiguilla() {
+
+  const texto = document.getElementById(
+    "liguillaEstadoInscripciones"
+  );
+
+  const btnAbrir = document.getElementById("btnAbrirLiguilla");
+  const btnCerrar = document.getElementById("btnCerrarLiguilla");
+
+  if (!texto) return;
+
+  btnAbrir.disabled = true;
+  btnCerrar.disabled = true;
+
+  try {
+
+    const respuesta = await fetch("/liguilla/grupo/1", {
+      credentials: "same-origin",
+      cache: "no-store"
+    });
+
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok || !datos.ok) {
+      throw new Error(datos.error || "Error consultando grupo.");
+    }
+
+    const grupo = datos.grupo;
+
+    const nombres = {
+      preparacion: "🟡 En preparación",
+      abierto: "🟢 Inscripciones abiertas",
+      cerrado: "🔴 Inscripciones cerradas",
+      sorteado: "🏆 Sorteo realizado",
+      finalizado: "🏁 Liguilla finalizada"
+    };
+
+    texto.textContent =
+      `${nombres[grupo.estado] || grupo.estado} — ` +
+      `${grupo.disponibles} lugares disponibles`;
+
+    const puedeCambiar =
+      !["sorteado", "finalizado"].includes(grupo.estado);
+
+    btnAbrir.disabled =
+      !puedeCambiar ||
+      grupo.estado === "abierto" ||
+      grupo.disponibles <= 0;
+
+    btnCerrar.disabled =
+      !puedeCambiar ||
+      grupo.estado === "cerrado";
+
+  } catch (error) {
+
+    texto.textContent = "❌ " + error.message;
+
+  }
+}
+
+async function cambiarEstadoInscripcionesLiguilla(estado) {
+
+  if (cambiandoEstadoLiguilla) return;
+
+  const abrir = estado === "abierto";
+
+  const confirmar = confirm(
+    abrir
+      ? "¿Deseas ABRIR las inscripciones del Grupo 1?"
+      : "¿Deseas CERRAR las inscripciones del Grupo 1?"
+  );
+
+  if (!confirmar) return;
+
+  cambiandoEstadoLiguilla = true;
+
+  const btnAbrir = document.getElementById("btnAbrirLiguilla");
+  const btnCerrar = document.getElementById("btnCerrarLiguilla");
+
+  btnAbrir.disabled = true;
+  btnCerrar.disabled = true;
+
+  try {
+
+    const respuesta = await fetch(
+      "/admin/liguilla/grupo/1/estado",
+      {
+        method: "PATCH",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ estado })
+      }
+    );
+
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok || !datos.ok) {
+      throw new Error(
+        datos.error || "No se pudo cambiar el estado."
+      );
+    }
+
+    alert("✅ " + datos.mensaje);
+
+    await cargarParticipantesLiguilla();
+
+  } catch (error) {
+
+    alert("❌ " + error.message);
+
+  } finally {
+
+    cambiandoEstadoLiguilla = false;
+
+    await consultarEstadoInscripcionesLiguilla();
+
+  }
+}
+
+
+/* ==========================================
+   ⚽ EQUIPOS LIGUILLA EL INGE
+========================================== */
+
+async function cargarEquiposLiguilla() {
+
+  const lista = document.getElementById(
+    "liguillaEquiposLista"
+  );
+
+  const contador = document.getElementById(
+    "liguillaEquiposContador"
+  );
+
+  const mensaje = document.getElementById(
+    "liguillaEquiposMensaje"
+  );
+
+  const boton = document.getElementById(
+    "btnRegistrarEquipoLiguilla"
+  );
+
+  if (!lista || !contador) return;
+
+  try {
+
+    const respuesta = await fetch(
+      "/admin/liguilla/equipos",
+      {
+        credentials:"same-origin",
+        cache:"no-store"
+      }
+    );
+
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok || !datos.ok) {
+      throw new Error(
+        datos.error || "No se pudieron cargar los equipos."
+      );
+    }
+
+    lista.replaceChildren();
+
+    contador.textContent =
+      `${datos.equipos.length} de 8 equipos registrados`;
+
+    boton.disabled = datos.equipos.length >= 8;
+
+    boton.textContent = boton.disabled
+      ? "✅ Ocho equipos registrados"
+      : "➕ Agregar equipo";
+
+    datos.equipos.forEach((equipo, indice) => {
+
+      const tarjeta = document.createElement("div");
+
+      tarjeta.style.cssText = `
+        display:flex;
+        align-items:center;
+        gap:15px;
+        padding:14px;
+        background:#1b3659;
+        border-radius:12px;
+        color:white;
+      `;
+
+      const numero = document.createElement("strong");
+
+      numero.textContent = `${indice + 1}.`;
+
+      const nombre = document.createElement("strong");
+
+      nombre.textContent = equipo.nombre;
+
+      tarjeta.append(numero);
+
+      if (equipo.logo_url) {
+
+        const escudo = document.createElement("img");
+
+        escudo.src = equipo.logo_url;
+        escudo.alt = `Escudo de ${equipo.nombre}`;
+
+        escudo.style.cssText = `
+          width:45px;
+          height:45px;
+          object-fit:contain;
+        `;
+
+        tarjeta.append(escudo);
+      }
+
+      tarjeta.append(nombre);
+
+
+      // =====================================
+      // BOTONES EDITAR Y ELIMINAR EQUIPO
+      // =====================================
+
+      const acciones = document.createElement("div");
+
+      acciones.style.cssText = `
+        display:flex;
+        flex-wrap:wrap;
+        gap:8px;
+        margin-left:auto;
+      `;
+
+      const btnEditar = document.createElement("button");
+      btnEditar.type = "button";
+      btnEditar.textContent = "✏️ Editar";
+
+      btnEditar.style.cssText = `
+        background:#d4a017;
+        color:#091b34;
+        border:none;
+        border-radius:8px;
+        padding:10px 14px;
+        font-weight:bold;
+        cursor:pointer;
+      `;
+
+      btnEditar.onclick = () => editarEquipoLiguilla(equipo);
+
+      const btnEliminar = document.createElement("button");
+      btnEliminar.type = "button";
+      btnEliminar.textContent = "🗑️ Eliminar";
+
+      btnEliminar.style.cssText = `
+        background:#dc2626;
+        color:white;
+        border:none;
+        border-radius:8px;
+        padding:10px 14px;
+        font-weight:bold;
+        cursor:pointer;
+      `;
+
+      btnEliminar.onclick = () =>
+        eliminarEquipoLiguilla(equipo.id, equipo.nombre);
+
+      acciones.append(btnEditar, btnEliminar);
+      tarjeta.append(acciones);
+
+
+      lista.append(tarjeta);
+
+    });
+
+    mensaje.textContent = "";
+
+  } catch (error) {
+
+    contador.textContent = "Error al cargar equipos";
+    mensaje.textContent = "❌ " + error.message;
+
+  }
+}
+
+let registrandoEquipoLiguilla = false;
+
+async function registrarEquipoLiguilla(event) {
+
+  event.preventDefault();
+
+  if (registrandoEquipoLiguilla) return;
+
+  const nombre = document.getElementById(
+    "liguillaNombreEquipo"
+  ).value.trim();
+
+  const logo_url = document.getElementById(
+    "liguillaLogoEquipo"
+  ).value.trim();
+
+  const mensaje = document.getElementById(
+    "liguillaEquiposMensaje"
+  );
+
+  const boton = document.getElementById(
+    "btnRegistrarEquipoLiguilla"
+  );
+
+  if (!nombre) return;
+
+  registrandoEquipoLiguilla = true;
+  boton.disabled = true;
+
+  mensaje.textContent = "⏳ Registrando equipo...";
+
+  try {
+
+    const respuesta = await fetch(
+      "/admin/liguilla/equipos",
+      {
+        method:"POST",
+        credentials:"same-origin",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          nombre,
+          logo_url
+        })
+      }
+    );
+
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok || !datos.ok) {
+      throw new Error(
+        datos.error || "No se pudo registrar el equipo."
+      );
+    }
+
+    document.getElementById(
+      "formEquipoLiguilla"
+    ).reset();
+
+    await cargarEquiposLiguilla();
+
+    mensaje.textContent =
+      "✅ Equipo registrado correctamente.";
+
+  } catch (error) {
+
+    mensaje.textContent = "❌ " + error.message;
+
+  } finally {
+
+    registrandoEquipoLiguilla = false;
+
+    if (!boton.textContent.includes("Ocho equipos")) {
+      boton.disabled = false;
+    }
+
+  }
+}
+
+
+/* ==========================================
+   ⚽ EDITAR Y ELIMINAR EQUIPOS
+========================================== */
+
+async function editarEquipoLiguilla(equipo) {
+
+  const nombre = prompt(
+    "Nuevo nombre del equipo:",
+    equipo.nombre
+  );
+
+  if (nombre === null) return;
+
+  const logo = prompt(
+    "URL HTTPS del escudo (puedes dejarla vacía):",
+    equipo.logo_url || ""
+  );
+
+  if (logo === null) return;
+
+  try {
+
+    const respuesta = await fetch(
+      `/admin/liguilla/equipos/${encodeURIComponent(equipo.id)}`,
+      {
+        method:"PATCH",
+        credentials:"same-origin",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          nombre:nombre.trim(),
+          logo_url:logo.trim()
+        })
+      }
+    );
+
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok || !datos.ok) {
+      throw new Error(
+        datos.error || "No se pudo editar el equipo."
+      );
+    }
+
+    await cargarEquiposLiguilla();
+
+    alert("✅ Equipo actualizado correctamente.");
+
+  } catch (error) {
+
+    alert("❌ " + error.message);
+
+  }
+}
+
+async function eliminarEquipoLiguilla(id, nombre) {
+
+  const confirmado = confirm(
+    `¿Estás seguro de eliminar al equipo ${nombre}?`
+  );
+
+  if (!confirmado) return;
+
+  try {
+
+    const respuesta = await fetch(
+      `/admin/liguilla/equipos/${encodeURIComponent(id)}`,
+      {
+        method:"DELETE",
+        credentials:"same-origin"
+      }
+    );
+
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok || !datos.ok) {
+      throw new Error(
+        datos.error || "No se pudo eliminar el equipo."
+      );
+    }
+
+    await cargarEquiposLiguilla();
+
+    alert("✅ Equipo eliminado correctamente.");
+
+  } catch (error) {
+
+    alert("❌ " + error.message);
+
+  }
+}
+
+
+/* ==========================================
+   🎰 ESTADO DEL SORTEO - LIGUILLA EL INGE
+========================================== */
+
+let sorteoLiguillaEnProceso = false;
+let resultadosSorteoLiguilla = [];
+
+async function consultarSorteoLiguilla() {
+
+  const estado = document.getElementById("liguillaSorteoEstado");
+  const boton = document.getElementById("btnRealizarSorteoLiguilla");
+  const nombre = document.getElementById("liguillaSorteoNombre");
+  const equipo = document.getElementById("liguillaSorteoEquipo");
+  const progreso = document.getElementById("liguillaSorteoProgreso");
+
+  if (!estado || !boton) return;
+
+  boton.disabled = true;
+
+  estado.textContent = "⏳ Consultando sorteo...";
+
+  try {
+
+    const [respuestaGrupo, respuestaSorteo, respuestaEquipos] =
+      await Promise.all([
+        fetch("/liguilla/grupo/1", {
+          credentials: "same-origin",
+          cache: "no-store"
+        }),
+        fetch("/admin/liguilla/sorteo", {
+          credentials: "same-origin",
+          cache: "no-store"
+        }),
+        fetch("/admin/liguilla/equipos", {
+          credentials: "same-origin",
+          cache: "no-store"
+        })
+      ]);
+
+    if (
+      !respuestaGrupo.ok ||
+      !respuestaSorteo.ok ||
+      !respuestaEquipos.ok
+    ) {
+      throw new Error("No se pudo consultar el estado del sorteo.");
+    }
+
+    const datosGrupo = await respuestaGrupo.json();
+    const datosSorteo = await respuestaSorteo.json();
+    const datosEquipos = await respuestaEquipos.json();
+
+// ==========================================
+// 🔒 BLOQUEAR INICIAR SORTEO AL FINALIZAR
+// ==========================================
+
+const botonIniciar = document.getElementById(
+  "btnDemoSorteoLiguilla"
+);
+
+if (botonIniciar) {
+
+  const finalizado =
+    datosSorteo.ok === true &&
+    datosSorteo.realizado === true;
+
+  botonIniciar.disabled = finalizado;
+
+  botonIniciar.textContent = finalizado
+    ? "🔒 Sorteo Finalizado"
+    : "▶️ Iniciar sorteo";
+
+  botonIniciar.style.opacity = finalizado ? "0.5" : "1";
+
+  botonIniciar.style.cursor = finalizado
+    ? "not-allowed"
+    : "pointer";
+}
+
+const botonReproducir = document.getElementById(
+  "btnReproducirSorteoOficial"
+);
+
+if (botonReproducir) {
+
+  const sorteoDisponible =
+    datosSorteo.ok === true &&
+    datosSorteo.realizado === true &&
+    Array.isArray(datosSorteo.asignaciones) &&
+    datosSorteo.asignaciones.length === 8;
+
+  const reproduccionFinalizada =
+    localStorage.getItem("liguillaSorteoReproducido") === "true";
+
+  botonReproducir.style.display =
+    sorteoDisponible ? "block" : "none";
+
+  botonReproducir.disabled =
+    reproduccionFinalizada;
+
+  botonReproducir.textContent =
+    reproduccionFinalizada
+      ? "🔒 Sorteo Finalizado"
+      : "▶️ Reproducir sorteo oficial";
+
+  botonReproducir.style.opacity =
+    reproduccionFinalizada ? "0.5" : "1";
+
+  botonReproducir.style.cursor =
+    reproduccionFinalizada
+      ? "not-allowed"
+      : "pointer";
+}
+
+
+    if (
+      !datosGrupo.ok ||
+      !datosSorteo.ok ||
+      !datosEquipos.ok
+    ) {
+      throw new Error("La consulta devolvió un error.");
+    }
+
+    const grupo = datosGrupo.grupo;
+    const totalEquipos = datosEquipos.equipos.length;
+
+    if (datosSorteo.realizado) {
+
+      resultadosSorteoLiguilla = datosSorteo.asignaciones;
+
+      estado.textContent = "✅ Sorteo realizado y guardado.";
+
+      nombre.textContent = "🏆 Sorteo realizado";
+      equipo.textContent = "Los resultados están disponibles";
+      progreso.textContent =
+        `${resultadosSorteoLiguilla.length} de 8 asignaciones`;
+
+      boton.disabled = true;
+      boton.textContent = "🔒 Sorteo ya realizado";
+
+      return;
+    }
+
+    resultadosSorteoLiguilla = [];
+
+    const confirmados = Number(grupo.confirmados);
+
+    nombre.textContent = "Sorteo pendiente";
+    equipo.textContent = "Los equipos aparecerán aquí";
+    progreso.textContent = "0 de 8";
+
+    const listo =
+      grupo.estado === "cerrado" &&
+      confirmados === 8 &&
+      totalEquipos === 8;
+
+    if (listo) {
+
+      estado.textContent =
+        "🟢 Todo listo: 8 participantes y 8 equipos.";
+
+      boton.textContent = "🎲 Realizar sorteo automático";
+
+    } else {
+
+      estado.textContent =
+        `⏳ ${confirmados}/8 participantes confirmados · ` +
+        `${totalEquipos}/8 equipos · ` +
+        `Estado: ${grupo.estado}`;
+
+      boton.textContent = "🔒 Sorteo no disponible";
+
+    }
+
+    // Por seguridad, no activamos el botón todavía.
+    // Se conectará después de crear la animación.
+    boton.disabled = true;
+
+  } catch (error) {
+
+    estado.textContent = "❌ " + error.message;
+
+    boton.disabled = true;
+
+  }
+}
+
+
+
+/* ==========================================
+   🎬 DEMOSTRACIÓN ANIMADA - LIGUILLA EL INGE
+   No realiza peticiones al servidor.
+========================================== */
+
+const esperarDemoLiguilla = ms =>
+  new Promise(resolve => setTimeout(resolve, ms));
+
+async function iniciarDemoSorteoLiguilla() {
+
+  if (sorteoLiguillaEnProceso) return;
+
+  const boton = document.getElementById("btnDemoSorteoLiguilla");
+  const escudo = document.getElementById("liguillaSorteoEscudo");
+  const nombre = document.getElementById("liguillaSorteoNombre");
+  const equipo = document.getElementById("liguillaSorteoEquipo");
+  const progreso = document.getElementById("liguillaSorteoProgreso");
+  const resultados = document.getElementById("liguillaSorteoResultados");
+  const escenario = document.getElementById("liguillaSorteoEscenario");
+
+  if (!boton || !escudo || !nombre ||
+      !equipo || !progreso || !resultados || !escenario) {
+    alert("No se encontró el panel del sorteo.");
+    return;
+  }
+
+  const participantes = [
+    "Carlos", "María", "José", "Ana",
+    "Luis", "Sofía", "Diego", "Valeria"
+  ];
+
+  const equipos = [
+    { nombre: "América", simbolo: "🟡" },
+    { nombre: "Cruz Azul", simbolo: "🔵" },
+    { nombre: "Toluca", simbolo: "🔴" },
+    { nombre: "Tigres", simbolo: "🐯" },
+    { nombre: "Monterrey", simbolo: "🔷" },
+    { nombre: "Pumas", simbolo: "🐾" },
+    { nombre: "Chivas", simbolo: "🔴" },
+    { nombre: "Pachuca", simbolo: "⚽" }
+  ];
+
+  // Mezclar equipos para esta demostración.
+  const mezclados = [...equipos];
+
+  for (let i = mezclados.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [mezclados[i], mezclados[j]] =
+      [mezclados[j], mezclados[i]];
+  }
+
+  sorteoLiguillaEnProceso = true;
+  boton.disabled = true;
+  boton.textContent = "🎬 Animación en curso...";
+  resultados.replaceChildren();
+
+  try {
+
+    escenario.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+
+    // CUENTA REGRESIVA
+    nombre.textContent = "¡PREPÁRATE!";
+    equipo.textContent = "El sorteo está por comenzar";
+
+    for (let numero = 3; numero >= 1; numero--) {
+      escudo.textContent = numero;
+      escudo.style.transform = "scale(1.25)";
+      escudo.style.transition = "transform .35s ease";
+
+      await esperarDemoLiguilla(400);
+      escudo.style.transform = "scale(1)";
+      await esperarDemoLiguilla(600);
+    }
+
+    // REVELAR LOS 8 PARTICIPANTES
+    for (let i = 0; i < participantes.length; i++) {
+
+      nombre.textContent = participantes[i];
+      equipo.textContent = "🎰 Buscando equipo...";
+      progreso.textContent = `${i} de 8 asignaciones`;
+
+      // Ruleta visual
+      for (let vuelta = 0; vuelta < 18; vuelta++) {
+
+        const temporal =
+          equipos[(vuelta + i * 3) % equipos.length];
+
+        escudo.textContent = temporal.simbolo;
+        equipo.textContent = temporal.nombre;
+
+        escudo.style.transform =
+          `rotate(${vuelta % 2 === 0 ? -12 : 12}deg) scale(1.1)`;
+
+        // 🎰 Desaceleración progresiva de la ruleta
+        const velocidad = 45 + Math.pow(vuelta / 17, 3) * 350;
+
+        await esperarDemoLiguilla(velocidad);
+        
+        }
+
+      const elegido = mezclados[i];
+
+      // Revelación
+      escudo.textContent = elegido.simbolo;
+      escudo.style.transition =
+      "transform 0.65s cubic-bezier(0.2, 1.6, 0.4, 1)";
+      escudo.style.transform = "rotate(0deg) scale(1.3)";
+      equipo.textContent = `🏆 ${elegido.nombre}`;
+      nombre.textContent = participantes[i];
+      progreso.textContent = `${i + 1} de 8 asignaciones`;
+
+      await esperarDemoLiguilla(450);
+      escudo.style.transform = "scale(1)";
+
+      // Agregar resultado sin insertar HTML de usuarios.
+      const tarjeta = document.createElement("div");
+      tarjeta.style.cssText = `
+        background:#18375f;
+        border:1px solid #d4a017;
+        border-radius:10px;
+        padding:13px;
+        color:white;
+        display:flex;
+        justify-content:space-between;
+        gap:10px;
+        flex-wrap:wrap;
+        animation:aparecerDemoLiguilla .5s ease;
+      `;
+
+      // INFORMACIÓN DEL PARTICIPANTE
+const datosJugador = document.createElement("div");
+
+datosJugador.style.cssText = `
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  min-width:0;
+  flex:1;
+`;
+
+const jugador = document.createElement("strong");
+jugador.textContent = participantes[i];
+
+const folio = document.createElement("small");
+folio.textContent = "🎬 Participante de demostración";
+folio.style.color = "#b9cbe0";
+
+datosJugador.append(jugador, folio);
+
+
+// INFORMACIÓN DEL EQUIPO
+const datosEquipo = document.createElement("div");
+
+datosEquipo.style.cssText = `
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:10px;
+  flex:1;
+  min-width:0;
+`;
+
+const club = document.createElement("strong");
+club.textContent = elegido.nombre;
+club.style.cssText = `
+  color:#f5c451;
+  text-align:right;
+  overflow-wrap:anywhere;
+`;
+
+if (false) {
+  const logo = document.createElement("img");
+
+  logo.src = asignacion.logo_url;
+  logo.alt = asignacion.equipo;
+
+  logo.style.cssText = `
+    width:45px;
+    height:45px;
+    object-fit:contain;
+    flex-shrink:0;
+  `;
+
+  logo.onerror = () => {
+    logo.remove();
+  };
+
+  datosEquipo.appendChild(logo);
+}
+
+datosEquipo.appendChild(club);
+
+
+// MOSTRAR RESULTADO OFICIAL
+tarjeta.append(datosJugador, datosEquipo);
+
+resultados.appendChild(tarjeta);
+
+      await esperarDemoLiguilla(850);
+    }
+
+    escudo.textContent = "🏆";
+    nombre.textContent = "¡SORTEO COMPLETADO!";
+    equipo.textContent = "8 participantes · 8 equipos";
+    progreso.textContent = "8 de 8 asignaciones";
+
+  } catch (error) {
+    console.error("Error en demostración:", error);
+    alert("No se pudo completar la animación.");
+  } finally {
+    sorteoLiguillaEnProceso = false;
+    boton.disabled = false;
+    boton.textContent = "🔁 Repetir demostración";
+  }
+}
+
+
+/* ==========================================
+   🏆 CONSULTAR ASIGNACIONES OFICIALES
+   Solo lectura: NO ejecuta el sorteo.
+========================================== */
+
+async function obtenerAsignacionesOficialesLiguilla() {
+
+  const respuesta = await fetch(
+    "/admin/liguilla/sorteo",
+    {
+      method: "GET",
+      credentials: "same-origin",
+      cache: "no-store"
+    }
+  );
+
+  if (!respuesta.ok) {
+    throw new Error(
+      "No fue posible consultar el sorteo oficial."
+    );
+  }
+
+  const datos = await respuesta.json();
+
+  if (!datos.ok) {
+    throw new Error(
+      datos.error || "Error al consultar el sorteo."
+    );
+  }
+
+  if (!datos.realizado) {
+    return [];
+  }
+
+  if (
+    !Array.isArray(datos.asignaciones) ||
+    datos.asignaciones.length !== 8
+  ) {
+    throw new Error(
+      "El sorteo no contiene ocho asignaciones válidas."
+    );
+  }
+
+  return datos.asignaciones;
+}
+
+
+/* ==========================================
+   🏆 REPRODUCIR RESULTADOS OFICIALES
+   No realiza sorteos ni modifica la BD.
+========================================== */
+
+async function reproducirSorteoOficialLiguilla() {
+
+  if (sorteoLiguillaEnProceso) return;
+
+  const escudo = document.getElementById("liguillaSorteoEscudo");
+  const nombre = document.getElementById("liguillaSorteoNombre");
+  const equipo = document.getElementById("liguillaSorteoEquipo");
+  const progreso = document.getElementById("liguillaSorteoProgreso");
+  const resultados = document.getElementById("liguillaSorteoResultados");
+
+  if (!escudo || !nombre || !equipo || !progreso || !resultados) {
+    alert("No se encontró el escenario del sorteo.");
+    return;
+  }
+
+  sorteoLiguillaEnProceso = true;
+
+  try {
+
+    const asignaciones =
+      await obtenerAsignacionesOficialesLiguilla();
+
+    if (asignaciones.length !== 8) {
+      alert("Todavía no existe un sorteo oficial completo.");
+      return;
+    }
+
+    resultados.replaceChildren();
+
+    // Cuenta regresiva
+    nombre.textContent = "¡SORTEO OFICIAL!";
+    equipo.textContent = "Preparando revelación";
+
+    for (let n = 3; n >= 1; n--) {
+      escudo.textContent = n;
+      progreso.textContent = "Comenzando...";
+      await esperarDemoLiguilla(1000);
+    }
+
+    // Mostrar asignaciones ya guardadas
+    for (let i = 0; i < asignaciones.length; i++) {
+
+      const asignacion = asignaciones[i];
+
+      nombre.textContent = asignacion.nombre;
+      equipo.textContent = "🎰 Revelando equipo...";
+      escudo.textContent = "⚽";
+
+      await esperarDemoLiguilla(800);
+
+      escudo.replaceChildren();
+
+      if (asignacion.logo_url) {
+        const imagen = document.createElement("img");
+        imagen.src = asignacion.logo_url;
+        imagen.alt = asignacion.equipo;
+        imagen.style.cssText = `
+          width:130px;
+          height:130px;
+          object-fit:contain;
+          display:block;
+          margin:auto;
+          filter:drop-shadow(0 0 18px rgba(245,196,81,.6));
+        `;
+        imagen.onerror = () => {
+          escudo.textContent = "⚽";
+        };
+        escudo.appendChild(imagen);
+      } else {
+        escudo.textContent = "⚽";
+      }
+
+      equipo.textContent = asignacion.equipo;
+      progreso.textContent = `${i + 1} de 8 asignaciones`;
+
+      const tarjeta = document.createElement("div");
+      tarjeta.style.cssText = `
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+        padding:12px;
+        border:1px solid #d4a017;
+        border-radius:10px;
+        background:#18375f;
+        color:white;
+      `;
+
+      const jugador = document.createElement("strong");
+      jugador.textContent = asignacion.nombre;
+
+      const club = document.createElement("strong");
+      club.textContent = asignacion.equipo;
+      club.style.color = "#f5c451";
+
+      tarjeta.append(jugador, club);
+      resultados.appendChild(tarjeta);
+
+      await esperarDemoLiguilla(1400);
+    }
+
+    escudo.textContent = "🏆";
+    nombre.textContent = "¡SORTEO COMPLETADO!";
+    equipo.textContent = "Las ocho asignaciones son definitivas.";
+    progreso.textContent = "8 de 8 asignaciones";
+
+        // 🔒 BLOQUEAR REPRODUCCIÓN AL FINALIZAR
+        localStorage.setItem("liguillaSorteoReproducido", "true");
+    const botonReproducir = document.getElementById(
+      "btnReproducirSorteoOficial"
+    );
+
+    if (botonReproducir) {
+      botonReproducir.disabled = true;
+      botonReproducir.textContent = "🔒 Sorteo Finalizado";
+      botonReproducir.style.opacity = "0.5";
+      botonReproducir.style.cursor = "not-allowed";
+    }
+
+  } catch (error) {
+    console.error("Error reproduciendo sorteo oficial:", error);
+    alert(error.message || "No se pudo reproducir el sorteo.");
+  } finally {
+    sorteoLiguillaEnProceso = false;
+  }
+}
+
+
+/* ==========================================
+   🔍 DIAGNÓSTICO COMPLETO DEL SORTEO
+   No modifica la base de datos
+========================================== */
+
+async function validarSorteoOficialLiguilla() {
+
+  try {
+
+    const respuestas = await Promise.all([
+      fetch("/liguilla/grupo/1", { cache: "no-store" }),
+      fetch("/admin/liguilla/participantes", { cache: "no-store" }),
+      fetch("/admin/liguilla/equipos", { cache: "no-store" }),
+      fetch("/admin/liguilla/sorteo", { cache: "no-store" })
+    ]);
+
+    if (!respuestas.every(r => r.ok)) {
+      throw new Error("No se pudieron consultar los requisitos.");
+    }
+
+    const [grupo, participantes, equipos, sorteo] =
+      await Promise.all(respuestas.map(r => r.json()));
+
+    if (
+      grupo.ok !== true ||
+      participantes.ok !== true ||
+      equipos.ok !== true ||
+      sorteo.ok !== true ||
+      !Array.isArray(participantes.participantes) ||
+      !Array.isArray(equipos.equipos)
+    ) {
+      throw new Error("La información recibida no es válida.");
+    }
+
+    const estado = grupo.grupo?.estado;
+
+    const aprobados = participantes.participantes.filter(
+      p => p.estado_pago === "aprobado"
+    ).length;
+
+    const cantidadEquipos = equipos.equipos.length;
+
+    const realizado = sorteo.realizado === true;
+
+    const requisitos = [
+      {
+        correcto: estado === "cerrado",
+        texto: `Inscripciones: ${estado || "desconocido"}`
+      },
+      {
+        correcto: aprobados === 8,
+        texto: `Participantes aprobados: ${aprobados}/8`
+      },
+      {
+        correcto: cantidadEquipos === 8,
+        texto: `Equipos registrados: ${cantidadEquipos}/8`
+      },
+      {
+        correcto: !realizado,
+        texto: `Sorteo anterior: ${realizado ? "Sí" : "No"}`
+      }
+    ];
+
+    const listo = requisitos.every(r => r.correcto);
+
+    const detalle = requisitos.map(r =>
+      `${r.correcto ? "✅" : "❌"} ${r.texto}`
+    ).join("\n");
+
+    return {
+      listo,
+      mensaje:
+        detalle +
+        "\n\n" +
+        (listo
+          ? "🏆 Todo listo para el sorteo oficial."
+          : "⚠️ Hay requisitos pendientes.")
+    };
+
+  } catch (error) {
+
+    console.error("Error validando sorteo:", error);
+
+    return {
+      listo: false,
+      mensaje: error.message || "Error de validación."
+    };
+  }
+}
+
+
+/* ==========================================
+   🔍 COMPROBAR REQUISITOS DEL SORTEO
+========================================== */
+
+async function comprobarRequisitosSorteoLiguilla() {
+
+  const boton = document.getElementById(
+    "btnValidarSorteoLiguilla"
+  );
+
+  if (boton) {
+    boton.disabled = true;
+    boton.textContent = "⏳ Verificando requisitos...";
+  }
+
+  try {
+
+    const resultado = await validarSorteoOficialLiguilla();
+
+
+const botonSorteo = document.getElementById(
+  "btnRealizarSorteoLiguilla"
+);
+
+if (botonSorteo) {
+
+  
+botonSorteo.disabled =
+  !resultado.listo ||
+  sorteoLiguillaEnProceso ||
+  resultadosSorteoLiguilla.length === 8;
+
+  botonSorteo.textContent = resultado.listo
+    ? "🏆 Realizar sorteo oficial"
+    : "🔒 Sorteo no disponible";
+
+  botonSorteo.style.opacity = resultado.listo
+    ? "1"
+    : "0.6";
+
+  botonSorteo.style.cursor = resultado.listo
+    ? "pointer"
+    : "not-allowed";
+}
+
+
+
+    if (resultado.listo) {
+      alert(
+        "✅ SORTEO LISTO\n\n" +
+        resultado.mensaje +
+        "\n\nTodavía no se ha ejecutado ningún sorteo."
+      );
+    } else {
+      alert(
+        "⚠️ SORTEO NO DISPONIBLE\n\n" +
+        resultado.mensaje
+      );
+    }
+
+  } catch (error) {
+
+    console.error(error);
+    alert("❌ No se pudo verificar el sorteo.");
+
+  } finally {
+
+    if (boton) {
+      boton.disabled = false;
+      boton.textContent = "🔍 Verificar requisitos del sorteo";
+    }
+  }
+}
+
+
+/* ==========================================
+   🏆 EJECUTAR SORTEO OFICIAL
+   Requiere validación y confirmación.
+========================================== */
+
+async function ejecutarSorteoOficialLiguilla() {
+
+  if (sorteoLiguillaEnProceso) return;
+
+  const validacion = await validarSorteoOficialLiguilla();
+
+  if (!validacion.listo) {
+    alert(
+      "⚠️ NO SE PUEDE REALIZAR EL SORTEO\n\n" +
+      validacion.mensaje
+    );
+    return;
+  }
+
+  const confirmado = confirm(
+    "🏆 SORTEO OFICIAL DE LIGUILLA\n\n" +
+    "Se asignará aleatoriamente un equipo a cada " +
+    "uno de los ocho participantes.\n\n" +
+    "Los resultados quedarán guardados " +
+    "definitivamente y no podrán repetirse.\n\n" +
+    "¿CONFIRMAS REALIZAR EL SORTEO OFICIAL?"
+  );
+
+  if (!confirmado) return;
+
+  const boton = document.getElementById(
+    "btnRealizarSorteoLiguilla"
+  );
+
+  sorteoLiguillaEnProceso = true;
+
+  if (boton) {
+    boton.disabled = true;
+    boton.textContent = "⏳ Realizando sorteo oficial...";
+  }
+
+  try {
+
+    const respuesta = await fetch(
+      "/admin/liguilla/sortear",
+      {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({})
+      }
+    );
+
+    const datos = await respuesta.json();
+
+    if (!respuesta.ok || !datos.ok) {
+      throw new Error(
+        datos.error || "No se pudo realizar el sorteo."
+      );
+    }
+
+    await consultarSorteoLiguilla();
+
+try {
+  await reproducirSorteoOficialLiguilla();
+} catch (errorAnimacion) {
+  console.error(
+    "El sorteo se guardó, pero falló la animación:",
+    errorAnimacion
+  );
+
+  alert(
+    "✅ El sorteo oficial se guardó correctamente.\n\n" +
+    "⚠️ No se pudo reproducir la animación.\n" +
+    "Puedes utilizar el botón para volver a visualizarla."
+  );
+}
+
+  } catch (error) {
+
+    console.error("Error en sorteo oficial:", error);
+
+    alert(
+      "❌ " +
+      (error.message || "Error al realizar el sorteo.")
+    );
+
+  } finally {
+
+    sorteoLiguillaEnProceso = false;
+
+    if (boton) {
+      boton.textContent = "🏆 Realizar sorteo oficial";
+      // El botón sigue bloqueado hasta completar
+      // las verificaciones del siguiente paso.
+      boton.disabled = true;
+    }
+  }
+}
+
+// ==========================================
+// 🧹 REINICIAR LIGUILLA DESDE ADMIN
+// ==========================================
+
+async function reiniciarLiguillaAdmin() {
+
+  const confirmar = prompt(
+    "⚠️ ATENCIÓN\n\n" +
+    "Se eliminarán todos los participantes, " +
+    "comprobantes y resultados del sorteo.\n\n" +
+    "Los ocho equipos se conservarán.\n\n" +
+    "Escribe exactamente:\nREINICIAR LIGUILLA"
+  );
+
+  if (confirmar !== "REINICIAR LIGUILLA") {
+    alert("Operación cancelada.");
+    return;
+  }
+
+  const segundaConfirmacion = confirm(
+    "🚨 ÚLTIMA CONFIRMACIÓN\n\n" +
+    "¿Estás seguro de eliminar los registros " +
+    "de esta Liguilla?\n\n" +
+    "Esta acción no se puede deshacer."
+  );
+
+  if (!segundaConfirmacion) return;
+
+  const boton = document.getElementById(
+    "btnReiniciarLiguilla"
+  );
+
+  boton.disabled = true;
+  boton.textContent = "⏳ Reiniciando...";
+
+  try {
+
+    const respuesta = await fetch(
+      "/admin/liguilla/reiniciar",
+      {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          confirmacion: "REINICIAR LIGUILLA"
+        })
+      }
+    );
+
+    const data = await respuesta.json();
+
+    if (!respuesta.ok || !data.ok) {
+      throw new Error(
+        data.error || "No se pudo reiniciar."
+      );
+    }
+
+    alert(
+      "✅ LIGUILLA REINICIADA\n\n" +
+      "Participantes: 0 de 8\n" +
+      "Sorteo: eliminado\n" +
+      "Equipos: conservados\n" +
+      "Estado: preparación"
+    );
+
+    // 🧹 LIMPIAR ESTADO DE REPRODUCCIÓN
+localStorage.removeItem("liguillaSorteoReproducido");
+
+   // 🔄 ACTUALIZAR PANEL DESPUÉS DEL REINICIO
+await Promise.all([
+  cargarParticipantesLiguilla(),
+  consultarEstadoInscripcionesLiguilla(),
+  cargarEquiposLiguilla(),
+  consultarSorteoLiguilla()
+]); 
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert("❌ " + error.message);
+
+  } finally {
+
+    boton.disabled = false;
+    boton.textContent = "🧹 Reiniciar Liguilla";
+
+  }
+}
+
+
+
+</script>
+
+  </main>
+
+</body>
+</html>
