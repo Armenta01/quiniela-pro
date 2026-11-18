@@ -362,6 +362,218 @@ app.get('/admin/liguilla/comprobante/:id',
 
 
 /* ==========================================
+   🏆 LIGUILLA EL INGE
+   APROBAR Y RECHAZAR PAGOS
+========================================== */
+
+app.patch(
+  '/admin/liguilla/participantes/:id/pago',
+  verificarAdmin,
+  async (req, res) => {
+
+    // Protección básica contra solicitudes de otro sitio.
+    const origen = req.get('Origin');
+
+    if (origen) {
+      try {
+        if (new URL(origen).origin !==
+            `${req.protocol}://${req.get('host')}`) {
+          return res.status(403).json({
+            ok: false,
+            error: 'Origen de solicitud no autorizado.'
+          });
+        }
+      } catch {
+        return res.status(403).json({
+          ok: false,
+          error: 'Origen inválido.'
+        });
+      }
+    }
+
+    const id = Number(req.params.id);
+    const nuevoEstado = req.body?.estado_pago;
+
+    if (!Number.isSafeInteger(id) || id <= 0) {
+      return res.status(400).json({
+        ok: false,
+        error: 'Participante inválido.'
+      });
+    }
+
+    if (!['aprobado', 'rechazado'].includes(nuevoEstado)) {
+      return res.status(400).json({
+        ok: false,
+        error: 'Estado de pago inválido.'
+      });
+    }
+
+    let client;
+
+    try {
+      client = await pool.connect();
+      await client.query('BEGIN');
+
+      // Bloqueo del grupo para evitar cambios simultáneos.
+      const grupoResultado = await client.query(`
+        SELECT id, cupos, estado
+        FROM liguilla_grupos
+        WHERE id = 1
+        FOR UPDATE
+      `);
+
+      if (!grupoResultado.rows.length) {
+        await client.query('ROLLBACK');
+
+        return res.status(404).json({
+          ok: false,
+          error: 'Grupo no encontrado.'
+        });
+      }
+
+      const grupo = grupoResultado.rows[0];
+
+      if (!['preparacion', 'abierto', 'cerrado']
+        .includes(grupo.estado)) {
+
+        await client.query('ROLLBACK');
+
+        return res.status(409).json({
+          ok: false,
+          error: 'El grupo ya no permite modificar pagos.'
+        });
+      }
+
+      const resultado = await client.query(`
+        SELECT id, nombre, estado_pago
+        FROM liguilla_participantes
+        WHERE id = $1 AND grupo_id = 1
+        FOR UPDATE
+      `, [id]);
+
+      if (!resultado.rows.length) {
+        await client.query('ROLLBACK');
+
+        return res.status(404).json({
+          ok: false,
+          error: 'Participante no encontrado.'
+        });
+      }
+
+      const participante = resultado.rows[0];
+
+      // Solo se pueden resolver pagos pendientes.
+      if (participante.estado_pago !== 'pendiente') {
+        await client.query('ROLLBACK');
+
+        return res.status(409).json({
+          ok: false,
+          error: 'Este pago ya fue revisado.'
+        });
+      }
+
+      if (nuevoEstado === 'aprobado') {
+
+        const comprobante = await client.query(`
+          SELECT id
+          FROM liguilla_comprobantes
+          WHERE participante_id = $1
+        `, [id]);
+
+        if (!comprobante.rows.length) {
+          await client.query('ROLLBACK');
+
+          return res.status(409).json({
+            ok: false,
+            error: 'El participante no tiene comprobante.'
+          });
+        }
+
+        const conteo = await client.query(`
+          SELECT COUNT(*)::INTEGER AS total
+          FROM liguilla_participantes
+          WHERE grupo_id = 1
+            AND estado_pago = 'aprobado'
+        `);
+
+        if (conteo.rows[0].total >= grupo.cupos) {
+          await client.query('ROLLBACK');
+
+          return res.status(409).json({
+            ok: false,
+            error: 'Los ocho lugares ya están confirmados.'
+          });
+        }
+      }
+
+      await client.query(`
+        UPDATE liguilla_participantes
+        SET estado_pago = $1,
+            aprobado_en = CASE
+              WHEN $1 = 'aprobado' THEN NOW()
+              ELSE NULL
+            END
+        WHERE id = $2
+      `, [nuevoEstado, id]);
+
+      // Guardar historial del cambio.
+      await client.query(`
+        INSERT INTO liguilla_pagos_auditoria (
+          participante_id,
+          estado_anterior,
+          estado_nuevo
+        )
+        VALUES ($1, $2, $3)
+      `, [
+        id,
+        participante.estado_pago,
+        nuevoEstado
+      ]);
+
+      await client.query('COMMIT');
+
+      res.set('Cache-Control', 'no-store');
+
+      return res.json({
+        ok: true,
+        mensaje: nuevoEstado === 'aprobado'
+          ? 'Pago aprobado correctamente.'
+          : 'Pago rechazado correctamente.',
+        participante_id: id,
+        estado_pago: nuevoEstado
+      });
+
+    } catch (error) {
+
+      if (client) {
+        try {
+          await client.query('ROLLBACK');
+        } catch (rollbackError) {
+          console.error(
+            'Error al revertir pago:',
+            rollbackError
+          );
+        }
+      }
+
+      console.error(
+        'Error al actualizar pago de Liguilla:',
+        error
+      );
+
+      return res.status(500).json({
+        ok: false,
+        error: 'No se pudo actualizar el pago.'
+      });
+
+    } finally {
+      if (client) client.release();
+    }
+  }
+);
+
+
+/* ==========================================
    🎁 ADMINISTRADOR DE PROMOCIONES
    QUINIELAS EL INGE
 ========================================== */
