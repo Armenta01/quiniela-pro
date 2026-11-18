@@ -1892,6 +1892,35 @@ await pool.query(`
   `);
 
 
+  // ==========================================
+  // 🎲 REGISTRO DEL SORTEO - LIGUILLA EL INGE
+  // ==========================================
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS liguilla_sorteos (
+      id BIGSERIAL PRIMARY KEY,
+
+      grupo_id INTEGER NOT NULL UNIQUE
+        REFERENCES liguilla_grupos(id),
+
+      realizado_en TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+      algoritmo TEXT NOT NULL DEFAULT 'crypto-shuffle-v1',
+
+      total_participantes INTEGER NOT NULL
+        CHECK (total_participantes = 8),
+
+      total_equipos INTEGER NOT NULL
+        CHECK (total_equipos = 8)
+    );
+  `);
+
+  // Cada equipo asignado debe pertenecer al grupo.
+  // Una vez sorteado, no se permitirá repetir el sorteo.
+
+  console.log("🎲 Registro de sorteos preparado");
+
+
   console.log("🏆 Base de datos Liguilla preparada");
 
 
