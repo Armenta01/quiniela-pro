@@ -3347,6 +3347,84 @@ function volverPanelAdmin() {
   <div id="liguillaMensaje" role="status"></div>
   
 
+
+
+<!-- ==========================================
+     🎰 SORTEO ANIMADO - LIGUILLA EL INGE
+========================================== -->
+
+<section id="liguillaSorteoPanel" style="
+  background:#102344;
+  border:1px solid #d4a017;
+  border-radius:15px;
+  padding:20px;
+  margin:25px 0;
+  color:white;
+">
+
+  <h3 style="color:#f5c451;text-align:center;">
+    🏆 Sorteo oficial — Grupo 1
+  </h3>
+
+  <p id="liguillaSorteoEstado"
+     style="text-align:center;color:#d1dcef;">
+    Consultando sorteo...
+  </p>
+
+  <div id="liguillaSorteoEscenario" style="
+    background:#091b34;
+    border-radius:14px;
+    padding:25px 15px;
+    text-align:center;
+    margin:20px 0;
+  ">
+
+    <div id="liguillaSorteoEscudo"
+         style="font-size:60px;">
+      🏆
+    </div>
+
+    <h2 id="liguillaSorteoNombre"
+        style="color:#f5c451;">
+      Sorteo pendiente
+    </h2>
+
+    <p id="liguillaSorteoEquipo"
+       style="font-size:22px;">
+      Los equipos aparecerán aquí
+    </p>
+
+    <p id="liguillaSorteoProgreso"
+       style="color:#d1dcef;">
+      0 de 8
+    </p>
+
+  </div>
+
+  <button
+    id="btnRealizarSorteoLiguilla"
+    type="button"
+    disabled
+    style="
+      width:100%;
+      padding:15px;
+      background:#d4a017;
+      color:#102344;
+      border:0;
+      border-radius:10px;
+      font-weight:bold;
+      cursor:pointer;
+    ">
+    🎲 Realizar sorteo automático
+  </button>
+
+  <div id="liguillaSorteoResultados"
+       style="display:grid;gap:10px;margin-top:20px;">
+  </div>
+
+</section>
+
+
 <!-- ==========================================
      ⚽ ADMINISTRACIÓN DE EQUIPOS LIGUILLA
 ========================================== -->
