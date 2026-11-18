@@ -363,6 +363,140 @@ app.get('/admin/liguilla/comprobante/:id',
 
 /* ==========================================
    🏆 LIGUILLA EL INGE
+   ABRIR Y CERRAR INSCRIPCIONES
+========================================== */
+
+app.patch(
+  '/admin/liguilla/grupo/1/estado',
+  verificarAdmin,
+  async (req, res) => {
+
+    const origen = req.get('Origin');
+
+    if (origen) {
+      try {
+        if (
+          new URL(origen).origin !==
+          `${req.protocol}://${req.get('host')}`
+        ) {
+          return res.status(403).json({
+            ok: false,
+            error: 'Origen no autorizado.'
+          });
+        }
+      } catch {
+        return res.status(403).json({
+          ok: false,
+          error: 'Origen inválido.'
+        });
+      }
+    }
+
+    const nuevoEstado = req.body?.estado;
+
+    if (!['abierto', 'cerrado'].includes(nuevoEstado)) {
+      return res.status(400).json({
+        ok: false,
+        error: 'Estado no válido.'
+      });
+    }
+
+    let client;
+
+    try {
+      client = await pool.connect();
+      await client.query('BEGIN');
+
+      const resultado = await client.query(`
+        SELECT id, cupos, estado
+        FROM liguilla_grupos
+        WHERE id = 1
+        FOR UPDATE
+      `);
+
+      if (!resultado.rows.length) {
+        await client.query('ROLLBACK');
+
+        return res.status(404).json({
+          ok: false,
+          error: 'Grupo no encontrado.'
+        });
+      }
+
+      const grupo = resultado.rows[0];
+
+      if (['sorteado', 'finalizado'].includes(grupo.estado)) {
+        await client.query('ROLLBACK');
+
+        return res.status(409).json({
+          ok: false,
+          error: 'No puedes reabrir un grupo sorteado o finalizado.'
+        });
+      }
+
+      if (nuevoEstado === 'abierto') {
+
+        const conteo = await client.query(`
+          SELECT COUNT(*)::INTEGER AS ocupados
+          FROM liguilla_participantes
+          WHERE grupo_id = 1
+            AND estado_pago IN ('pendiente', 'aprobado')
+        `);
+
+        if (conteo.rows[0].ocupados >= grupo.cupos) {
+          await client.query('ROLLBACK');
+
+          return res.status(409).json({
+            ok: false,
+            error: 'El grupo ya tiene sus ocho lugares ocupados.'
+          });
+        }
+      }
+
+      await client.query(`
+        UPDATE liguilla_grupos
+        SET estado = $1
+        WHERE id = 1
+      `, [nuevoEstado]);
+
+      await client.query('COMMIT');
+
+      res.set('Cache-Control', 'no-store');
+
+      return res.json({
+        ok: true,
+        estado: nuevoEstado,
+        mensaje: nuevoEstado === 'abierto'
+          ? 'Inscripciones abiertas correctamente.'
+          : 'Inscripciones cerradas correctamente.'
+      });
+
+    } catch (error) {
+
+      if (client) {
+        try {
+          await client.query('ROLLBACK');
+        } catch (e) {
+          console.error('Error al revertir:', e);
+        }
+      }
+
+      console.error('Error cambiando estado Liguilla:', error);
+
+      return res.status(500).json({
+        ok: false,
+        error: 'No se pudo cambiar el estado del grupo.'
+      });
+
+    } finally {
+      if (client) client.release();
+    }
+  }
+);
+
+
+/* ==========================================
+   🏆 LIGUILLA EL INGE
    APROBAR Y RECHAZAR PAGOS
 ========================================== */
 
