@@ -362,6 +362,207 @@ app.get('/admin/liguilla/comprobante/:id',
 
 
 /* ==========================================
+   ⚽ LIGUILLA EL INGE
+   REGISTRO MANUAL DE EQUIPOS
+========================================== */
+
+// Consultar los equipos registrados.
+app.get('/admin/liguilla/equipos',
+  verificarAdmin,
+  async (req, res) => {
+
+    try {
+      const resultado = await pool.query(`
+        SELECT id, nombre, logo_url
+        FROM liguilla_equipos
+        WHERE grupo_id = 1
+        ORDER BY id ASC
+      `);
+
+      res.set('Cache-Control', 'no-store');
+
+      return res.json({
+        ok: true,
+        equipos: resultado.rows
+      });
+
+    } catch (error) {
+      console.error('Error consultando equipos:', error);
+
+      return res.status(500).json({
+        ok: false,
+        error: 'No se pudieron consultar los equipos.'
+      });
+    }
+  }
+);
+
+// Registrar un equipo.
+app.post('/admin/liguilla/equipos',
+  verificarAdmin,
+  async (req, res) => {
+
+    const origen = req.get('Origin');
+
+    if (origen) {
+      try {
+        if (
+          new URL(origen).origin !==
+          `${req.protocol}://${req.get('host')}`
+        ) {
+          return res.status(403).json({
+            ok: false,
+            error: 'Origen no autorizado.'
+          });
+        }
+      } catch {
+        return res.status(403).json({
+          ok: false,
+          error: 'Origen inválido.'
+        });
+      }
+    }
+
+    const nombre = typeof req.body?.nombre === 'string'
+      ? req.body.nombre.trim().replace(/\s+/g, ' ')
+      : '';
+
+    const logoUrl = typeof req.body?.logo_url === 'string'
+      ? req.body.logo_url.trim()
+      : '';
+
+    if (nombre.length < 2 || nombre.length > 80) {
+      return res.status(400).json({
+        ok: false,
+        error: 'El nombre debe tener entre 2 y 80 caracteres.'
+      });
+    }
+
+    if (logoUrl.length > 500) {
+      return res.status(400).json({
+        ok: false,
+        error: 'La URL del escudo es demasiado larga.'
+      });
+    }
+
+    if (logoUrl) {
+      try {
+        const url = new URL(logoUrl);
+
+        if (
+          url.protocol !== 'https:' ||
+          url.username ||
+          url.password
+        ) {
+          throw new Error('URL no permitida');
+        }
+      } catch {
+        return res.status(400).json({
+          ok: false,
+          error: 'El escudo debe tener una URL HTTPS válida.'
+        });
+      }
+    }
+
+    let client;
+
+    try {
+      client = await pool.connect();
+      await client.query('BEGIN');
+
+      const grupoResultado = await client.query(`
+        SELECT estado
+        FROM liguilla_grupos
+        WHERE id = 1
+        FOR UPDATE
+      `);
+
+      if (!grupoResultado.rows.length) {
+        await client.query('ROLLBACK');
+
+        return res.status(404).json({
+          ok: false,
+          error: 'Grupo no encontrado.'
+        });
+      }
+
+      if (
+        ['sorteado', 'finalizado'].includes(
+          grupoResultado.rows[0].estado
+        )
+      ) {
+        await client.query('ROLLBACK');
+
+        return res.status(409).json({
+          ok: false,
+          error: 'No puedes agregar equipos después del sorteo.'
+        });
+      }
+
+      const conteo = await client.query(`
+        SELECT COUNT(*)::INTEGER AS total
+        FROM liguilla_equipos
+        WHERE grupo_id = 1
+      `);
+
+      if (conteo.rows[0].total >= 8) {
+        await client.query('ROLLBACK');
+
+        return res.status(409).json({
+          ok: false,
+          error: 'Ya están registrados los ocho equipos.'
+        });
+      }
+
+      const resultado = await client.query(`
+        INSERT INTO liguilla_equipos (
+          grupo_id, nombre, logo_url
+        )
+        VALUES (1, $1, $2)
+        RETURNING id, nombre, logo_url
+      `, [nombre, logoUrl || null]);
+
+      await client.query('COMMIT');
+
+      return res.status(201).json({
+        ok: true,
+        mensaje: 'Equipo registrado correctamente.',
+        equipo: resultado.rows[0]
+      });
+
+    } catch (error) {
+
+      if (client) {
+        try {
+          await client.query('ROLLBACK');
+        } catch (e) {
+          console.error('Error al revertir:', e);
+        }
+      }
+
+      if (error.code === '23505') {
+        return res.status(409).json({
+          ok: false,
+          error: 'Este equipo ya está registrado.'
+        });
+      }
+
+      console.error('Error registrando equipo:', error);
+
+      return res.status(500).json({
+        ok: false,
+        error: 'No se pudo registrar el equipo.'
+      });
+
+    } finally {
+      if (client) client.release();
+    }
+  }
+);
+
+
+
+/* ==========================================
    🏆 LIGUILLA EL INGE
    ABRIR Y CERRAR INSCRIPCIONES
 ========================================== */
@@ -1452,6 +1653,40 @@ await pool.query(`
   `);
 
   console.log("🧾 Almacenamiento de comprobantes preparado");
+
+
+  // ==========================================
+  // ⚽ EQUIPOS DE LIGUILLA - GRUPO 1
+  // ==========================================
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS liguilla_equipos (
+      id SERIAL PRIMARY KEY,
+
+      grupo_id INTEGER NOT NULL
+        REFERENCES liguilla_grupos(id),
+
+      nombre TEXT NOT NULL,
+
+      logo_url TEXT,
+
+      creado_en TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+      CONSTRAINT liguilla_equipo_nombre_valido
+        CHECK (
+          LENGTH(TRIM(nombre)) BETWEEN 2 AND 80
+        ),
+
+      CONSTRAINT liguilla_equipo_nombre_unico
+        UNIQUE (grupo_id, nombre)
+    );
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_liguilla_equipos_grupo
+    ON liguilla_equipos(grupo_id);
+  `);
+
 
   console.log("🏆 Base de datos Liguilla preparada");
 
