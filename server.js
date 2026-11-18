@@ -968,6 +968,80 @@ initDB().catch(err => {
   console.error("🔥 ERROR INIT DB:", err);
 });
 
+
+/* ==========================================
+   🏆 LIGUILLA EL INGE
+   CONSULTA PÚBLICA - GRUPO 1
+========================================== */
+
+app.get('/liguilla/grupo/1', async (req, res) => {
+  try {
+    const resultado = await pool.query(`
+      SELECT
+        g.id,
+        g.nombre,
+        g.cupos,
+        g.precio,
+        g.premio,
+        g.estado,
+        COUNT(p.id) FILTER (
+          WHERE p.estado_pago = 'aprobado'
+        )::INTEGER AS confirmados,
+        COUNT(p.id) FILTER (
+          WHERE p.estado_pago = 'pendiente'
+        )::INTEGER AS pendientes
+      FROM liguilla_grupos g
+      LEFT JOIN liguilla_participantes p
+        ON p.grupo_id = g.id
+      WHERE g.id = 1
+      GROUP BY
+        g.id, g.nombre, g.cupos,
+        g.precio, g.premio, g.estado
+    `);
+
+    if (!resultado.rows.length) {
+      return res.status(404).json({
+        ok: false,
+        error: 'Grupo no encontrado'
+      });
+    }
+
+    const grupo = resultado.rows[0];
+
+    const confirmados = Number(grupo.confirmados);
+    const pendientes = Number(grupo.pendientes);
+
+    res.set('Cache-Control', 'no-store');
+
+    return res.json({
+      ok: true,
+      grupo: {
+        id: grupo.id,
+        nombre: grupo.nombre,
+        cupos: grupo.cupos,
+        precio: Number(grupo.precio),
+        premio: Number(grupo.premio),
+        estado: grupo.estado,
+        confirmados,
+        pendientes,
+        disponibles: Math.max(
+          0,
+          grupo.cupos - confirmados - pendientes
+        )
+      }
+    });
+
+  } catch (error) {
+    console.error('Error consultando Liguilla:', error);
+
+    return res.status(500).json({
+      ok: false,
+      error: 'No se pudo consultar el grupo'
+    });
+  }
+});
+
+
 // 🔒 BLOQUEO
 async function jornadaBloqueada(jornada) {
 
