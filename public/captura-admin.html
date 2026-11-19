@@ -67,6 +67,40 @@
 
     <div id="listaPartidos" class="lista-partidos"></div>
 
+
+<!-- AGREGAR VARIAS QUINIELAS -->
+
+<div style="margin-top:20px;">
+
+  <button
+    type="button"
+    id="btnAgregarQuinielaAdmin"
+    class="btn-guardar"
+    style="background:#2563eb;">
+    ➕ Agregar quiniela
+  </button>
+
+</div>
+
+<!-- QUINIELAS AGREGADAS -->
+
+<div
+  id="misQuinielasAdmin"
+  style="display:none; margin-top:20px;">
+
+  <h3>🏆 Mis quinielas</h3>
+
+  <div id="listaQuinielasAdmin"></div>
+
+  <div
+    id="resumenQuinielasAdmin"
+    style="margin-top:15px;">
+  </div>
+
+</div>
+
+
+
     <div class="acciones">
       <button id="btnGuardar" class="btn-guardar" onclick="guardarCapturaAdmin()">🔐 Registrar Quiniela</button>
     </div>
@@ -78,6 +112,8 @@ if (sessionStorage.getItem("admin") !== "true") {
 }
 
 let partidos = [];
+// Quinielas agregadas temporalmente desde Captura Admin
+let quinielasAgregadasAdmin = [];
 const params = new URLSearchParams(window.location.search);
 const jornadaInicial = params.get("jornada");
 
@@ -305,6 +341,129 @@ if (!password) return;
     actualizarEstado();
   }
 }
+
+
+function agregarQuinielaAdmin() {
+
+  if (!partidos.length) {
+    mostrarMensaje(
+      "Sin partidos",
+      "No hay partidos disponibles para capturar.",
+      "⚠️"
+    );
+    return;
+  }
+
+  const primero = primerPartidoLocal();
+
+  if (!primero || new Date() >= primero) {
+    actualizarEstado();
+    mostrarMensaje(
+      "Captura cerrada",
+      "Ya comenzó el primer partido.",
+      "❌"
+    );
+    return;
+  }
+
+  const pronosticos = [];
+
+  for (const p of partidos) {
+
+    const inputLocal = document.getElementById("adminGl" + p.id);
+    const inputVisitante = document.getElementById("adminGv" + p.id);
+
+    const gl = inputLocal?.value.trim() ?? "";
+    const gv = inputVisitante?.value.trim() ?? "";
+
+    if (gl === "" || gv === "") {
+      mostrarMensaje(
+        "Marcador incompleto",
+        `Completa el marcador de ${p.local} vs ${p.visitante}.`,
+        "⚠️"
+      );
+      return;
+    }
+
+    const local = Number(gl);
+    const visitante = Number(gv);
+
+    if (
+      !Number.isInteger(local) ||
+      !Number.isInteger(visitante) ||
+      local < 0 || local > 30 ||
+      visitante < 0 || visitante > 30
+    ) {
+      mostrarMensaje(
+        "Marcador inválido",
+        `Revisa el marcador de ${p.local} vs ${p.visitante}.`,
+        "❌"
+      );
+      return;
+    }
+
+    pronosticos.push({
+      partido_id: Number(p.id),
+      goles_local: local,
+      goles_visitante: visitante
+    });
+  }
+
+  quinielasAgregadasAdmin.push(pronosticos);
+
+  const lista = document.getElementById("listaQuinielasAdmin");
+  const contenedor = document.getElementById("misQuinielasAdmin");
+  const resumen = document.getElementById("resumenQuinielasAdmin");
+
+  contenedor.style.display = "block";
+
+  lista.innerHTML = "";
+
+  quinielasAgregadasAdmin.forEach((quiniela, index) => {
+
+    const tarjeta = document.createElement("div");
+
+    tarjeta.className = "partido-card";
+    tarjeta.style.marginBottom = "12px";
+
+    const titulo = document.createElement("strong");
+    titulo.textContent = `🏆 Quiniela ${index + 1}`;
+
+    const detalle = document.createElement("div");
+    detalle.style.marginTop = "8px";
+    detalle.style.fontSize = "14px";
+    detalle.style.color = "#cbd5e1";
+
+    detalle.textContent = quiniela
+      .map(p => `${p.goles_local}-${p.goles_visitante}`)
+      .join(" | ");
+
+    tarjeta.appendChild(titulo);
+    tarjeta.appendChild(detalle);
+
+    lista.appendChild(tarjeta);
+  });
+
+  const cantidad = quinielasAgregadasAdmin.length;
+
+  resumen.textContent =
+    `${cantidad} quiniela(s) — Total: $${cantidad * 50} MXN`;
+
+  partidos.forEach(p => {
+    document.getElementById("adminGl" + p.id).value = "";
+    document.getElementById("adminGv" + p.id).value = "";
+  });
+
+  mostrarToast(
+    `Quiniela ${cantidad} agregada correctamente.`,
+    "✅"
+  );
+}
+
+document
+  .getElementById("btnAgregarQuinielaAdmin")
+  .addEventListener("click", agregarQuinielaAdmin);
+
 
 cargarSemanas();
 cargarPartidos();
