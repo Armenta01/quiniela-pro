@@ -4042,8 +4042,9 @@ const verificacion = await client.query(`
       }
 
 
+      
       // 🔐 Confirmar la compra administrativa
-      await client.query(`
+      const compraConfirmada = await client.query(`
         UPDATE compras_admin_unicas
         SET
           estado = 'completado',
@@ -4059,7 +4060,14 @@ const verificacion = await client.query(`
         precioCompra.ahorro
       ]);
 
+      // 🔒 Verificar que se actualizó exactamente una compra
+      if (compraConfirmada.rowCount !== 1) {
+        throw new Error(
+          "No se pudo confirmar la compra administrativa."
+        );
+      }
 
+      
       await client.query("COMMIT");
       transaccionIniciada = false;
 
