@@ -5,6 +5,7 @@ const multer = require('multer');
 const crypto = require('crypto');
 const { Pool, types } = require('pg');
 const enviosEnProceso = new Set();
+const comprasAdminEnProceso = new Set();
 
 // timestamp without time zone (OID 1114)
 // Devolver SIEMPRE como texto
@@ -213,6 +214,30 @@ const pool = new Pool({
   ssl: process.env.DATABASE_URL?.includes("render.com")
     ? { rejectUnauthorized: false }
     : false
+});
+
+
+// 🔐 Crear tabla para controlar compras administrativas únicas
+async function prepararComprasAdmin() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS compras_admin_unicas (
+      identificador_compra UUID PRIMARY KEY,
+      jornada INTEGER NOT NULL,
+      cantidad INTEGER,
+      total NUMERIC(12,2),
+      ahorro NUMERIC(12,2),
+      estado VARCHAR(20) NOT NULL DEFAULT 'procesando',
+      creado_en TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+}
+
+
+prepararComprasAdmin().catch(error => {
+  console.error(
+    "❌ Error preparando la tabla de compras administrativas:",
+    error
+  );
 });
 
 app.set('trust proxy', 1);
@@ -3120,6 +3145,7 @@ client = await pool.connect();
 await client.query("BEGIN");
 
 
+      
    
 const usuarioResult = await client.query(
   `INSERT INTO users (nombre, telefono)
@@ -3629,6 +3655,477 @@ app.post("/guardar-multiples", async (req, res) => {
   }
 });
 
+// ==========================================================
+// 🎁 CAPTURA ADMINISTRATIVA MÚLTIPLE
+
+
+app.post("/admin/guardar-multiples", async (req, res) => {
+
+  
+const {
+  password,
+  nombre,
+  telefono,
+  jornada,
+  quinielas,
+  identificador_compra
+} = req.body || {};
+
+
+
+// 🔐 Validar el identificador único de compra
+if (
+  typeof identificador_compra !== "string" ||
+  !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(identificador_compra)
+) {
+  return res.status(400).json({
+    ok: false,
+    error: "Identificador de compra inválido."
+  });
+}
+
+  // Validar contraseña administrativa
+  if (
+    !process.env.ADMIN_PASSWORD ||
+    password !== process.env.ADMIN_PASSWORD
+  ) {
+    return res.status(403).json({
+      ok: false,
+      error: "Contraseña de administrador incorrecta."
+    });
+  }
+
+  // Validar datos del participante
+  if (
+    typeof nombre !== "string" ||
+    nombre.trim().length < 2 ||
+    (telefono && !/^\d{10}$/.test(String(telefono)))
+  ) {
+    return res.status(400).json({
+      ok: false,
+      error: "Verifica el nombre y WhatsApp."
+    });
+  }
+
+  // Validar jornada y cantidad de quinielas
+  const jornadaNumero = Number(jornada);
+
+  if (
+    !Number.isInteger(jornadaNumero) ||
+    jornadaNumero < 1 ||
+    !Array.isArray(quinielas) ||
+    quinielas.length < 1 ||
+    quinielas.length > 100
+  ) {
+    return res.status(400).json({
+      ok: false,
+      error: "Jornada o cantidad de quinielas inválida."
+    });
+  }
+
+  
+  // ==========================================
+  // ⚽ VALIDAR PARTIDOS Y HORARIO ADMINISTRATIVO
+  // ==========================================
+
+  try {
+
+    
+const resultado = await pool.query(`
+  SELECT
+    id,
+    TO_CHAR(fecha, 'YYYY-MM-DD HH24:MI:SS') AS fecha
+  FROM partidos
+  WHERE jornada = $1
+  ORDER BY partidos.fecha ASC, id ASC
+`, [jornadaNumero]);
+
+    const partidosJornada = resultado.rows;
+
+    if (!partidosJornada.length) {
+      return res.status(400).json({
+        ok: false,
+        error: "Esta jornada no tiene partidos registrados."
+      });
+    }
+
+    // Cierre administrativo al inicio del primer partido
+    const primerPartido = moment.tz(
+      partidosJornada[0].fecha,
+      "YYYY-MM-DD HH:mm:ss",
+      "America/Mexico_City"
+    );
+
+    const ahora = moment.tz("America/Mexico_City");
+
+    if (
+      !primerPartido.isValid() ||
+      ahora.isSameOrAfter(primerPartido)
+    ) {
+      return res.status(403).json({
+        ok: false,
+        error: "La captura administrativa está cerrada porque ya comenzó el primer partido."
+      });
+    }
+
+    // IDs válidos de esta jornada
+    const idsValidos = new Set(
+      partidosJornada.map(p => Number(p.id))
+    );
+
+    // Revisar todas las quinielas
+    for (const quiniela of quinielas) {
+
+      if (
+        !Array.isArray(quiniela) ||
+        quiniela.length !== partidosJornada.length
+      ) {
+        return res.status(400).json({
+          ok: false,
+          error: "Cada quiniela debe contener todos los partidos de la jornada."
+        });
+      }
+
+      const idsCapturados = new Set();
+
+      for (const pronostico of quiniela) {
+
+        const partidoId = pronostico?.partido_id;
+        const gl = pronostico?.goles_local;
+        const gv = pronostico?.goles_visitante;
+
+        if (
+          !Number.isSafeInteger(partidoId) ||
+          !idsValidos.has(partidoId) ||
+          idsCapturados.has(partidoId) ||
+          !Number.isInteger(gl) ||
+          !Number.isInteger(gv) ||
+          gl < 0 || gl > 30 ||
+          gv < 0 || gv > 30
+        ) {
+          return res.status(400).json({
+            ok: false,
+            error: "Una quiniela contiene partidos o marcadores inválidos."
+          });
+        }
+
+        idsCapturados.add(partidoId);
+      }
+    }
+
+
+    // ==========================================
+    // 🔒 EVITAR QUINIELAS REPETIDAS EN ESTA COMPRA
+    // ==========================================
+
+    const combinaciones = new Set();
+
+    for (const quiniela of quinielas) {
+
+      const combinacion = [...quiniela]
+        .sort((a, b) => a.partido_id - b.partido_id)
+        .map(p =>
+          `${p.partido_id}:${p.goles_local}-${p.goles_visitante}`
+        )
+        .join("|");
+
+      if (combinaciones.has(combinacion)) {
+        return res.status(400).json({
+          ok: false,
+          error: "Tienes dos quinielas idénticas. Cambia al menos un marcador."
+        });
+      }
+
+      combinaciones.add(combinacion);
+    }
+
+    
+    // ==========================================
+    // 💾 GUARDAR QUINIELAS Y COMPRA
+    // ==========================================
+
+    const client = await pool.connect();
+    let transaccionIniciada = false;
+
+    try {
+      await client.query("BEGIN");
+      transaccionIniciada = true;
+
+
+      // 🔐 Reservar identificador único de compra
+      const compraReservada = await client.query(`
+        INSERT INTO compras_admin_unicas (
+          identificador_compra,
+          jornada,
+          estado
+        )
+        VALUES ($1, $2, 'procesando')
+        ON CONFLICT (identificador_compra) DO NOTHING
+        RETURNING identificador_compra
+      `, [
+        identificador_compra,
+        jornadaNumero
+      ]);
+
+      // Evitar registrar nuevamente la misma compra
+      if (compraReservada.rowCount === 0) {
+        await client.query("ROLLBACK");
+        transaccionIniciada = false;
+
+        return res.status(409).json({
+          ok: false,
+          error: "Esta compra ya fue registrada. Verifica las quinielas antes de volver a intentar."
+        });
+      }
+
+
+      // Bloquear los partidos durante la validación final.
+      
+const verificacion = await client.query(`
+  SELECT
+    id,
+    TO_CHAR(fecha, 'YYYY-MM-DD HH24:MI:SS') AS fecha
+  FROM partidos
+  WHERE jornada = $1
+  ORDER BY partidos.fecha ASC, id ASC
+  FOR SHARE
+`, [jornadaNumero]);
+
+
+      if (
+        verificacion.rows.length !== partidosJornada.length ||
+        verificacion.rows.some(
+          (p, i) =>
+            Number(p.id) !== Number(partidosJornada[i].id)
+        )
+      ) {
+        throw new Error(
+          "Los partidos de la jornada cambiaron. Actualiza la página."
+        );
+      }
+
+      const inicio = moment.tz(
+        verificacion.rows[0].fecha,
+        "YYYY-MM-DD HH:mm:ss",
+        "America/Mexico_City"
+      );
+
+      if (
+        !inicio.isValid() ||
+        moment.tz("America/Mexico_City").isSameOrAfter(inicio)
+      ) {
+        throw new Error(
+          "La captura administrativa ya está cerrada."
+        );
+      }
+
+      // Buscar o crear al participante.
+      const nombreLimpio = nombre.trim();
+      const telefonoLimpio = String(telefono || "").trim();
+
+      let usuario = await client.query(
+        `SELECT id FROM users WHERE nombre = $1 LIMIT 1`,
+        [nombreLimpio]
+      );
+
+      let userId;
+
+      if (usuario.rows.length) {
+        userId = usuario.rows[0].id;
+      } else {
+        usuario = await client.query(`
+          INSERT INTO users (nombre, telefono)
+          VALUES ($1, $2)
+          RETURNING id
+        `, [nombreLimpio, telefonoLimpio || null]);
+
+        userId = usuario.rows[0].id;
+      }
+
+      // Calcular la promoción en el servidor.
+      const precioCompra = await calcularPrecioPromocional(
+        quinielas.length,
+        client
+      );
+
+      const crypto = require("crypto");
+
+      const compraId =
+        Date.now().toString() +
+        "_ADMIN_COMPRA_" +
+        crypto.randomBytes(8).toString("hex");
+
+      await client.query(`
+        INSERT INTO compras_quinielas (
+          compra_id,
+          jornada,
+          user_id,
+          cantidad,
+          precio_normal,
+          precio_final,
+          ahorro,
+          promocion_id,
+          promocion_nombre
+        )
+        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+      `, [
+        compraId,
+        jornadaNumero,
+        userId,
+        quinielas.length,
+        precioCompra.precio_normal,
+        precioCompra.precio_final,
+        precioCompra.ahorro,
+        precioCompra.promocion?.id ?? null,
+        precioCompra.promocion?.nombre ?? null
+      ]);
+
+      const fechaEnvio = moment
+        .tz("America/Mexico_City")
+        .format("YYYY-MM-DD HH:mm:ss");
+
+      const envios = [];
+
+      for (const quiniela of quinielas) {
+
+        const envioId =
+          Date.now().toString() +
+          "_ADMIN_MULTI_" +
+          crypto.randomBytes(8).toString("hex");
+
+        for (const p of quiniela) {
+
+          await client.query(`
+            INSERT INTO predicciones (
+              user_id,
+              partido_id,
+              goles_local,
+              goles_visitante,
+              jornada,
+              envio_id,
+              telefono,
+              estado_pago,
+              fecha_envio
+            )
+            VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+          `, [
+            userId,
+            p.partido_id,
+            p.goles_local,
+            p.goles_visitante,
+            jornadaNumero,
+            envioId,
+            telefonoLimpio || null,
+            "Pendiente",
+            fechaEnvio
+          ]);
+        }
+
+        await client.query(`
+          INSERT INTO compras_quinielas_envios (
+            compra_id,
+            envio_id
+          )
+          VALUES ($1,$2)
+        `, [compraId, envioId]);
+
+        envios.push(envioId);
+      }
+
+      // Verificar nuevamente el horario antes de confirmar.
+      if (
+        moment.tz("America/Mexico_City").isSameOrAfter(inicio)
+      ) {
+        throw new Error(
+          "Comenzó el primer partido antes de finalizar el registro."
+        );
+      }
+
+
+      // 🔐 Confirmar la compra administrativa
+      await client.query(`
+        UPDATE compras_admin_unicas
+        SET
+          estado = 'completado',
+          cantidad = $2,
+          total = $3,
+          ahorro = $4
+        WHERE identificador_compra = $1
+          AND estado = 'procesando'
+      `, [
+        identificador_compra,
+        envios.length,
+        precioCompra.precio_final,
+        precioCompra.ahorro
+      ]);
+
+
+      await client.query("COMMIT");
+      transaccionIniciada = false;
+
+      return res.json({
+        ok: true,
+        compra_id: compraId,
+        cantidad: envios.length,
+        precio_normal: precioCompra.precio_normal,
+        total: precioCompra.precio_final,
+        ahorro: precioCompra.ahorro,
+        promocion: precioCompra.promocion,
+        envios
+      });
+
+    } catch (error) {
+
+      if (transaccionIniciada) {
+        try {
+          await client.query("ROLLBACK");
+        } catch (rollbackError) {
+          console.error(
+            "Error al revertir la compra:",
+            rollbackError
+          );
+        }
+      }
+
+      console.error(
+        "Error guardando captura administrativa múltiple:",
+        error
+      );
+
+      return res.status(400).json({
+        ok: false,
+        error: error.message ||
+          "No se pudieron registrar las quinielas."
+      });
+
+    } finally {
+      client.release();
+    }
+
+
+  } catch (error) {
+
+    console.error("Error validando captura múltiple:", error);
+
+    return res.status(500).json({
+      ok: false,
+      error: "No se pudieron validar las quinielas."
+    });
+
+  }
+
+
+});
+
+// Registro de varias quinielas con promociones
+// Cierre: inicio del primer partido
+// ==========================================================
+
+// Aquí se incorporará la ruta:
+// POST /admin/guardar-multiples
+//
+// Reutilizará calcularPrecioPromocional()
+// y guardará todas las quinielas en una transacción.
 
 // ==========================================================
 // 🔓 CAPTURA ADMINISTRATIVA DE QUINIELAS

@@ -114,6 +114,8 @@ if (sessionStorage.getItem("admin") !== "true") {
 let partidos = [];
 // Quinielas agregadas temporalmente desde Captura Admin
 let quinielasAgregadasAdmin = [];
+let registroAdminEnProceso = false;
+let identificadorCompraAdmin = crypto.randomUUID();
 const params = new URLSearchParams(window.location.search);
 const jornadaInicial = params.get("jornada");
 
@@ -167,6 +169,19 @@ function actualizarEstado(){
 
 async function cargarPartidos(){
   const jornada=document.getElementById("jornada").value;
+
+
+  // Limpiar quinielas temporales al cargar otra jornada
+  quinielasAgregadasAdmin = [];
+
+  const contenedor = document.getElementById("misQuinielasAdmin");
+  const listaAgregadas = document.getElementById("listaQuinielasAdmin");
+  const resumen = document.getElementById("resumenQuinielasAdmin");
+
+  if (contenedor) contenedor.style.display = "none";
+  if (listaAgregadas) listaAgregadas.replaceChildren();
+  if (resumen) resumen.textContent = "";
+
   const estado=document.getElementById("estado");
   const lista=document.getElementById("listaPartidos");
   estado.className="estado info";
@@ -219,6 +234,25 @@ async function cargarPartidos(){
 
 async function guardarCapturaAdmin(){
 
+
+  // 🔒 Evitar enviar dos veces la misma captura
+
+const botonRegistro = document.getElementById("btnGuardar");
+
+if (registroAdminEnProceso || botonRegistro.disabled) return;
+
+
+  // 📋 Utilizar las quinielas agregadas
+  if (quinielasAgregadasAdmin.length === 0) {
+    mostrarMensaje(
+      "Sin quinielas",
+      "Primero presiona ➕ Agregar quiniela para guardar tus marcadores.",
+      "⚠️"
+    );
+    return;
+  }
+
+
   if(!partidos.length){
     mostrarMensaje(
         "Sin partidos",
@@ -262,29 +296,7 @@ if(telefono && !/^\d{10}$/.test(telefono)){
     return;
 }
 
-  const pronosticos=[];
-  for(const p of partidos){
-    const gl=document.getElementById("adminGl"+p.id)?.value.trim();
-    const gv=document.getElementById("adminGv"+p.id)?.value.trim();
-    if(gl==="" || gv===""){
-     mostrarMensaje(
-    "Marcador incompleto",
-    `Falta capturar el marcador de:<br><br><b>${p.local} vs ${p.visitante}</b>`,
-    "⚠️"
-);
-      return;
-    }
-    if(!Number.isInteger(Number(gl)) || !Number.isInteger(Number(gv))){
-      mostrarMensaje(
-    "Marcador inválido",
-    `Marcador inválido en:<br><br><b>${p.local} vs ${p.visitante}</b>`,
-    "❌"
-);
-      return;
-    }
-    pronosticos.push({partido_id:Number(p.id),goles_local:Number(gl),goles_visitante:Number(gv)});
-  }
-
+  
   const password = await mostrarPassword(
     "Contraseña de administrador",
     "Escribe la contraseña para registrar la quiniela."
@@ -293,15 +305,30 @@ if(telefono && !/^\d{10}$/.test(telefono)){
 if (!password) return;
 
   const boton=document.getElementById("btnGuardar");
-  boton.disabled=true;
-  boton.textContent="⏳ Registrando...";
+  
+registroAdminEnProceso = true;
+boton.disabled = true;
+boton.textContent = "⏳ Registrando...";
+
 
   try{
-    const res=await fetch("/admin/guardar-quiniela",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({password,nombre,telefono,jornada,pronosticos})
-    });
+    
+const res = await fetch("/admin/guardar-multiples", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+ 
+body: JSON.stringify({
+  password,
+  nombre,
+  telefono,
+  jornada,
+  quinielas: quinielasAgregadasAdmin,
+  identificador_compra: identificadorCompraAdmin
+})
+});
+
     const data=await res.json();
     if(!res.ok || !data.ok){
      mostrarMensaje(
@@ -313,14 +340,51 @@ if (!password) return;
     }
     
     
+    
+    const cantidadRegistrada = Number(data.cantidad);
+    const totalRegistrado = Number(data.total);
+    const ahorroRegistrado = Number(data.ahorro || 0);
+
+    const moneda = valor =>
+      valor.toLocaleString("es-MX", {
+        style: "currency",
+        currency: "MXN"
+      });
+
     mostrarMensaje(
-    "Quiniela registrada",
-    `✅ Quiniela registrada correctamente.<br><br>Participante: <b>${nombre}</b>`,
-    "✅"
-);
+      "🏆 Quinielas registradas",
+      `✅ Registro realizado correctamente.<br><br>
+      👤 Participante: <b>${nombre}</b><br>
+      🎟️ Quinielas: <b>${cantidadRegistrada}</b><br>
+      💰 Total: <b>${moneda(totalRegistrado)}</b>
+      ${ahorroRegistrado > 0
+        ? `<br>🎁 Ahorro: <b>${moneda(ahorroRegistrado)}</b>`
+        : ""}`,
+      "✅"
+    );
+
 
     document.getElementById("adminNombre").value="";
     document.getElementById("adminTelefono").value="";
+
+
+   
+    // ✅ Limpiar las quinielas después de guardarlas correctamente
+    quinielasAgregadasAdmin = [];
+
+    // 🔐 Generar un identificador nuevo para la siguiente compra
+    identificadorCompraAdmin = crypto.randomUUID();
+
+
+    document.getElementById("listaQuinielasAdmin")
+      .replaceChildren();
+
+    document.getElementById("misQuinielasAdmin")
+      .style.display = "none";
+
+    document.getElementById("resumenQuinielasAdmin")
+      .textContent = "";
+
     partidos.forEach(p=>{
       const gl=document.getElementById("adminGl"+p.id);
       const gv=document.getElementById("adminGv"+p.id);
@@ -336,6 +400,7 @@ if (!password) return;
     "❌"
 );
   }finally{
+    registroAdminEnProceso = false;
     boton.disabled=false;
     boton.textContent="🔐 Registrar Quiniela";
     actualizarEstado();
@@ -344,6 +409,18 @@ if (!password) return;
 
 
 function agregarQuinielaAdmin() {
+
+
+  // 🔒 No permitir agregar quinielas durante un registro
+  if (registroAdminEnProceso) {
+    mostrarMensaje(
+      "Registro en proceso",
+      "Espera a que termine el registro actual.",
+      "⚠️"
+    );
+    return;
+  }
+
 
   if (!partidos.length) {
     mostrarMensaje(
@@ -444,10 +521,12 @@ function agregarQuinielaAdmin() {
     lista.appendChild(tarjeta);
   });
 
-  const cantidad = quinielasAgregadasAdmin.length;
+const cantidad = quinielasAgregadasAdmin.length;
 
-  resumen.textContent =
-    `${cantidad} quiniela(s) — Total: $${cantidad * 50} MXN`;
+resumen.textContent =
+  `${cantidad} quiniela(s) — Calculando precio...`;
+
+actualizarPrecioCapturaAdmin();
 
   partidos.forEach(p => {
     document.getElementById("adminGl" + p.id).value = "";
@@ -463,6 +542,84 @@ function agregarQuinielaAdmin() {
 document
   .getElementById("btnAgregarQuinielaAdmin")
   .addEventListener("click", agregarQuinielaAdmin);
+
+
+async function actualizarPrecioCapturaAdmin() {
+
+  const cantidad = quinielasAgregadasAdmin.length;
+
+  const resumen = document.getElementById(
+    "resumenQuinielasAdmin"
+  );
+
+  if (!resumen) return;
+
+  if (cantidad === 0) {
+    resumen.textContent = "0 quinielas — $0 MXN";
+    return;
+  }
+
+  try {
+
+    const respuesta = await fetch(
+      `/promocion/precio?cantidad=${cantidad}`,
+      { cache: "no-store" }
+    );
+
+    if (!respuesta.ok) {
+      throw new Error("No se pudo calcular el precio.");
+    }
+
+    const datos = await respuesta.json();
+
+    // Evitar mostrar un precio anterior si cambió la cantidad
+    if (cantidad !== quinielasAgregadasAdmin.length) {
+      return;
+    }
+
+    const moneda = valor =>
+      Number(valor).toLocaleString("es-MX", {
+        style: "currency",
+        currency: "MXN"
+      });
+
+    resumen.replaceChildren();
+
+    const cantidadTexto = document.createElement("div");
+    cantidadTexto.textContent =
+      `${cantidad} quiniela(s)`;
+
+    const totalTexto = document.createElement("div");
+    totalTexto.style.fontWeight = "bold";
+    totalTexto.style.fontSize = "20px";
+    totalTexto.style.marginTop = "8px";
+    totalTexto.textContent =
+      `💰 Total: ${moneda(datos.precio_final)}`;
+
+    resumen.append(cantidadTexto, totalTexto);
+
+    if (datos.promocion && Number(datos.ahorro) > 0) {
+
+      const promocionTexto = document.createElement("div");
+
+      promocionTexto.style.color = "#4ade80";
+      promocionTexto.style.marginTop = "10px";
+      promocionTexto.style.fontWeight = "bold";
+
+      promocionTexto.textContent =
+        `🎁 ${datos.promocion.nombre} — Ahorras ${moneda(datos.ahorro)}`;
+
+      resumen.appendChild(promocionTexto);
+    }
+
+  } catch (error) {
+
+    console.error("Error calculando promoción:", error);
+
+    resumen.textContent =
+      "⚠️ No se pudo consultar el precio. Intenta nuevamente.";
+  }
+}
 
 
 cargarSemanas();
