@@ -2112,7 +2112,7 @@ mensaje += `💰 Importe: *$${total.toLocaleString("es-MX", {
 
 if (Number(precioCompra.ahorro) > 0) {
   mensaje += `🎁 Promoción: *${precioCompra.promocion?.nombre || "Descuento especial"}*\n`;
-  mensaje += `💚 Ahorraste: *$${Number(precioCompra.ahorro).toLocaleString("es-MX", {
+  mensaje += `💸 Ahorraste: *$${Number(precioCompra.ahorro).toLocaleString("es-MX", {
     maximumFractionDigits: 2
   })} MXN*\n`;
 }
