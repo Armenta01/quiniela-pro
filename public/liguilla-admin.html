@@ -194,6 +194,25 @@
 
   <div id="liguillaMensaje" role="status"></div>
 
+  <!-- NOTIFICACIONES PERSONALIZADAS -->
+<div
+  id="liguillaNotificacion"
+  role="status"
+  aria-live="polite"
+  hidden
+  style="
+    margin:15px 0;
+    padding:16px;
+    background:#193458;
+    color:#ffffff;
+    border:1px solid #f5c451;
+    border-radius:12px;
+    font-weight:bold;
+    white-space:pre-line;
+    overflow-wrap:anywhere;
+  ">
+</div>
+
   <!-- 🧹 RESTABLECER LIGUILLA -->
 <div style="
   background:#102344;
@@ -487,12 +506,498 @@
 
   <div id="liguillaLista"></div>
 
+  <!-- ==========================================
+     🏆 MODAL PERSONALIZADO LIGUILLA
+========================================== -->
+
+<div id="modalConfirmacionLiguilla"
+     hidden
+     style="
+       position:fixed;
+       inset:0;
+       z-index:99999;
+       background:rgba(0,0,0,.78);
+       display:none;
+       align-items:center;
+       justify-content:center;
+       padding:20px;
+       box-sizing:border-box;
+     ">
+
+  <div role="dialog"
+       aria-modal="true"
+       aria-labelledby="tituloModalLiguilla"
+       style="
+         width:100%;
+         max-width:430px;
+         background:#102344;
+         border:2px solid #f5c451;
+         border-radius:18px;
+         padding:25px;
+         box-sizing:border-box;
+         text-align:center;
+         color:white;
+         box-shadow:0 20px 60px rgba(0,0,0,.5);
+       ">
+
+    <div style="font-size:45px;margin-bottom:12px;">
+      🏆
+    </div>
+
+    <h2 id="tituloModalLiguilla"
+        style="color:#f5c451;">
+      Confirmar operación
+    </h2>
+
+    <p id="mensajeModalLiguilla"
+       style="
+         color:#d1dcef;
+         line-height:1.6;
+         white-space:pre-line;
+       ">
+    </p>
+
+    <!-- FORMULARIO PERSONALIZADO PARA EDITAR EQUIPOS -->
+<div id="formularioEditarEquipoLiguilla"
+     hidden
+     style="display:none;text-align:left;margin-top:20px;">
+
+  <label for="editarNombreEquipoLiguilla"
+         style="display:block;color:#f5c451;margin-bottom:8px;">
+    ⚽ Nombre del equipo
+  </label>
+
+  <input
+    id="editarNombreEquipoLiguilla"
+    type="text"
+    maxlength="80"
+    style="
+      width:100%;
+      box-sizing:border-box;
+      padding:13px;
+      margin-bottom:18px;
+      border:1px solid #f5c451;
+      border-radius:10px;
+      background:#091b34;
+      color:white;
+      font-size:15px;
+    "
+  >
+
+  <label for="editarLogoEquipoLiguilla"
+         style="display:block;color:#f5c451;margin-bottom:8px;">
+    🛡️ URL del escudo
+  </label>
+
+  <input
+    id="editarLogoEquipoLiguilla"
+    type="url"
+    maxlength="500"
+    placeholder="https://ejemplo.com/escudo.png"
+    style="
+      width:100%;
+      box-sizing:border-box;
+      padding:13px;
+      border:1px solid #f5c451;
+      border-radius:10px;
+      background:#091b34;
+      color:white;
+      font-size:15px;
+    "
+  >
+
+</div>
+
+    <!-- CAMPO DE CONFIRMACIÓN PARA REINICIO -->
+<div id="contenedorTextoConfirmacionLiguilla"
+     hidden
+     style="
+       display:none;
+       margin-top:20px;
+       text-align:left;
+     ">
+
+  <label for="textoConfirmacionLiguilla"
+         style="
+           display:block;
+           color:#f5c451;
+           font-weight:bold;
+           margin-bottom:10px;
+           font-size:14px;
+         ">
+    Escribe REINICIAR LIGUILLA para continuar:
+  </label>
+
+  <input
+    type="text"
+    id="textoConfirmacionLiguilla"
+    autocomplete="off"
+    spellcheck="false"
+    placeholder="REINICIAR LIGUILLA"
+    style="
+      width:100%;
+      box-sizing:border-box;
+      padding:14px;
+      background:#091b34;
+      border:1px solid #f5c451;
+      border-radius:10px;
+      color:white;
+      font-size:15px;
+      outline:none;
+    "
+  >
+
+</div>
+
+    <div style="
+      display:flex;
+      gap:12px;
+      margin-top:25px;
+    ">
+
+      <button type="button"
+              id="cancelarModalLiguilla"
+              style="
+                flex:1;
+                padding:14px;
+                background:#36547c;
+                color:white;
+                border:none;
+                border-radius:10px;
+                font-weight:bold;
+                cursor:pointer;
+              ">
+        Cancelar
+      </button>
+
+      <button type="button"
+              id="aceptarModalLiguilla"
+              style="
+                flex:1;
+                padding:14px;
+                background:#f5c451;
+                color:#102344;
+                border:none;
+                border-radius:10px;
+                font-weight:bold;
+                cursor:pointer;
+              ">
+        Confirmar
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
 </section>
 
 <script>
 
+// ==========================================
+// 🏆 NOTIFICACIONES PERSONALIZADAS
+// ==========================================
+
+function mostrarNotificacionLiguilla(mensaje, tipo = "info") {
+
+  const notificacion = document.getElementById(
+    "liguillaNotificacion"
+  );
+
+  if (!notificacion) return;
+
+  const colores = {
+    exito: "#16a34a",
+    error: "#dc2626",
+    advertencia: "#f5c451",
+    info: "#36547c"
+  };
+
+  notificacion.hidden = false;
+  notificacion.textContent = mensaje;
+
+  notificacion.style.borderColor =
+    colores[tipo] || colores.info;
+
+  notificacion.style.color =
+    tipo === "advertencia" ? "#f5c451" : "#ffffff";
+
+  notificacion.scrollIntoView({
+    behavior: "smooth",
+    block: "center"
+  });
+}
+
+// ==========================================
+// 🏆 CONFIRMACIÓN PERSONALIZADA LIGUILLA
+// ==========================================
+
+let confirmacionLiguillaActiva = false;
+
+function confirmarAccionLiguilla(mensaje, titulo = "Confirmar operación") {
+
+  return new Promise((resolve) => {
+
+    const modal = document.getElementById("modalConfirmacionLiguilla");
+    const tituloModal = document.getElementById("tituloModalLiguilla");
+    const mensajeModal = document.getElementById("mensajeModalLiguilla");
+    const btnAceptar = document.getElementById("aceptarModalLiguilla");
+    const btnCancelar = document.getElementById("cancelarModalLiguilla");
+
+    if (
+      !modal || !tituloModal || !mensajeModal ||
+      !btnAceptar || !btnCancelar || confirmacionLiguillaActiva
+    ) {
+      resolve(false);
+      return;
+    }
+
+    confirmacionLiguillaActiva = true;
+
+    // Restablecer el botón antes de cada confirmación.
+btnAceptar.disabled = false;
+btnAceptar.style.opacity = "1";
+btnAceptar.style.cursor = "pointer";
+
+    // ==========================================
+// 🔒 CONTROL DE FORMULARIOS DEL MODAL
+// ==========================================
+
+const formularioEdicion = document.getElementById(
+  "formularioEditarEquipoLiguilla"
+);
+
+const formularioReinicio = document.getElementById(
+  "contenedorTextoConfirmacionLiguilla"
+);
+
+// Mostrar solamente el formulario correspondiente.
+if (formularioEdicion) {
+  const esEdicion = titulo === "✏️ Editar equipo";
+
+  formularioEdicion.hidden = !esEdicion;
+  formularioEdicion.style.display = esEdicion ? "block" : "none";
+}
+
+if (formularioReinicio) {
+  const esReinicio = titulo === "🧹 Autorizar reinicio de Liguilla";
+
+  formularioReinicio.hidden = !esReinicio;
+  formularioReinicio.style.display = esReinicio ? "block" : "none";
+}
+
+    tituloModal.textContent = titulo;
+    mensajeModal.textContent = mensaje;
+
+    modal.hidden = false;
+    modal.style.display = "flex";
+
+    const cerrar = (resultado) => {
+
+      modal.style.display = "none";
+      modal.hidden = true;
+
+      btnAceptar.onclick = null;
+      btnCancelar.onclick = null;
+
+      document.removeEventListener("keydown", manejarEscape);
+
+      confirmacionLiguillaActiva = false;
+
+      resolve(resultado);
+    };
+
+    const manejarEscape = (event) => {
+      if (event.key === "Escape") {
+        cerrar(false);
+      }
+    };
+
+    btnAceptar.onclick = () => cerrar(true);
+    btnCancelar.onclick = () => cerrar(false);
+
+    document.addEventListener("keydown", manejarEscape);
+
+    // En los formularios especiales, mantener la validación.
+if (
+  titulo === "✏️ Editar equipo" ||
+  titulo === "🧹 Autorizar reinicio de Liguilla"
+) {
+  const campo = titulo === "✏️ Editar equipo"
+    ? document.getElementById("editarNombreEquipoLiguilla")
+    : document.getElementById("textoConfirmacionLiguilla");
+
+  if (campo) {
+    campo.dispatchEvent(new Event("input"));
+  }
+}
+
+
+    btnCancelar.focus();
+
+  });
+}
+
+// ==========================================
+// 🧹 CONFIRMACIÓN CON TEXTO OBLIGATORIO
+// ==========================================
+
+async function confirmarTextoReinicioLiguilla() {
+
+  const modal = document.getElementById("modalConfirmacionLiguilla");
+  const contenedor = document.getElementById("contenedorTextoConfirmacionLiguilla");
+  const campo = document.getElementById("textoConfirmacionLiguilla");
+  const botonAceptar = document.getElementById("aceptarModalLiguilla");
+
+  if (!modal || !contenedor || !campo || !botonAceptar) {
+    return false;
+  }
+
+  if (confirmacionLiguillaActiva) return false;
+
+  // Preparar el campo antes de abrir el modal.
+  campo.value = "";
+  contenedor.hidden = false;
+  contenedor.style.display = "block";
+
+  botonAceptar.disabled = true;
+  botonAceptar.style.opacity = "0.5";
+  botonAceptar.style.cursor = "not-allowed";
+
+  const validar = () => {
+    const valido = campo.value.trim() === "REINICIAR LIGUILLA";
+
+    botonAceptar.disabled = !valido;
+    botonAceptar.style.opacity = valido ? "1" : "0.5";
+    botonAceptar.style.cursor = valido ? "pointer" : "not-allowed";
+  };
+
+  campo.addEventListener("input", validar);
+
+  try {
+
+    const confirmado = await confirmarAccionLiguilla(
+      "⚠️ Esta operación eliminará los participantes, comprobantes y resultados.\n\n" +
+      "Los ocho equipos y sus escudos se conservarán.",
+      "🧹 Autorizar reinicio de Liguilla"
+    );
+
+    return confirmado && campo.value.trim() === "REINICIAR LIGUILLA";
+
+  } finally {
+
+    campo.removeEventListener("input", validar);
+
+    campo.value = "";
+    contenedor.hidden = true;
+    contenedor.style.display = "none";
+
+    botonAceptar.disabled = false;
+    botonAceptar.style.opacity = "1";
+    botonAceptar.style.cursor = "pointer";
+
+  }
+}
+
+// ==========================================
+// ⚽ EDITAR EQUIPO CON VENTANA PERSONALIZADA
+// ==========================================
+
+async function solicitarEdicionEquipoLiguilla(equipo) {
+
+  if (confirmacionLiguillaActiva) return null;
+
+  const formulario = document.getElementById(
+    "formularioEditarEquipoLiguilla"
+  );
+
+  const campoNombre = document.getElementById(
+    "editarNombreEquipoLiguilla"
+  );
+
+  const campoLogo = document.getElementById(
+    "editarLogoEquipoLiguilla"
+  );
+
+  const botonAceptar = document.getElementById(
+    "aceptarModalLiguilla"
+  );
+
+  if (!formulario || !campoNombre || !campoLogo || !botonAceptar) {
+    return null;
+  }
+
+  // Cargar los datos actuales del equipo.
+  campoNombre.value = equipo.nombre || "";
+  campoLogo.value = equipo.logo_url || "";
+
+  formulario.hidden = false;
+  formulario.style.display = "block";
+
+  // Evitar confirmar con un nombre vacío.
+  const validar = () => {
+    const nombreValido = campoNombre.value.trim().length > 0;
+
+const logo = campoLogo.value.trim();
+
+const logoValido =
+  campoLogo.checkValidity() &&
+  (logo === "" || logo.toLowerCase().startsWith("https://"));
+
+    const valido = nombreValido && logoValido;
+
+    botonAceptar.disabled = !valido;
+    botonAceptar.style.opacity = valido ? "1" : "0.5";
+    botonAceptar.style.cursor = valido ? "pointer" : "not-allowed";
+  };
+
+  campoNombre.addEventListener("input", validar);
+  campoLogo.addEventListener("input", validar);
+
+  validar();
+
+  try {
+
+    const confirmado = await confirmarAccionLiguilla(
+      "Modifica los datos del equipo y presiona Confirmar para guardar los cambios.",
+      "✏️ Editar equipo"
+    );
+
+    if (!confirmado) return null;
+
+    const nombre = campoNombre.value.trim();
+    const logo_url = campoLogo.value.trim();
+
+
+    if (
+  !nombre ||
+  !campoLogo.checkValidity() ||
+  (logo_url !== "" && !logo_url.toLowerCase().startsWith("https://"))
+) {
+  return null;
+}
+
+    return { nombre, logo_url };
+
+  } finally {
+
+    campoNombre.removeEventListener("input", validar);
+    campoLogo.removeEventListener("input", validar);
+
+    formulario.hidden = true;
+    formulario.style.display = "none";
+
+    botonAceptar.disabled = false;
+    botonAceptar.style.opacity = "1";
+    botonAceptar.style.cursor = "pointer";
+
+  }
+}
+
+
 async function abrirLiguillaAdmin() {
-  const panel = document.getElementById("panelLiguillaAdmin");
+const panel = document.getElementById("panelLiguillaAdmin");
 
   if (!panel) return;
 
@@ -680,11 +1185,14 @@ async function cambiarPagoLiguilla(id, estadoPago) {
     ? "APROBAR"
     : "RECHAZAR";
 
-  const confirmado = confirm(
-    `¿Estás seguro de ${accion} el pago del participante #${id}?`
-  );
+const confirmado = await confirmarAccionLiguilla(
+  `¿Estás seguro de ${accion} el pago del participante #${id}?`,
+  estadoPago === "aprobado"
+    ? "✅ Confirmar aprobación de pago"
+    : "❌ Confirmar rechazo de pago"
+);
 
-  if (!confirmado) return;
+if (!confirmado) return;
 
   procesandoPagoLiguilla = true;
 
@@ -716,9 +1224,12 @@ async function cambiarPagoLiguilla(id, estadoPago) {
       );
     }
 
-    alert("✅ " + datos.mensaje);
+   await cargarParticipantesLiguilla();
 
-    await cargarParticipantesLiguilla();
+mostrarNotificacionLiguilla(
+  "✅ " + (datos.mensaje || "Pago actualizado correctamente."),
+  "exito"
+);
 
   } catch (error) {
 
@@ -804,13 +1315,16 @@ async function cambiarEstadoInscripcionesLiguilla(estado) {
 
   const abrir = estado === "abierto";
 
-  const confirmar = confirm(
-    abrir
-      ? "¿Deseas ABRIR las inscripciones del Grupo 1?"
-      : "¿Deseas CERRAR las inscripciones del Grupo 1?"
-  );
+const confirmar = await confirmarAccionLiguilla(
+  abrir
+    ? "¿Deseas ABRIR las inscripciones del Grupo 1?"
+    : "¿Deseas CERRAR las inscripciones del Grupo 1?",
+  abrir
+    ? "🔓 Abrir inscripciones"
+    : "🔒 Cerrar inscripciones"
+);
 
-  if (!confirmar) return;
+if (!confirmar) return;
 
   cambiandoEstadoLiguilla = true;
 
@@ -842,13 +1356,20 @@ async function cambiarEstadoInscripcionesLiguilla(estado) {
       );
     }
 
-    alert("✅ " + datos.mensaje);
-
     await cargarParticipantesLiguilla();
 
-  } catch (error) {
+mostrarNotificacionLiguilla(
+  "✅ " + (datos.mensaje || "Estado de inscripciones actualizado."),
+  "exito"
+);
 
-    alert("❌ " + error.message);
+} catch (error) {
+
+  mostrarNotificacionLiguilla(
+    "❌ " + error.message,
+    "error"
+  );
+
 
   } finally {
 
@@ -1107,19 +1628,17 @@ async function registrarEquipoLiguilla(event) {
 
 async function editarEquipoLiguilla(equipo) {
 
-  const nombre = prompt(
-    "Nuevo nombre del equipo:",
-    equipo.nombre
-  );
 
-  if (nombre === null) return;
+    // ==========================================
+// ✏️ SOLICITAR EDICIÓN PERSONALIZADA
+// ==========================================
 
-  const logo = prompt(
-    "URL HTTPS del escudo (puedes dejarla vacía):",
-    equipo.logo_url || ""
-  );
+const datosEditados = await solicitarEdicionEquipoLiguilla(equipo);
 
-  if (logo === null) return;
+if (!datosEditados) return;
+
+const nombre = datosEditados.nombre;
+const logo = datosEditados.logo_url;
 
   try {
 
@@ -1148,22 +1667,29 @@ async function editarEquipoLiguilla(equipo) {
 
     await cargarEquiposLiguilla();
 
-    alert("✅ Equipo actualizado correctamente.");
+    mostrarNotificacionLiguilla(
+  "✅ Equipo actualizado correctamente.",
+  "exito"
+);
 
   } catch (error) {
 
-    alert("❌ " + error.message);
+    mostrarNotificacionLiguilla(
+  "❌ " + error.message,
+  "error"
+);
 
   }
 }
 
 async function eliminarEquipoLiguilla(id, nombre) {
 
-  const confirmado = confirm(
-    `¿Estás seguro de eliminar al equipo ${nombre}?`
-  );
+ const confirmado = await confirmarAccionLiguilla(
+  `⚠️ ¿Estás seguro de eliminar al equipo "${nombre}"?\n\nEsta acción eliminará al equipo de la Liguilla.`,
+  "🗑️ Confirmar eliminación de equipo"
+);
 
-  if (!confirmado) return;
+if (!confirmado) return;
 
   try {
 
@@ -1185,11 +1711,17 @@ async function eliminarEquipoLiguilla(id, nombre) {
 
     await cargarEquiposLiguilla();
 
-    alert("✅ Equipo eliminado correctamente.");
+mostrarNotificacionLiguilla(
+  "✅ Equipo eliminado correctamente.",
+  "exito"
+);
 
   } catch (error) {
 
-    alert("❌ " + error.message);
+    mostrarNotificacionLiguilla(
+  "❌ " + error.message,
+  "error"
+);
 
   }
 }
@@ -1405,8 +1937,12 @@ async function iniciarDemoSorteoLiguilla() {
 
   if (!boton || !escudo || !nombre ||
       !equipo || !progreso || !resultados || !escenario) {
-    alert("No se encontró el panel del sorteo.");
-    return;
+        mostrarNotificacionLiguilla(
+  "❌ No se encontró el panel del sorteo.",
+  "error"
+);
+
+        return;
   }
 
   const participantes = [
@@ -1592,9 +2128,16 @@ resultados.appendChild(tarjeta);
     equipo.textContent = "8 participantes · 8 equipos";
     progreso.textContent = "8 de 8 asignaciones";
 
-  } catch (error) {
-    console.error("Error en demostración:", error);
-    alert("No se pudo completar la animación.");
+ 
+    } catch (error) {
+  console.error("Error en demostración:", error);
+
+  mostrarNotificacionLiguilla(
+    "❌ No se pudo completar la animación.",
+    "error"
+  );
+
+
   } finally {
     sorteoLiguillaEnProceso = false;
     boton.disabled = false;
@@ -1666,7 +2209,10 @@ async function reproducirSorteoOficialLiguilla() {
   const resultados = document.getElementById("liguillaSorteoResultados");
 
   if (!escudo || !nombre || !equipo || !progreso || !resultados) {
-    alert("No se encontró el escenario del sorteo.");
+    mostrarNotificacionLiguilla(
+  "❌ No se encontró el escenario del sorteo.",
+  "error"
+);
     return;
   }
 
@@ -1678,8 +2224,11 @@ async function reproducirSorteoOficialLiguilla() {
       await obtenerAsignacionesOficialesLiguilla();
 
     if (asignaciones.length !== 8) {
-      alert("Todavía no existe un sorteo oficial completo.");
-      return;
+        mostrarNotificacionLiguilla(
+  "⚠️ Todavía no existe un sorteo oficial completo.",
+  "advertencia"
+);
+        return;
     }
 
     resultados.replaceChildren();
@@ -1776,8 +2325,12 @@ async function reproducirSorteoOficialLiguilla() {
 
   } catch (error) {
     console.error("Error reproduciendo sorteo oficial:", error);
-    alert(error.message || "No se pudo reproducir el sorteo.");
-  } finally {
+    mostrarNotificacionLiguilla(
+  "❌ " + (error.message || "No se pudo reproducir el sorteo."),
+  "error"
+);
+
+} finally {
     sorteoLiguillaEnProceso = false;
   }
 }
@@ -1920,26 +2473,37 @@ botonSorteo.disabled =
 }
 
 
+if (resultado.listo) {
 
-    if (resultado.listo) {
-      alert(
-        "✅ SORTEO LISTO\n\n" +
-        resultado.mensaje +
-        "\n\nTodavía no se ha ejecutado ningún sorteo."
-      );
-    } else {
-      alert(
-        "⚠️ SORTEO NO DISPONIBLE\n\n" +
-        resultado.mensaje
-      );
-    }
+  mostrarNotificacionLiguilla(
+    "✅ SORTEO LISTO\n\n" +
+    resultado.mensaje +
+    "\n\nTodavía no se ha ejecutado ningún sorteo.",
+    "exito"
+  );
 
-  } catch (error) {
+} else {
 
-    console.error(error);
-    alert("❌ No se pudo verificar el sorteo.");
+  mostrarNotificacionLiguilla(
+    "⚠️ SORTEO NO DISPONIBLE\n\n" +
+    resultado.mensaje,
+    "advertencia"
+  );
 
-  } finally {
+}
+
+} catch (error) {
+
+  console.error(error);
+
+  mostrarNotificacionLiguilla(
+    "❌ No se pudo verificar el sorteo. " +
+    (error.message || "Inténtalo nuevamente."),
+    "error"
+  );
+
+} finally {
+ 
 
     if (boton) {
       boton.disabled = false;
@@ -1961,23 +2525,24 @@ async function ejecutarSorteoOficialLiguilla() {
   const validacion = await validarSorteoOficialLiguilla();
 
   if (!validacion.listo) {
-    alert(
-      "⚠️ NO SE PUEDE REALIZAR EL SORTEO\n\n" +
-      validacion.mensaje
-    );
-    return;
-  }
 
-  const confirmado = confirm(
-    "🏆 SORTEO OFICIAL DE LIGUILLA\n\n" +
-    "Se asignará aleatoriamente un equipo a cada " +
-    "uno de los ocho participantes.\n\n" +
-    "Los resultados quedarán guardados " +
-    "definitivamente y no podrán repetirse.\n\n" +
-    "¿CONFIRMAS REALIZAR EL SORTEO OFICIAL?"
+  mostrarNotificacionLiguilla(
+    "⚠️ NO SE PUEDE REALIZAR EL SORTEO\n\n" +
+    validacion.mensaje,
+    "advertencia"
   );
 
-  if (!confirmado) return;
+  return;
+}
+
+const confirmado = await confirmarAccionLiguilla(
+  "🏆 ¿Estás seguro de realizar el SORTEO OFICIAL?\n\n" +
+  "Se asignarán aleatoriamente los 8 equipos a los 8 participantes.\n\n" +
+  "⚠️ Los resultados quedarán guardados y no podrás repetir el sorteo sin reiniciar la Liguilla.",
+  "🎲 Confirmar sorteo oficial"
+);
+
+if (!confirmado) return;
 
   const boton = document.getElementById(
     "btnRealizarSorteoLiguilla"
@@ -2022,21 +2587,23 @@ try {
     errorAnimacion
   );
 
-  alert(
-    "✅ El sorteo oficial se guardó correctamente.\n\n" +
-    "⚠️ No se pudo reproducir la animación.\n" +
-    "Puedes utilizar el botón para volver a visualizarla."
-  );
+  mostrarNotificacionLiguilla(
+  "✅ El sorteo oficial se guardó correctamente.\n\n" +
+  "⚠️ No se pudo reproducir la animación.\n" +
+  "Revisa el estado de la reproducción.",
+  "advertencia"
+);
 }
 
   } catch (error) {
 
     console.error("Error en sorteo oficial:", error);
 
-    alert(
-      "❌ " +
-      (error.message || "Error al realizar el sorteo.")
-    );
+    mostrarNotificacionLiguilla(
+  "❌ " +
+  (error.message || "Error al realizar el sorteo."),
+  "error"
+);
 
   } finally {
 
@@ -2057,27 +2624,20 @@ try {
 
 async function reiniciarLiguillaAdmin() {
 
-  const confirmar = prompt(
-    "⚠️ ATENCIÓN\n\n" +
-    "Se eliminarán todos los participantes, " +
-    "comprobantes y resultados del sorteo.\n\n" +
-    "Los ocho equipos se conservarán.\n\n" +
-    "Escribe exactamente:\nREINICIAR LIGUILLA"
-  );
+    const textoConfirmado = await confirmarTextoReinicioLiguilla();
 
-  if (confirmar !== "REINICIAR LIGUILLA") {
-    alert("Operación cancelada.");
-    return;
-  }
+if (!textoConfirmado) return;
 
-  const segundaConfirmacion = confirm(
-    "🚨 ÚLTIMA CONFIRMACIÓN\n\n" +
-    "¿Estás seguro de eliminar los registros " +
-    "de esta Liguilla?\n\n" +
-    "Esta acción no se puede deshacer."
-  );
+  const segundaConfirmacion = await confirmarAccionLiguilla(
+  "🚨 ÚLTIMA CONFIRMACIÓN\n\n" +
+  "¿Estás seguro de eliminar todos los participantes, " +
+  "comprobantes y resultados del sorteo?\n\n" +
+  "✅ Los ocho equipos y sus escudos se conservarán.\n\n" +
+  "⚠️ Esta acción no se puede deshacer.",
+  "🧹 Confirmar reinicio de Liguilla"
+);
 
-  if (!segundaConfirmacion) return;
+if (!segundaConfirmacion) return;
 
   const boton = document.getElementById(
     "btnReiniciarLiguilla"
@@ -2110,13 +2670,15 @@ async function reiniciarLiguillaAdmin() {
       );
     }
 
-    alert(
-      "✅ LIGUILLA REINICIADA\n\n" +
-      "Participantes: 0 de 8\n" +
-      "Sorteo: eliminado\n" +
-      "Equipos: conservados\n" +
-      "Estado: preparación"
-    );
+   mostrarNotificacionLiguilla(
+  "✅ LIGUILLA REINICIADA CORRECTAMENTE\n\n" +
+  "👥 Participantes: 0 de 8\n" +
+  "🎲 Sorteo: eliminado\n" +
+  "⚽ Equipos y escudos: conservados\n" +
+  "🔄 Estado: preparación\n\n" +
+  "🏆 ¡Todo listo para comenzar una nueva Liguilla!",
+  "exito"
+);
 
     // 🧹 LIMPIAR ESTADO DE REPRODUCCIÓN
 localStorage.removeItem("liguillaSorteoReproducido");
@@ -2129,13 +2691,18 @@ await Promise.all([
   consultarSorteoLiguilla()
 ]); 
 
-  } catch (error) {
+ } catch (error) {
 
-    console.error(error);
+  console.error("Error al reiniciar Liguilla:", error);
 
-    alert("❌ " + error.message);
+  mostrarNotificacionLiguilla(
+    "❌ NO SE PUDO REINICIAR LA LIGUILLA\n\n" +
+    error.message +
+    "\n\n⚠️ Verifica el problema antes de intentarlo nuevamente.",
+    "error"
+  );
 
-  } finally {
+} finally {
 
     boton.disabled = false;
     boton.textContent = "🧹 Reiniciar Liguilla";
