@@ -155,51 +155,244 @@ u.recordatorio_enviado
 
 }
 
-function enviarWhatsApp(id, nombre, telefono){
+async function enviarWhatsApp(id, nombre, telefono) {
+    // ⏰ OBTENER HORA DE CIERRE AUTOMÁTICAMENTE
+    let textoCierre = "⏰ *Recuerda enviar tu quiniela a tiempo*";
 
-    const mensaje =
+    try {
+
+        const respuestaJornada = await fetch("/jornada-actual");
+
+        if (!respuestaJornada.ok) {
+            throw new Error("Error consultando jornada");
+        }
+
+        const datosJornada = await respuestaJornada.json();
+
+        const respuestaLimite = await fetch(
+            `/limite?jornada=${encodeURIComponent(datosJornada.jornada)}`,
+            { cache: "no-store" }
+        );
+
+        if (!respuestaLimite.ok) {
+            throw new Error("Error consultando cierre");
+        }
+
+        const datosLimite = await respuestaLimite.json();
+
+        if (datosLimite.limite) {
+
+            const cierre = new Date(datosLimite.limite);
+
+            if (!Number.isNaN(cierre.getTime())) {
+
+                const opcionesHora = {
+                    timeZone: "America/Mexico_City",
+                    hour: "numeric",
+                    minute: "2-digit",
+                    hour12: true
+                };
+
+                const hora = cierre.toLocaleTimeString(
+                    "es-MX",
+                    opcionesHora
+                );
+
+                const fechaCierre = cierre.toLocaleDateString(
+                    "en-CA",
+                    { timeZone: "America/Mexico_City" }
+                );
+
+                const fechaHoy = new Date().toLocaleDateString(
+                    "en-CA",
+                    { timeZone: "America/Mexico_City" }
+                );
+
+                const fechaTexto = cierre.toLocaleDateString(
+                    "es-MX",
+                    {
+                        timeZone: "America/Mexico_City",
+                        day: "numeric",
+                        month: "long"
+                    }
+                );
+
+                if (datosLimite.bloqueada) {
+
+                    textoCierre =
+                        "⏰ *El registro de esta jornada ya cerró*";
+
+                } else if (fechaCierre === fechaHoy) {
+
+                    textoCierre =
+                        `⏰ *Recuerda que cierra hoy a las ${hora}*`;
+
+                } else {
+
+                    textoCierre =
+                        `⏰ *Recuerda que cierra el ${fechaTexto} a las ${hora}*`;
+
+                }
+            }
+        }
+
+    } catch (error) {
+
+        console.error("Error obteniendo hora de cierre:", error);
+
+    }
+
+    const mensajeNormal =
 `👋 Hola *${nombre}*.
 
 🏆 Ya está disponible una nueva jornada de *Quinielas El Inge*.
 
-⏰ *Recuerda que cierra hoy*
+${textoCierre}
 
 💰 ¡No te quedes fuera de la oportunidad de ganar!
 
 📲 *Registra tus pronósticos aquí:*
 
-https://quinielasinge.com 
+https://quinielasinge.com
 
 🍀 *¡Mucho éxito!*`;
 
+    let mensaje = mensajeNormal;
+
+    try {
+
+        const respuesta = await fetch("/promociones/activas", {
+            cache: "no-store"
+        });
+
+        if (!respuesta.ok) {
+            throw new Error("No se pudieron consultar las promociones");
+        }
+
+        const promociones = await respuesta.json();
+
+        if (Array.isArray(promociones) && promociones.length > 0) {
+
+            const moneda = valor =>
+                Number(valor).toLocaleString("es-MX", {
+                    style: "currency",
+                    currency: "MXN",
+                    maximumFractionDigits: 2
+                });
+
+            const detalles = [];
+
+            for (const promo of promociones) {
+
+                let detalle = "";
+
+                if (
+                    promo.tipo === "paquete" &&
+                    Number(promo.cantidad_paquete) > 0 &&
+                    Number.isFinite(Number(promo.precio_paquete))
+                ) {
+
+                    detalle =
+`🎟️ *${promo.cantidad_paquete} quinielas por ${moneda(promo.precio_paquete)}*`;
+
+                } else if (
+                    promo.tipo === "porcentaje" &&
+                    Number(promo.descuento) > 0
+                ) {
+
+                    detalle =
+`💸 *${promo.descuento}% de descuento*` +
+                    (Number(promo.cantidad_min) > 1
+                        ? ` al comprar ${promo.cantidad_min} quinielas o más`
+                        : "");
+
+                }
+
+                if (detalle) {
+
+                    detalles.push(
+`🎁 *${promo.nombre}*
+${detalle}`
+                    );
+
+                }
+            }
+
+            if (detalles.length > 0) {
+
+                const bloquePromociones =
+`🔥 *¡PROMOCIÓN ESPECIAL ACTIVA!* 🔥
+
+${detalles.join("\n\n")}
+
+⚡ ¡Aprovecha antes de que termine!`;
+
+                mensaje = mensajeNormal.replace(
+                    "💰 ¡No te quedes fuera de la oportunidad de ganar!",
+                    bloquePromociones +
+                    "\n\n💰 ¡No te quedes fuera de la oportunidad de ganar!"
+                );
+            }
+        }
+
+    } catch (error) {
+
+        console.error("Error consultando promociones:", error);
+
+        // Si falla la consulta, utilizar el mensaje normal.
+    }
+
     const url =
-`https://wa.me/52${telefono}?text=${encodeURIComponent(mensaje)}`;
+        `https://wa.me/52${telefono}?text=${encodeURIComponent(mensaje)}`;
 
-fetch('/recordatorio/enviado', {
+    const ventana = window.open(url, "_blank");
 
-    method: 'POST',
+    if (!ventana) {
+        mostrarMensaje(
+            "WhatsApp",
+            "No se pudo abrir WhatsApp. Permite las ventanas emergentes.",
+            "⚠️"
+        );
+        return;
+    }
 
-    headers:{
-        'Content-Type':'application/json'
-    },
+    try {
 
-    body: JSON.stringify({
-        id:id
-    })
+        const respuesta = await fetch("/recordatorio/enviado", {
 
-});
+            method: "POST",
 
-    window.open(url,'_blank');
+            headers: {
+                "Content-Type": "application/json"
+            },
 
-    const boton = document.getElementById(`btn-${id}`);
+            body: JSON.stringify({ id })
 
-    boton.innerHTML = "✅ Enviado";
+        });
 
-    boton.style.background = "#64748b";
+        if (!respuesta.ok) {
+            throw new Error("No se pudo actualizar el recordatorio");
+        }
 
-    boton.disabled = true;
+        const boton = document.getElementById(`btn-${id}`);
 
+        if (boton) {
+            boton.innerHTML = "✅ Enviado";
+            boton.style.background = "#64748b";
+            boton.disabled = true;
+        }
+
+    } catch (error) {
+
+        console.error("Error marcando recordatorio:", error);
+
+        mostrarToast(
+            "WhatsApp abierto, pero no se pudo actualizar el estado.",
+            "⚠️"
+        );
+    }
 }
+
 
 cargarRecordatorios();
 
